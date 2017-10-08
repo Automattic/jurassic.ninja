@@ -11,7 +11,7 @@ $db = new Medoo([
 	'database_name' => 'sites',
 	'server' => 'localhost',
 	'username' => $globalconfig['db']['username'],
-	'password' => $globalconfig['db']['password']
+	'password' => $globalconfig['db']['password'],
 ] );
 
 function l( $stuff ) {
