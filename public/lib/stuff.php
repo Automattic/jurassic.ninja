@@ -4,14 +4,24 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use Medoo\Medoo;
 
-$globalconfig = $CONFIG;
+function config( $key = null ) {
+	if ( ! isset( $CONFIG ) ) {
+		throw new Exception( 'Error Finding config variable', 1 );
+	}
+	if ( $key && isset( $CONFIG[ $key ] ) ) {
+		return $CONFIG[ $key ];
+	}
+	return $CONFIG;
+}
+// Just call it to trigger an exception if the config global is not defined
+config();
 
 $db = new Medoo([
 	'database_type' => 'mysql',
 	'database_name' => 'sites',
 	'server' => 'localhost',
-	'username' => $globalconfig['db']['username'],
-	'password' => $globalconfig['db']['password'],
+	'username' => config( 'db' )['username'],
+	'password' => config( 'db' )['password'],
 ] );
 
 function l( $stuff ) {
@@ -24,10 +34,9 @@ function generate_random_username() {
 }
 
 function generate_new_user( $password ) {
-	global $globalconfig;
 	$username = generate_random_username();
-	$sp = new ServerPilot( $globalconfig['serverpilot'] );
-	$user = $sp->sysuser_create( $globalconfig['SERVER_ID'], $username, $password );
+	$sp = new ServerPilot( config( 'serverpilot' ) );
+	$user = $sp->sysuser_create( config( 'SERVER_ID' ), $username, $password );
 	return $user;
 }
 
@@ -67,15 +76,13 @@ function generate_random_subdomain() {
 }
 
 function run_command_on_behalf( $user, $password, $cmd ) {
-	global $globalconfig;
-	$domain = $globalconfig['DOMAIN'];
+	$domain = config( 'DOMAIN' );
 	$run = "sshpass -p $password ssh $user@$domain '$cmd'";
 	return shell_exec( $run );
 }
 
 function add_auto_login( $user, $password ) {
-	global $globalconfig;
-	$domain = $globalconfig['DOMAIN'];
+	$domain = config( 'DOMAIN' );
 	$wp_home = "~/apps/$user/public";
 	$cmd = "cd $wp_home && wp option add auto_login 1 && wp option add sandbox_password '$password'";
 	run_command_on_behalf( $user, $password, $cmd );
@@ -91,15 +98,13 @@ function copy_sandbox_plugin( $user, $password ) {
 }
 
 function add_jetpack( $user, $password ) {
-	global $globalconfig;
 	$wp_home = "~/apps/$user/public";
 	run_command_on_behalf( $user, $password, "cd $wp_home && wp plugin install jetpack && wp plugin activate jetpack" );
 }
 
 function enable_multisite( $user, $password, $domain, $subdomain_based = false ) {
-	global $globalconfig;
 	$wp_home = "~/apps/$user/public";
-	$email = $globalconfig['DEFAULT_ADMIN_EMAIL_ADDRESS'];
+	$email = config( 'DEFAULT_ADMIN_EMAIL_ADDRESS' );
 	l( $domain );
 	$cmd = "cd $wp_home && wp core multisite-install --title=\"My Primary WordPress Site on my Network\" --url=\"$domain\" --admin_email=\"$email\"";
 	run_command_on_behalf( $user, $password, $cmd );
@@ -107,8 +112,7 @@ function enable_multisite( $user, $password, $domain, $subdomain_based = false )
 }
 
 function wait_action( $action_id ) {
-	global $globalconfig;
-	$sp = new ServerPilot( $globalconfig['serverpilot'] );
+	$sp = new ServerPilot( config( 'serverpilot' ) );
 	$ok = false;
 	do {
 		sleep( 1 );
@@ -119,16 +123,13 @@ function wait_action( $action_id ) {
 }
 
 function enable_ssl( $app_id ) {
-	global $globalconfig;
-	$sp = new ServerPilot( $globalconfig['serverpilot'] );
+	$sp = new ServerPilot( config( 'serverpilot' ) );
 	$data = $sp->ssl_auto( $app_id );
 	l( wait_action( $data->actionid ) );
 
 }
 
 function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpack = false, $add_jetpack_beta = false, $enable_multisite = false ) {
-	global $globalconfig;
-
 	$defaults = [
 		'runtime' => 'php5.6',
 		'ssl' => false,
@@ -145,7 +146,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		'multisite-subdirs' => $enable_multisite,
 	] );
 
-	$sp = new ServerPilot( $globalconfig['serverpilot'] );
+	$sp = new ServerPilot( config( 'serverpilot' ) );
 
 	try {
 		$password = generate_random_password();
@@ -154,9 +155,9 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 			'site_title' => 'My WordPress Site',
 			'admin_user' => 'demo',
 			'admin_password' => $password,
-			'admin_email' => $globalconfig['DEFAULT_ADMIN_EMAIL_ADDRESS'],
+			'admin_email' => config( 'DEFAULT_ADMIN_EMAIL_ADDRESS' ),
 		);
-		$domain = generate_random_subdomain() . '.' . $globalconfig['DOMAIN'];
+		$domain = generate_random_subdomain() . '.' . config( 'DOMAIN' );
 		$app = $sp->app_create( $user->data->name, $user->data->id, $php_version, array( $domain ), $wordpress_options );
 		wait_action( $app->actionid );
 		log_new_site( $app->data );
@@ -234,15 +235,13 @@ function log_new_site( $data ) {
 }
 
 function delete_sysuser( $id ) {
-	global $globalconfig;
-	$sp = new ServerPilot( $globalconfig['serverpilot'] );
+	$sp = new ServerPilot( config( 'serverpilot' ) );
 	return $sp->sysuser_delete( $id );
 }
 
 function purge_sites() {
 	$sites = sites_to_be_purged();
-	global $globalconfig;
-	$sp = new ServerPilot( $globalconfig['serverpilot'] );
+	$sp = new ServerPilot( config( 'serverpilot' ) );
 	$system_users  = $sp->sysuser_list()->data;
 	$site_users = array_map(
 		function ( $site ) {
