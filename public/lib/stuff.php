@@ -243,14 +243,14 @@ function purge_sites() {
 	$sites = sites_to_be_purged();
 	global $globalconfig;
 	$sp = new ServerPilot( $globalconfig['serverpilot'] );
-	$systemUsers  = $sp->sysuser_list()->data;
+	$system_users  = $sp->sysuser_list()->data;
 	$siteUsers = array_map(
 		function ( $site ) {
 			return $site['username'];
 		},
 		$sites
 	);
-	$purge = array_filter($systemUsers, function ( $user ) use ( $siteUsers ) {
+	$purge = array_filter($system_users, function ( $user ) use ( $siteUsers ) {
 			return in_array( $user->name, $siteUsers );
 	} );
 	foreach ( $purge as $user ) {
