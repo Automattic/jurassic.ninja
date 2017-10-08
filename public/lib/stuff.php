@@ -126,7 +126,7 @@ function enable_ssl( $app_id ) {
 
 }
 
-function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpack = false, $add_jetpack_beta = false, $enableMultisite = false ) {
+function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpack = false, $add_jetpack_beta = false, $enable_multisite = false ) {
 	global $globalconfig;
 
 	$defaults = [
@@ -142,7 +142,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		'ssl' => $add_ssl,
 		'jetpack' => $add_jetpack,
 		'jetpack-beta' => $add_jetpack_beta,
-		'multisite-subdirs' => $enableMultisite,
+		'multisite-subdirs' => $enable_multisite,
 	] );
 
 	$sp = new ServerPilot( $globalconfig['serverpilot'] );
@@ -169,7 +169,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		add_auto_login( $USER->data->name, $PASSWORD );
 		copy_sandbox_plugin( $USER->data->name, $PASSWORD );
 		$sp->sysuser_update( $USER->data->id, NULL );
-		if ( $enableMultisite ) {
+		if ( $enable_multisite ) {
 			enable_multisite( $USER->data->name, $PASSWORD, $DOMAIN );
 		}
 		return $app->data;
