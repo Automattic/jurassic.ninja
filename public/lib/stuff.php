@@ -126,7 +126,7 @@ function enable_ssl( $app_id ) {
 
 }
 
-function create_wordpress( $phpVersion = 'php5.6', $addSsl = false, $addJetpack = false, $addJetpackBeta = false, $enableMultisite = false ) {
+function create_wordpress( $php_version = 'php5.6', $addSsl = false, $addJetpack = false, $addJetpackBeta = false, $enableMultisite = false ) {
 	global $globalconfig;
 
 	$defaults = [
@@ -138,7 +138,7 @@ function create_wordpress( $phpVersion = 'php5.6', $addSsl = false, $addJetpack 
 		'multisite-subdomains' => false,
 	];
 	$options = array_merge( $defaults, [
-		'runtime' => $phpVersion,
+		'runtime' => $php_version,
 		'ssl' => $addSsl,
 		'jetpack' => $addJetpack,
 		'jetpack-beta' => $addJetpackBeta,
@@ -157,7 +157,7 @@ function create_wordpress( $phpVersion = 'php5.6', $addSsl = false, $addJetpack 
 			'admin_email' => $globalconfig['DEFAULT_ADMIN_EMAIL_ADDRESS'],
 		);
 		$DOMAIN = generate_random_subdomain() . '.' . $globalconfig['DOMAIN'];
-		$app = $sp->app_create( $USER->data->name, $USER->data->id, $phpVersion, array( $DOMAIN ), $wpOptions );
+		$app = $sp->app_create( $USER->data->name, $USER->data->id, $php_version, array( $DOMAIN ), $wpOptions );
 		wait_action( $app->actionid );
 		log_new_site( $app->data );
 		if ( $addSsl ) {
