@@ -4,12 +4,14 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use Medoo\Medoo;
 
+$globalconfig = $CONFIG;
+
 $db = new Medoo([
 	'database_type' => 'mysql',
 	'database_name' => 'sites',
 	'server' => 'localhost',
-	'username' => $CONFIG['db']['username'],
-	'password' => $CONFIG['db']['password']
+	'username' => $globalconfig['db']['username'],
+	'password' => $globalconfig['db']['password']
 ] );
 
 function l( $stuff ) {
@@ -22,10 +24,10 @@ function generate_random_username() {
 }
 
 function generate_new_user( $password ) {
-	global $CONFIG;
+	global $globalconfig;
 	$username = generate_random_username();
-	$sp = new ServerPilot( $CONFIG['serverpilot'] );
-	$user = $sp->sysuser_create( $CONFIG['SERVER_ID'], $username, $password );
+	$sp = new ServerPilot( $globalconfig['serverpilot'] );
+	$user = $sp->sysuser_create( $globalconfig['SERVER_ID'], $username, $password );
 	return $user;
 }
 
@@ -69,15 +71,15 @@ function generate_random_subdomain() {
 }
 
 function run_command_on_behalf( $user, $password, $cmd ) {
-	global $CONFIG;
-	$domain = $CONFIG['DOMAIN'];
+	global $globalconfig;
+	$domain = $globalconfig['DOMAIN'];
 	$run = "sshpass -p $password ssh $user@$domain '$cmd'";
 	return shell_exec( $run );
 }
 
 function add_auto_login( $user, $password ) {
-	global $CONFIG;
-	$domain = $CONFIG['DOMAIN'];
+	global $globalconfig;
+	$domain = $globalconfig['DOMAIN'];
 	$WP_HOME = "~/apps/$user/public";
 	$cmd = "cd $WP_HOME && wp option add auto_login 1 && wp option add sandbox_password '$password'";
 	run_command_on_behalf( $user, $password, $cmd );
@@ -93,15 +95,15 @@ function copy_sandbox_plugin( $user, $password ) {
 }
 
 function add_jetpack( $user, $password ) {
-	global $CONFIG;
+	global $globalconfig;
 	$WP_HOME = "~/apps/$user/public";
 	run_command_on_behalf( $user, $password, "cd $WP_HOME && wp plugin install jetpack && wp plugin activate jetpack" );
 }
 
 function enable_multisite( $user, $password, $domain, $subdomainBase = false ) {
-	global $CONFIG;
+	global $globalconfig;
 	$WP_HOME = "~/apps/$user/public";
-	$email = $CONFIG['DEFAULT_ADMIN_EMAIL_ADDRESS'];
+	$email = $globalconfig['DEFAULT_ADMIN_EMAIL_ADDRESS'];
 	l( $domain );
 	$cmd = "cd $WP_HOME && wp core multisite-install --title=\"My Primary WordPress Site on my Network\" --url=\"$domain\" --admin_email=\"$email\"";
 	run_command_on_behalf( $user, $password, $cmd );
@@ -109,8 +111,8 @@ function enable_multisite( $user, $password, $domain, $subdomainBase = false ) {
 }
 
 function wait_action( $actionId ) {
-	global $CONFIG;
-	$sp = new ServerPilot( $CONFIG['serverpilot'] );
+	global $globalconfig;
+	$sp = new ServerPilot( $globalconfig['serverpilot'] );
 	$ok = false;
 	do {
 		sleep( 1 );
@@ -121,15 +123,15 @@ function wait_action( $actionId ) {
 }
 
 function enable_ssl( $appId ) {
-	global $CONFIG;
-	$sp = new ServerPilot( $CONFIG['serverpilot'] );
+	global $globalconfig;
+	$sp = new ServerPilot( $globalconfig['serverpilot'] );
 	$data = $sp->ssl_auto( $appId );
 	l( wait_action( $data->actionid ) );
 
 }
 
 function create_wordpress( $phpVersion = 'php5.6', $addSsl = false, $addJetpack = false, $addJetpackBeta = false, $enableMultisite = false ) {
-	global $CONFIG;
+	global $globalconfig;
 
 	$defaults = [
 		'runtime' => 'php5.6',
@@ -147,7 +149,7 @@ function create_wordpress( $phpVersion = 'php5.6', $addSsl = false, $addJetpack 
 		'multisite-subdirs' => $enableMultisite,
 	] );
 
-	$sp = new ServerPilot( $CONFIG['serverpilot'] );
+	$sp = new ServerPilot( $globalconfig['serverpilot'] );
 
 	try {
 		$PASSWORD = generate_random_password();
@@ -156,9 +158,9 @@ function create_wordpress( $phpVersion = 'php5.6', $addSsl = false, $addJetpack 
 			'site_title' => 'My WordPress Site',
 			'admin_user' => 'demo',
 			'admin_password' => $PASSWORD,
-			'admin_email' => $CONFIG['DEFAULT_ADMIN_EMAIL_ADDRESS'],
+			'admin_email' => $globalconfig['DEFAULT_ADMIN_EMAIL_ADDRESS'],
 		);
-		$DOMAIN = generate_random_subdomain() . '.' . $CONFIG['DOMAIN'];
+		$DOMAIN = generate_random_subdomain() . '.' . $globalconfig['DOMAIN'];
 		$app = $sp->app_create( $USER->data->name, $USER->data->id, $phpVersion, array( $DOMAIN ), $wpOptions );
 		wait_action( $app->actionid );
 		log_new_site( $app->data );
@@ -236,15 +238,15 @@ function log_new_site( $data ) {
 }
 
 function delete_sysuser( $id ) {
-	global $CONFIG;
-	$sp = new ServerPilot( $CONFIG['serverpilot'] );
+	global $globalconfig;
+	$sp = new ServerPilot( $globalconfig['serverpilot'] );
 	return $sp->sysuser_delete( $id );
 }
 
 function purge_sites() {
 	$sites = sites_to_be_purged();
-	global $CONFIG;
-	$sp = new ServerPilot( $CONFIG['serverpilot'] );
+	global $globalconfig;
+	$sp = new ServerPilot( $globalconfig['serverpilot'] );
 	$systemUsers  = $sp->sysuser_list()->data;
 	$siteUsers = array_map(
 		function ( $site ) {
