@@ -156,8 +156,8 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 			'admin_password' => $password,
 			'admin_email' => $globalconfig['DEFAULT_ADMIN_EMAIL_ADDRESS'],
 		);
-		$DOMAIN = generate_random_subdomain() . '.' . $globalconfig['DOMAIN'];
-		$app = $sp->app_create( $user->data->name, $user->data->id, $php_version, array( $DOMAIN ), $wordpress_options );
+		$domain = generate_random_subdomain() . '.' . $globalconfig['DOMAIN'];
+		$app = $sp->app_create( $user->data->name, $user->data->id, $php_version, array( $domain ), $wordpress_options );
 		wait_action( $app->actionid );
 		log_new_site( $app->data );
 		if ( $add_ssl ) {
@@ -170,7 +170,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		copy_sandbox_plugin( $user->data->name, $password );
 		$sp->sysuser_update( $user->data->id, NULL );
 		if ( $enable_multisite ) {
-			enable_multisite( $user->data->name, $password, $DOMAIN );
+			enable_multisite( $user->data->name, $password, $domain );
 		}
 		return $app->data;
 	} catch ( ServerPilotException $e ) {
