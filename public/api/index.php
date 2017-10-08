@@ -11,8 +11,8 @@ $app = new \Slim\App;
 
 // Register with container
 $container = $app->getContainer();
-$container['csrf'] = function ($c) {
-    return new \Slim\Csrf\Guard;
+$container['csrf'] = function ( $c ) {
+	return new \Slim\Csrf\Guard;
 };
 
 $app->post( '/create', rest_api_create );
@@ -23,16 +23,16 @@ $app->get(  '/expiration/{domain}', rest_api_site_expiration_time );
 
 
 $app->get('/anticsrf',function ($request, $response, $args) {
-    $nameKey = $this->csrf->getTokenNameKey();
-    $valueKey = $this->csrf->getTokenValueKey();
-    $name = $request->getAttribute($nameKey);
-    $value = $request->getAttribute($valueKey);
+	$nameKey = $this->csrf->getTokenNameKey();
+	$valueKey = $this->csrf->getTokenValueKey();
+	$name = $request->getAttribute($nameKey);
+	$value = $request->getAttribute($valueKey);
 
-    $tokenArray = [
-        $nameKey => $name,
-        $valueKey => $value
-    ];
-    return $response->write(json_encode($tokenArray));
+	$tokenArray = [
+		$nameKey => $name,
+		$valueKey => $value
+	];
+	return $response->write(json_encode($tokenArray));
 })->add($container->get('csrf'));
 
 $app->post('/anticsrf',function ($request, $response, $args) {
@@ -62,7 +62,7 @@ function rest_api_check_in( Request $request, Response $response, $domain ) {
 
 function rest_api_purge( Request $request, Response $response, $domain ) {
 	purge_sites();
-	return $response->withJson( $purged_sites );	
+	return $response->withJson( $purged_sites );
 }
 
 function rest_api_site_expiration_time( Request $request, Response $response, $domain ) {
