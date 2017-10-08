@@ -36,7 +36,7 @@ function generate_new_user( $password ) {
  * @param       int     $length number of characters in the generated string
  * @return      string          a new string is created with random characters of the desired length
  */
-function RandomString( $length = 32 ) {
+function random_string( $length = 32 ) {
 	$randstr;
 	srand( (double) microtime( TRUE ) * 1000000 );
 	//our array add all letters and numbers if you wish
@@ -55,7 +55,7 @@ function RandomString( $length = 32 ) {
 
 function generate_random_password() {
 	$length = 12;
-	return RandomString( $length );
+	return random_string( $length );
 }
 
 function create_slug( $str, $delimiter = '-' ) {
