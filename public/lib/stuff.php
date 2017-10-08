@@ -118,10 +118,10 @@ function wait_action( $action_id ) {
 	return $status;
 }
 
-function enable_ssl( $appId ) {
+function enable_ssl( $app_id ) {
 	global $globalconfig;
 	$sp = new ServerPilot( $globalconfig['serverpilot'] );
-	$data = $sp->ssl_auto( $appId );
+	$data = $sp->ssl_auto( $app_id );
 	l( wait_action( $data->actionid ) );
 
 }
