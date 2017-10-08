@@ -251,7 +251,7 @@ function purge_sites() {
 		$sites
 	);
 	$purge = array_filter( $system_users, function ( $user ) use ( $site_users ) {
-			return in_array( $user->name, $site_users );
+			return in_array( $user->name, $site_users, true );
 	} );
 	foreach ( $purge as $user ) {
 		delete_sysuser( $user->id );
