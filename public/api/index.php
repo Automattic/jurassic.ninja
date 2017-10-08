@@ -19,33 +19,33 @@ $app->post( '/create', rest_api_create );
 $app->post( '/extend/{domain}', rest_api_extend );
 $app->post( '/checkin/{domain}', rest_api_check_in );
 $app->post( '/purge', rest_api_purge );
-$app->get(  '/expiration/{domain}', rest_api_site_expiration_time );
+$app->get( '/expiration/{domain}', rest_api_site_expiration_time );
 
 
-$app->get('/anticsrf',function ($request, $response, $args) {
-	$nameKey = $this->csrf->getTokenNameKey();
-	$valueKey = $this->csrf->getTokenValueKey();
-	$name = $request->getAttribute($nameKey);
-	$value = $request->getAttribute($valueKey);
+$app->get('/anticsrf',function ( $request, $response, $args ) {
+	$name_key = $this->csrf->getTokenNameKey();
+	$value_key = $this->csrf->getTokenValueKey();
+	$name = $request->getAttribute( $name_key );
+	$value = $request->getAttribute( $value_key );
 
-	$tokenArray = [
-		$nameKey => $name,
-		$valueKey => $value
+	$token_array = [
+		$name_key => $name,
+		$value_key => $value,
 	];
-	return $response->write(json_encode($tokenArray));
-})->add($container->get('csrf'));
+	return $response->write( json_encode( $token_array ) );
+} )->add( $container->get( 'csrf' ) );
 
-$app->post('/anticsrf',function ($request, $response, $args) {
-   return $response->withJson( [] );
-})->add($container->get('csrf'));
+$app->post( '/anticsrf', function ( $request, $response, $args ) {
+	return $response->withJson( [] );
+} )->add( $container->get( 'csrf' ) );
 
 $app->run();
 
 function rest_api_create( Request $request, Response $response ) {
-	$data = create_wordpress( 'php5.6', false, true, false);
-	$url = 'http://' . $data->domains[ 0 ];
+	$data = create_wordpress( 'php5.6', false, true, false );
+	$url = 'http://' . $data->domains[0];
 	$reply = array(
-		'url' => $url
+		'url' => $url,
 	);
 	return $response->withJson( $reply );
 }
@@ -67,5 +67,5 @@ function rest_api_purge( Request $request, Response $response, $domain ) {
 
 function rest_api_site_expiration_time( Request $request, Response $response, $domain ) {
 	$data = get_site_expiration_date();
-	return $response->withJson( $data ) ;
+	return $response->withJson( $data );
 }
