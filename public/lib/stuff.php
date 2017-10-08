@@ -126,7 +126,7 @@ function enable_ssl( $app_id ) {
 
 }
 
-function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $addJetpack = false, $addJetpackBeta = false, $enableMultisite = false ) {
+function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpack = false, $add_jetpack_beta = false, $enableMultisite = false ) {
 	global $globalconfig;
 
 	$defaults = [
@@ -140,8 +140,8 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $addJetpac
 	$options = array_merge( $defaults, [
 		'runtime' => $php_version,
 		'ssl' => $add_ssl,
-		'jetpack' => $addJetpack,
-		'jetpack-beta' => $addJetpackBeta,
+		'jetpack' => $add_jetpack,
+		'jetpack-beta' => $add_jetpack_beta,
 		'multisite-subdirs' => $enableMultisite,
 	] );
 
@@ -163,7 +163,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $addJetpac
 		if ( $add_ssl ) {
 			enable_ssl( $app->data->id );
 		}
-		if ( $addJetpack ) {
+		if ( $add_jetpack ) {
 			add_jetpack( $USER->data->name, $PASSWORD );
 		}
 		add_auto_login( $USER->data->name, $PASSWORD );
