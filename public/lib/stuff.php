@@ -106,13 +106,13 @@ function enable_multisite( $user, $password, $domain, $subdomain_based = false )
 	run_command_on_behalf( $user, $password, "cd $wp_home && cp .htaccess .htaccess-not-multisite && cp /home/templates/multisite-htaccess .htaccess" );
 }
 
-function wait_action( $actionId ) {
+function wait_action( $action_id ) {
 	global $globalconfig;
 	$sp = new ServerPilot( $globalconfig['serverpilot'] );
 	$ok = false;
 	do {
 		sleep( 1 );
-		$status = $sp->action_info( $actionId );
+		$status = $sp->action_info( $action_id );
 		$ok = 'open' === $status->data->status ? false : true;
 	} while ( ! $ok );
 	return $status;
