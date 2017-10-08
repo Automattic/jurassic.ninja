@@ -76,34 +76,34 @@ function run_command_on_behalf( $user, $password, $cmd ) {
 function add_auto_login( $user, $password ) {
 	global $globalconfig;
 	$domain = $globalconfig['DOMAIN'];
-	$WP_HOME = "~/apps/$user/public";
-	$cmd = "cd $WP_HOME && wp option add auto_login 1 && wp option add sandbox_password '$password'";
+	$wp_home = "~/apps/$user/public";
+	$cmd = "cd $wp_home && wp option add auto_login 1 && wp option add sandbox_password '$password'";
 	run_command_on_behalf( $user, $password, $cmd );
 
 }
 
 function copy_sandbox_plugin( $user, $password ) {
-	$WP_HOME = "~/apps/$user/public";
+	$wp_home = "~/apps/$user/public";
 
-	$cmd = "cp -a /home/sandbox $WP_HOME/wp-content/plugins/ && cd $WP_HOME && wp plugin activate sandbox" ;
+	$cmd = "cp -a /home/sandbox $wp_home/wp-content/plugins/ && cd $wp_home && wp plugin activate sandbox" ;
 	run_command_on_behalf( $user, $password, $cmd );
 
 }
 
 function add_jetpack( $user, $password ) {
 	global $globalconfig;
-	$WP_HOME = "~/apps/$user/public";
-	run_command_on_behalf( $user, $password, "cd $WP_HOME && wp plugin install jetpack && wp plugin activate jetpack" );
+	$wp_home = "~/apps/$user/public";
+	run_command_on_behalf( $user, $password, "cd $wp_home && wp plugin install jetpack && wp plugin activate jetpack" );
 }
 
 function enable_multisite( $user, $password, $domain, $subdomainBase = false ) {
 	global $globalconfig;
-	$WP_HOME = "~/apps/$user/public";
+	$wp_home = "~/apps/$user/public";
 	$email = $globalconfig['DEFAULT_ADMIN_EMAIL_ADDRESS'];
 	l( $domain );
-	$cmd = "cd $WP_HOME && wp core multisite-install --title=\"My Primary WordPress Site on my Network\" --url=\"$domain\" --admin_email=\"$email\"";
+	$cmd = "cd $wp_home && wp core multisite-install --title=\"My Primary WordPress Site on my Network\" --url=\"$domain\" --admin_email=\"$email\"";
 	run_command_on_behalf( $user, $password, $cmd );
-	run_command_on_behalf( $user, $password, "cd $WP_HOME && cp .htaccess .htaccess-not-multisite && cp /home/templates/multisite-htaccess .htaccess" );
+	run_command_on_behalf( $user, $password, "cd $wp_home && cp .htaccess .htaccess-not-multisite && cp /home/templates/multisite-htaccess .htaccess" );
 }
 
 function wait_action( $actionId ) {
