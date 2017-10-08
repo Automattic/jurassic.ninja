@@ -168,7 +168,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		}
 		add_auto_login( $user->data->name, $password );
 		copy_sandbox_plugin( $user->data->name, $password );
-		$sp->sysuser_update( $user->data->id, NULL );
+		$sp->sysuser_update( $user->data->id, null );
 		if ( $enable_multisite ) {
 			enable_multisite( $user->data->name, $password, $domain );
 		}
