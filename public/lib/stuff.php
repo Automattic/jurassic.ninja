@@ -38,7 +38,7 @@ function generate_new_user( $password ) {
  */
 function random_string( $length = 32 ) {
 	$randstr;
-	srand( (double) microtime( TRUE ) * 1000000 );
+	srand( (double) microtime( true ) * 1000000 );
 	//our array add all letters and numbers if you wish
 	$chars = array(
 		'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'p',
