@@ -150,14 +150,14 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 	try {
 		$password = generate_random_password();
 		$user = generate_new_user( $password );
-		$wpOptions = array(
+		$wordpress_options = array(
 			'site_title' => 'My WordPress Site',
 			'admin_user' => 'demo',
 			'admin_password' => $password,
 			'admin_email' => $globalconfig['DEFAULT_ADMIN_EMAIL_ADDRESS'],
 		);
 		$DOMAIN = generate_random_subdomain() . '.' . $globalconfig['DOMAIN'];
-		$app = $sp->app_create( $user->data->name, $user->data->id, $php_version, array( $DOMAIN ), $wpOptions );
+		$app = $sp->app_create( $user->data->name, $user->data->id, $php_version, array( $DOMAIN ), $wordpress_options );
 		wait_action( $app->actionid );
 		log_new_site( $app->data );
 		if ( $add_ssl ) {
