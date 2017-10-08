@@ -5,13 +5,14 @@ require __DIR__ . '/../vendor/autoload.php';
 use Medoo\Medoo;
 
 function config( $key = null ) {
-	if ( ! isset( $CONFIG ) ) {
+	global $global_config;
+	if ( ! isset( $global_config ) ) {
 		throw new Exception( 'Error Finding config variable', 1 );
 	}
-	if ( $key && isset( $CONFIG[ $key ] ) ) {
-		return $CONFIG[ $key ];
+	if ( $key && isset( $global_config[ $key ] ) ) {
+		return $global_config[ $key ];
 	}
-	return $CONFIG;
+	return $global_config;
 }
 // Just call it to trigger an exception if the config global is not defined
 config();
