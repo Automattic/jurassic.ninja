@@ -6,10 +6,10 @@ $CONFIG = array(
 	'DEFAULT_ADMIN_EMAIL_ADDRESS' => 'test@test.com',
 	'db' => array(
 		'username' => 'db-username',
-		'password' => 'db-password'
+		'password' => 'db-password',
 	),
 	'serverpilot' => array(
 		'id' => 'client_id',
-		'key' => 'client_key'
-	)
+		'key' => 'client_key',
+	),
 );

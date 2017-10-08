@@ -4,12 +4,14 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use Medoo\Medoo;
 
+$globalconfig = $CONFIG;
+
 $db = new Medoo([
-    'database_type' => 'mysql',
-    'database_name' => 'sites',
-    'server' => 'localhost',
-    'username' => $CONFIG[ 'db' ][ 'username'],
-    'password' => $CONFIG[ 'db' ][ 'password']
+	'database_type' => 'mysql',
+	'database_name' => 'sites',
+	'server' => 'localhost',
+	'username' => $globalconfig['db']['username'],
+	'password' => $globalconfig['db']['password'],
 ] );
 
 function l( $stuff ) {
@@ -22,48 +24,41 @@ function generate_random_username() {
 }
 
 function generate_new_user( $password ) {
-	global $CONFIG;
-	$username = generate_random_username(); 
-	$sp = new ServerPilot( $CONFIG[ 'serverpilot' ] );
-	$user = $sp->sysuser_create( $CONFIG[ 'SERVER_ID' ], $username, $password );
+	global $globalconfig;
+	$username = generate_random_username();
+	$sp = new ServerPilot( $globalconfig['serverpilot'] );
+	$user = $sp->sysuser_create( $globalconfig['SERVER_ID'], $username, $password );
 	return $user;
 }
 
-
 /**
  * function to generate random strings
- * @param 		int 	$length 	number of characters in the generated string
- * @return 		string	a new string is created with random characters of the desired length
+ * @param       int     $length number of characters in the generated string
+ * @return      string          a new string is created with random characters of the desired length
  */
-function RandomString($length = 32) {
-    $randstr;
-    srand((double) microtime(TRUE) * 1000000);
-    //our array add all letters and numbers if you wish
-    $chars = array(
-        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'p',
-        'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', '5',
-        '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 
-        'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
+function random_string( $length = 32 ) {
+	$randstr;
+	srand( (double) microtime( true ) * 1000000 );
+	//our array add all letters and numbers if you wish
+	$chars = array_merge( range( 'a', 'z' ), range( 0, 9 ), range( 'A', 'Z' ) );
 
-    for ($rand = 0; $rand <= $length; $rand++) {
-        $random = rand(0, count($chars) - 1);
-        $randstr .= $chars[$random];
-    }
-    return $randstr;
+	for ( $rand = 0; $rand <= $length; $rand++ ) {
+		$random = rand( 0, count( $chars ) - 1 );
+		$randstr .= $chars[ $random ];
+	}
+	return $randstr;
 }
 
-function generate_random_password() {	
+function generate_random_password() {
 	$length = 12;
-	return RandomString( $length );
+	return random_string( $length );
 }
 
+function create_slug( $str, $delimiter = '-' ) {
+	$slug = strtolower( trim( preg_replace( '/[\s-]+/', $delimiter, preg_replace( '/[^A-Za-z0-9-]+/', $delimiter, preg_replace( '/[&]/', 'and', preg_replace( '/[\']/', '', iconv( 'UTF-8', 'ASCII//TRANSLIT', $str ) ) ) ) ), $delimiter ) );
+	return $slug;
 
-function create_slug( $str, $delimiter = '-' ){
-
-    $slug = strtolower(trim(preg_replace('/[\s-]+/', $delimiter, preg_replace('/[^A-Za-z0-9-]+/', $delimiter, preg_replace('/[&]/', 'and', preg_replace('/[\']/', '', iconv('UTF-8', 'ASCII//TRANSLIT', $str))))), $delimiter));
-    return $slug;
-
-} 
+}
 
 function generate_random_subdomain() {
 	$generator = new \Nubs\RandomNameGenerator\Alliteration();
@@ -72,72 +67,67 @@ function generate_random_subdomain() {
 }
 
 function run_command_on_behalf( $user, $password, $cmd ) {
-	global $CONFIG;
-	$domain = $CONFIG[ 'DOMAIN' ];
+	global $globalconfig;
+	$domain = $globalconfig['DOMAIN'];
 	$run = "sshpass -p $password ssh $user@$domain '$cmd'";
 	return shell_exec( $run );
 }
 
 function add_auto_login( $user, $password ) {
-	global $CONFIG;
-	$domain = $CONFIG[ 'DOMAIN' ];
-	$WP_HOME="~/apps/$user/public";
-	$cmd= "cd $WP_HOME && wp option add auto_login 1 && wp option add sandbox_password '$password'";
+	global $globalconfig;
+	$domain = $globalconfig['DOMAIN'];
+	$wp_home = "~/apps/$user/public";
+	$cmd = "cd $wp_home && wp option add auto_login 1 && wp option add sandbox_password '$password'";
 	run_command_on_behalf( $user, $password, $cmd );
-	
+
 }
 
 function copy_sandbox_plugin( $user, $password ) {
-	$WP_HOME="~/apps/$user/public";
+	$wp_home = "~/apps/$user/public";
 
-	$cmd= "cp -a /home/sandbox $WP_HOME/wp-content/plugins/ && cd $WP_HOME && wp plugin activate sandbox" ;
+	$cmd = "cp -a /home/sandbox $wp_home/wp-content/plugins/ && cd $wp_home && wp plugin activate sandbox" ;
 	run_command_on_behalf( $user, $password, $cmd );
-	
+
 }
 
 function add_jetpack( $user, $password ) {
-	global $CONFIG;
-	$WP_HOME="~/apps/$user/public";
-	run_command_on_behalf( $user, $password, "cd $WP_HOME && wp plugin install jetpack && wp plugin activate jetpack" );
+	global $globalconfig;
+	$wp_home = "~/apps/$user/public";
+	run_command_on_behalf( $user, $password, "cd $wp_home && wp plugin install jetpack && wp plugin activate jetpack" );
 }
 
-function enable_multisite( $user, $password, $domain, $subdomainBase = false ) {
-	global $CONFIG;
-	$WP_HOME="~/apps/$user/public";
-	$email = $CONFIG[ 'DEFAULT_ADMIN_EMAIL_ADDRESS' ];
-	l($domain );
-	$cmd = "cd $WP_HOME && wp core multisite-install --title=\"My Primary WordPress Site on my Network\" --url=\"$domain\" --admin_email=\"$email\"";
+function enable_multisite( $user, $password, $domain, $subdomain_based = false ) {
+	global $globalconfig;
+	$wp_home = "~/apps/$user/public";
+	$email = $globalconfig['DEFAULT_ADMIN_EMAIL_ADDRESS'];
+	l( $domain );
+	$cmd = "cd $wp_home && wp core multisite-install --title=\"My Primary WordPress Site on my Network\" --url=\"$domain\" --admin_email=\"$email\"";
 	run_command_on_behalf( $user, $password, $cmd );
-	run_command_on_behalf( $user, $password, "cd $WP_HOME && cp .htaccess .htaccess-not-multisite && cp /home/templates/multisite-htaccess .htaccess" );
+	run_command_on_behalf( $user, $password, "cd $wp_home && cp .htaccess .htaccess-not-multisite && cp /home/templates/multisite-htaccess .htaccess" );
 }
 
-function wait_action( $actionId ) {
-	global $CONFIG;
-	$sp = new ServerPilot( $CONFIG[ 'serverpilot' ] );
+function wait_action( $action_id ) {
+	global $globalconfig;
+	$sp = new ServerPilot( $globalconfig['serverpilot'] );
 	$ok = false;
 	do {
 		sleep( 1 );
-		$status = $sp->action_info( $actionId );
-		$ok = $status->data->status == 'open' ? false : true;
-	} while( ! $ok );
+		$status = $sp->action_info( $action_id );
+		$ok = 'open' === $status->data->status ? false : true;
+	} while ( ! $ok );
 	return $status;
 }
 
-function enable_ssl( $appId ) {
-	global $CONFIG;
-	$sp = new ServerPilot( $CONFIG[ 'serverpilot' ] );
-echo '2rasdf';
-	$data = $sp->ssl_auto( $appId );
-echo 'rasdf';
-l(3);
-l($data);
-l(3);
-	l(wait_action( $data->actionid ));
+function enable_ssl( $app_id ) {
+	global $globalconfig;
+	$sp = new ServerPilot( $globalconfig['serverpilot'] );
+	$data = $sp->ssl_auto( $app_id );
+	l( wait_action( $data->actionid ) );
 
 }
 
-function create_wordpress( $phpVersion = 'php5.6', $addSsl = false, $addJetpack = false, $addJetpackBeta = false, $enableMultisite = false ) {
-	global $CONFIG;
+function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpack = false, $add_jetpack_beta = false, $enable_multisite = false ) {
+	global $globalconfig;
 
 	$defaults = [
 		'runtime' => 'php5.6',
@@ -145,60 +135,60 @@ function create_wordpress( $phpVersion = 'php5.6', $addSsl = false, $addJetpack 
 		'jetpack' => false,
 		'jetpack-beta' => false,
 		'multisite-subdirs' => false,
-		'multisite-subdomains' => false
+		'multisite-subdomains' => false,
 	];
 	$options = array_merge( $defaults, [
-		'runtime' => $phpVersion,
-		'ssl' => $addSsl,
-		'jetpack' => $addJetpack,
-		'jetpack-beta' => $addJetpackBeta,
-		'multisite-subdirs' => $enableMultisite
-		
+		'runtime' => $php_version,
+		'ssl' => $add_ssl,
+		'jetpack' => $add_jetpack,
+		'jetpack-beta' => $add_jetpack_beta,
+		'multisite-subdirs' => $enable_multisite,
 	] );
-	$sp = new ServerPilot( $CONFIG[ 'serverpilot' ] );
+
+	$sp = new ServerPilot( $globalconfig['serverpilot'] );
 
 	try {
-		$PASSWORD = generate_random_password();
-		$USER = generate_new_user( $PASSWORD );
-		$wpOptions = array(
+		$password = generate_random_password();
+		$user = generate_new_user( $password );
+		$wordpress_options = array(
 			'site_title' => 'My WordPress Site',
 			'admin_user' => 'demo',
-			'admin_password' => $PASSWORD,
-			'admin_email' => $CONFIG[ 'DEFAULT_ADMIN_EMAIL_ADDRESS' ]
+			'admin_password' => $password,
+			'admin_email' => $globalconfig['DEFAULT_ADMIN_EMAIL_ADDRESS'],
 		);
-		$DOMAIN = generate_random_subdomain() . '.' . $CONFIG[ 'DOMAIN' ];
-		$app = $sp->app_create( $USER->data->name, $USER->data->id, $phpVersion, array( $DOMAIN ), $wpOptions );
+		$domain = generate_random_subdomain() . '.' . $globalconfig['DOMAIN'];
+		$app = $sp->app_create( $user->data->name, $user->data->id, $php_version, array( $domain ), $wordpress_options );
 		wait_action( $app->actionid );
 		log_new_site( $app->data );
-		if ( $addSsl ) {
+		if ( $add_ssl ) {
 			enable_ssl( $app->data->id );
 		}
-		if ( $addJetpack ) {
-			add_jetpack( $USER->data->name, $PASSWORD );
+		if ( $add_jetpack ) {
+			add_jetpack( $user->data->name, $password );
 		}
-		add_auto_login( $USER->data->name, $PASSWORD  );
-		copy_sandbox_plugin( $USER->data->name, $PASSWORD  );
-		$sp->sysuser_update( $USER->data->id, NULL );
-		if ( $enableMultisite  ) {
-			enable_multisite( $USER->data->name, $PASSWORD, $DOMAIN );
+		add_auto_login( $user->data->name, $password );
+		copy_sandbox_plugin( $user->data->name, $password );
+		$sp->sysuser_update( $user->data->id, null );
+		if ( $enable_multisite ) {
+			enable_multisite( $user->data->name, $password, $domain );
 		}
 		return $app->data;
-	} catch( ServerPilotException $e ) {
-	    //echo $e->getCode() . ': ' .$e->getMessage();
-		return NULL;
+	} catch ( ServerPilotException $e ) {
+		// echo $e->getCode() . ': ' .$e->getMessage();
+		return null;
 	}
 
 }
 
 
 function redirect_to_site( $data ) {
-        $content = '';
-        if ( ! $data ) {
-                die( 'error' );
-        }
-        $url = 'http://' . $data->domains[ 0 ];
+	$content = '';
+	if ( ! $data ) {
+		die( 'error' );
+	}
+	$url = 'http://' . $data->domains[0];
 
-        header( 'Location: ' . $url );
+	header( 'Location: ' . $url );
 }
 
 function sites_to_be_purged() {
@@ -206,101 +196,117 @@ function sites_to_be_purged() {
 	// TODO BETTER STRATEGY FOR WIPING OUT EARLY THOSE SITES THAT NEVER GOT VISITED AT ALL
 	// CURRENTLY THE last_logged_in datetime is filled if the user logs in with user/password
 	// and not on the first time they reach the site's dashboard.
-	$never_logged_in =  sites_never_logged_in();
-	$unused =  sites_never_checked_in();
+	$never_logged_in = sites_never_logged_in();
+	$unused = sites_never_checked_in();
 	return array_merge( $expired, $never_logged_in, $unused );
 }
 
 
 function expired_sites() {
 	global $db;
-	$INTERVAL = 'INTERVAL 1 WEEK';
-	return $db->query( "select * from sites where last_logged_in IS NOT NULL AND last_logged_in < DATE_SUB( NOW(), $INTERVAL )" )->fetchAll();
+	$interval = 'INTERVAL 1 WEEK';
+	return $db->query( "select * from sites where last_logged_in IS NOT NULL AND last_logged_in < DATE_SUB( NOW(), $interval )" )->fetchAll();
 }
 
 function sites_never_logged_in() {
 	global $db;
-	$INTERVAL = 'INTERVAL 1 WEEK';
-	return $db->query( "select * from sites where last_logged_in is NULL and created < DATE_SUB( NOW(), $INTERVAL )" )->fetchAll();
+	$interval = 'INTERVAL 1 WEEK';
+	return $db->query( "select * from sites where last_logged_in is NULL and created < DATE_SUB( NOW(), $interval )" )->fetchAll();
 }
 
 function sites_never_checked_in() {
 	global $db;
-	$INTERVAL = 'INTERVAL 10 HOUR';
-	return $db->query( "select * from sites where checked_in is NULL and created < DATE_SUB( NOW(), $INTERVAL )" )->fetchAll();
+	$interval = 'INTERVAL 10 HOUR';
+	return $db->query( "select * from sites where checked_in is NULL and created < DATE_SUB( NOW(), $interval )" )->fetchAll();
 }
 
 function log_new_site( $data ) {
 	global $db;
 
-	$db->insert('sites', [
-    		'username' => $data->name, 
-    		'domain' => $data->domains[ 0 ],
-		'#created' => 'NOW()'
-	] );
+	$db->insert('sites',
+		[
+			'username' => $data->name,
+			'domain' => $data->domains[0],
+			'#created' => 'NOW()',
+		]
+	);
 	l( $db->error() );
 }
 
 function delete_sysuser( $id ) {
-	global $CONFIG;
-	$sp = new ServerPilot( $CONFIG[ 'serverpilot' ] );
+	global $globalconfig;
+	$sp = new ServerPilot( $globalconfig['serverpilot'] );
 	return $sp->sysuser_delete( $id );
 }
 
 function purge_sites() {
 	$sites = sites_to_be_purged();
-	global $CONFIG;
-	$sp = new ServerPilot( $CONFIG[ 'serverpilot' ] );
-	$systemUsers  = $sp->sysuser_list()->data;
-	$siteUsers = array_map( function ( $site ) { return $site['username']; }, $sites );
-	$purge = array_filter($systemUsers, function ( $user ) use ( $siteUsers ) {
-    		return in_array( $user->name, $siteUsers );
+	global $globalconfig;
+	$sp = new ServerPilot( $globalconfig['serverpilot'] );
+	$system_users  = $sp->sysuser_list()->data;
+	$site_users = array_map(
+		function ( $site ) {
+			return $site['username'];
+		},
+		$sites
+	);
+	$purge = array_filter( $system_users, function ( $user ) use ( $site_users ) {
+			return in_array( $user->name, $site_users, true );
 	} );
-	foreach( $purge as $user ) {
+	foreach ( $purge as $user ) {
 		delete_sysuser( $user->id );
 	}
-	foreach( $sites as $site ) {
+	foreach ( $sites as $site ) {
 		log_purged_site( $site );
 	}
-	return array_map( function ( $site ) { return $site['domain']; }, $sites ); 
+	return array_map(
+		function ( $site ) {
+			return $site['domain'];
+		},
+		$sites
+	);
 }
 
 function extend_site_life( $domain ) {
 	global $db;
-	
-	$db->update( 'sites', [
-		'#last_logged_in' => 'NOW()'
-	], [
-		'domain' => $domain
-	] );
+
+	$db->update( 'sites',
+		[
+			'#last_logged_in' => 'NOW()',
+		], [
+			'domain' => $domain,
+		]
+	);
 	l( $db->error() );
 }
 
 function mark_site_as_checked_in( $domain ) {
-        global $db;
+	global $db;
 
-        $db->update( 'sites', [
-                '#checked_in' => 'NOW()'
-        ], [
-                'domain' => $domain
-        ] );
-        l( $db->error() );
+	$db->update( 'sites',
+		[
+			'#checked_in' => 'NOW()',
+		], [
+			'domain' => $domain,
+		]
+	);
+	l( $db->error() );
 }
 
 function log_purged_site( $data ) {
 	global $db;
 	$db->insert('purged', [
-    		'username' => $data['username'], 
-    		'domain' => $data['domain'],
+		'username' => $data['username'],
+		'domain' => $data['domain'],
 		'created' => $data['created'],
 		'last_logged_in' => $data['last_logged_in'],
-		'checked_in' => $data['checked_in']
+		'checked_in' => $data['checked_in'],
 	] );
 	$db->delete( 'sites', [
 		'AND' => [
-    			'username' => $data['username'], 
-    			'domain' => $data['domain'],
-		]
+			'username' => $data['username'],
+			'domain' => $data['domain'],
+		],
 	] );
 	l( $db->error() );
 }
