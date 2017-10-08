@@ -149,7 +149,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 
 	try {
 		$password = generate_random_password();
-		$USER = generate_new_user( $password );
+		$user = generate_new_user( $password );
 		$wpOptions = array(
 			'site_title' => 'My WordPress Site',
 			'admin_user' => 'demo',
@@ -157,20 +157,20 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 			'admin_email' => $globalconfig['DEFAULT_ADMIN_EMAIL_ADDRESS'],
 		);
 		$DOMAIN = generate_random_subdomain() . '.' . $globalconfig['DOMAIN'];
-		$app = $sp->app_create( $USER->data->name, $USER->data->id, $php_version, array( $DOMAIN ), $wpOptions );
+		$app = $sp->app_create( $user->data->name, $user->data->id, $php_version, array( $DOMAIN ), $wpOptions );
 		wait_action( $app->actionid );
 		log_new_site( $app->data );
 		if ( $add_ssl ) {
 			enable_ssl( $app->data->id );
 		}
 		if ( $add_jetpack ) {
-			add_jetpack( $USER->data->name, $password );
+			add_jetpack( $user->data->name, $password );
 		}
-		add_auto_login( $USER->data->name, $password );
-		copy_sandbox_plugin( $USER->data->name, $password );
-		$sp->sysuser_update( $USER->data->id, NULL );
+		add_auto_login( $user->data->name, $password );
+		copy_sandbox_plugin( $user->data->name, $password );
+		$sp->sysuser_update( $user->data->id, NULL );
 		if ( $enable_multisite ) {
-			enable_multisite( $USER->data->name, $password, $DOMAIN );
+			enable_multisite( $user->data->name, $password, $DOMAIN );
 		}
 		return $app->data;
 	} catch ( ServerPilotException $e ) {
