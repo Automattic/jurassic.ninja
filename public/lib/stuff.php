@@ -96,7 +96,7 @@ function add_jetpack( $user, $password ) {
 	run_command_on_behalf( $user, $password, "cd $wp_home && wp plugin install jetpack && wp plugin activate jetpack" );
 }
 
-function enable_multisite( $user, $password, $domain, $subdomainBase = false ) {
+function enable_multisite( $user, $password, $domain, $subdomain_based = false ) {
 	global $globalconfig;
 	$wp_home = "~/apps/$user/public";
 	$email = $globalconfig['DEFAULT_ADMIN_EMAIL_ADDRESS'];
