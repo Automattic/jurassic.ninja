@@ -18,9 +18,9 @@ function jurassic_ninja_admin_notices() {
 	?>
 	<div class="notice notice-success is-dismissible">
 		<h3><?php _e( 'Welcome to Jurassic Ninja!', 'sample-text-domain' ); ?></h3>
-		<p><?php _e( 'This WP will be destroyed 7 days after the last time you logged in.'); ?></p>
+		<p><?php _e( 'This WP will be destroyed 7 days after the last time you logged in.' ); ?></p>
 		<p><strong>URL:</strong> <code><?php echo get_site_url(); ?></code></p>
-		<p><?php _e( 'These are your credentials' ) ?></p>
+		<p><?php _e( 'These are your credentials' ); ?></p>
 		<p><strong>Username:</strong> <code>demo</code></p>
 		<p><strong>Password:</strong> <code><?php echo get_option( 'sandbox_password' ); ?></code></p>
 	</div>
@@ -63,9 +63,9 @@ function jurassic_ninja_wp_login() {
 
 
 function jurassic_ninja_after_setup_theme() {
-	$auto_login = get_option('auto_login');
-	if ( ! empty($auto_login) ){
-		$password = get_option('sandbox_password');
+	$auto_login = get_option( 'auto_login' );
+	if ( ! empty( $auto_login ) ) {
+		$password = get_option( 'sandbox_password' );
 		$creds = array();
 		$creds['user_login'] = 'demo';
 		$creds['user_password'] = $password;
