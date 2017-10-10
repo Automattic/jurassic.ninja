@@ -32,13 +32,7 @@ function config( $key = null ) {
 $db = null;
 
 try {
-	$db = new Medoo([
-		'database_type' => 'mysql',
-		'database_name' => config( 'db_name' ),
-		'server' => 'localhost',
-		'username' => config( 'db_username' ),
-		'password' => config( 'db_password' ),
-	] );
+	$db = $wpdb;
 } catch ( \Exception $e ) {
 	class MockIt {
 		function update() {
@@ -198,7 +192,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		$domain = generate_random_subdomain() . '.' . config( 'domain' );
 		$app = $sp->app_create( $user->data->name, $user->data->id, $php_version, array( $domain ), $wordpress_options );
 		wait_action( $app->actionid );
-		// log_new_site( $app->data );
+		log_new_site( $app->data );
 		if ( $add_ssl ) {
 			enable_ssl( $app->data->id );
 		}
@@ -244,32 +238,32 @@ function sites_to_be_purged() {
 function expired_sites() {
 	global $db;
 	$interval = config( 'sites_expiration' );
-	return db()->query( "select * from sites where last_logged_in IS NOT NULL AND last_logged_in < DATE_SUB( NOW(), $interval )" )->fetchAll();
+	return db()->get_results( "select * from sites where last_logged_in IS NOT NULL AND last_logged_in < DATE_SUB( NOW(), $interval )", \ARRAY_A );
 }
 
 function sites_never_logged_in() {
 	global $db;
 	$interval = config( 'sites_never_logged_in_expiration' );
-	return db()->query( "select * from sites where last_logged_in is NULL and created < DATE_SUB( NOW(), $interval )" )->fetchAll();
+	return db()->get_results( "select * from sites where last_logged_in is NULL and created < DATE_SUB( NOW(), $interval )", \ARRAY_A );
 }
 
 function sites_never_checked_in() {
 	global $db;
 	$interval = config( 'sites_never_checked_in_expiration' );
-	return db()->query( "select * from sites where checked_in is NULL and created < DATE_SUB( NOW(), $interval )" )->fetchAll();
+	return db()->get_results( "select * from sites where checked_in is NULL and created < DATE_SUB( NOW(), $interval )", \ARRAY_A );
 }
 
 function log_new_site( $data ) {
 	global $db;
 
-	db()->insert('sites',
+	db()->insert( 'sites',
 		[
 			'username' => $data->name,
 			'domain' => $data->domains[0],
-			'#created' => 'NOW()',
+			'created' => current_time( 'mysql', 1 ),
 		]
 	);
-	l( db()->error() );
+	l( db()->last_error );
 }
 
 function delete_sysuser( $id ) {
@@ -309,12 +303,12 @@ function extend_site_life( $domain ) {
 
 	db()->update( 'sites',
 		[
-			'#last_logged_in' => 'NOW()',
+			'last_logged_in' => current_time( 'mysql', 1 ),
 		], [
 			'domain' => $domain,
 		]
 	);
-	l( db()->error() );
+	l( db()->last_error );
 }
 
 function mark_site_as_checked_in( $domain ) {
@@ -322,17 +316,17 @@ function mark_site_as_checked_in( $domain ) {
 
 	db()->update( 'sites',
 		[
-			'#checked_in' => 'NOW()',
+			'checked_in' => current_time( 'mysql', 1 ),
 		], [
 			'domain' => $domain,
 		]
 	);
-	l( db()->error() );
+	l( db()->last_error );
 }
 
 function log_purged_site( $data ) {
 	global $db;
-	db()->insert('purged', [
+	db()->insert( 'purged', [
 		'username' => $data['username'],
 		'domain' => $data['domain'],
 		'created' => $data['created'],
@@ -340,12 +334,10 @@ function log_purged_site( $data ) {
 		'checked_in' => $data['checked_in'],
 	] );
 	db()->delete( 'sites', [
-		'AND' => [
-			'username' => $data['username'],
-			'domain' => $data['domain'],
-		],
+		'username' => $data['username'],
+		'domain' => $data['domain'],
 	] );
-	l( db()->error() );
+	l( db()->last_error );
 }
 
 function add_options_page() {
@@ -411,28 +403,6 @@ function add_options_page() {
 						),
 					),
 				),
-				'db' => array(
-					'title' => __( 'Management Database', 'jurassic-ninja' ),
-					'text' => '<p>' . __( 'Configure MySQL user and password', 'jurassic-ninja' ) . '</p>',
-					'fields' => array(
-						'db_username' => array(
-							'id' => 'db_username',
-							'title' => __( 'MySQL username', 'jurassic-ninja' ),
-							'text' => __( 'Just a username.' ),
-						),
-						'db_password' => array(
-							'id' => 'db_password',
-							'title' => __( 'MySQL password', 'jurassic-ninja' ),
-							'text' => __( 'Just a password.' ),
-							'type' => 'password',
-						),
-						'db_name' => array(
-							'id' => 'db_name',
-							'title' => __( 'MySQL database name', 'jurassic-ninja' ),
-							'text' => __( 'Just a database name.' ),
-						),
-					),
-				),
 			),
 		),
 	] );
@@ -454,6 +424,41 @@ function add_cron_job() {
 	function jurassic_ninja_purge() {
 		purge_sites();
 	}
+}
+
+function prefix_create_table() {
+	global $wpdb;
+
+	$charset_collate = $wpdb->get_charset_collate();
+
+	$sql = "CREATE TABLE sites (
+		`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		username text not null,
+		domain text not null,
+		created datetime ,
+		last_logged_in datetime ,
+		checked_in datetime
+	) $charset_collate;";
+
+	$sql2 = "CREATE TABLE purged (
+		`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		username text not null,
+		domain text not null,
+		created datetime ,
+		last_logged_in datetime ,
+		checked_in datetime
+	) $charset_collate;";
+
+	if ( ! function_exists( 'dbDelta' ) ) {
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+	}
+
+	dbDelta( $sql );
+	dbDelta( $sql2 );
+}
+
+function create_tables( $plugin_file ) {
+	register_activation_hook( $plugin_file, 'jn\prefix_create_table' );
 }
 
 function add_rest_api_endpoints() {
