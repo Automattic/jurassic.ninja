@@ -2,6 +2,22 @@
 
 namespace jn;
 
+function config( $key = null ) {
+	$options = get_option( OPTIONS_KEY );
+
+	if ( ! ( $options ) ) {
+		throw new \Exception( 'Error Finding config variable', 1 );
+	}
+	// Create the array needed by ServerPilot() here so I don't have to copy/paste this around
+	if ( 'serverpilot' === $key ) {
+		return [
+			'id' => config( 'serverpilot_client_id' ),
+			'key' => config( 'serverpilot_client_key' ),
+		];
+	}
+	return $options[ $key ];
+}
+
 function add_options_page() {
 	$options_page = new \RationalOptionPages( [
 		'jurassic-ninja' => array(
