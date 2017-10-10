@@ -65,7 +65,7 @@ function jurassic_ninja_wp_login() {
 		] );
 	}
 	// REDIRECT TO redirect_to INSTEAD
-		wp_redirect( '/wp-admin' );
+		wp_safe_redirect( '/wp-admin' );
 		exit( 0 );
 	}
 }
