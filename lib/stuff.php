@@ -62,7 +62,7 @@ function generate_random_username() {
 
 function generate_new_user( $password ) {
 	$username = generate_random_username();
-	$sp = new \ServerPilot( 'serverpilot' );
+	$sp = new \ServerPilot( config( 'serverpilot' ) );
 	$user = $sp->sysuser_create( config( 'serverpilot_server_id' ), $username, $password );
 	return $user;
 }
@@ -73,7 +73,7 @@ function generate_new_user( $password ) {
  * @return      string          a new string is created with random characters of the desired length
  */
 function random_string( $length = 32 ) {
-	$randstr;
+	$randstr = null;
 	srand( (double) microtime( true ) * 1000000 );
 	//our array add all letters and numbers if you wish
 	$chars = array_merge( range( 'a', 'z' ), range( 0, 9 ), range( 'A', 'Z' ) );
@@ -139,7 +139,7 @@ function enable_multisite( $user, $password, $domain, $subdomain_based = false )
 }
 
 function wait_action( $action_id ) {
-	$sp = new \ServerPilot( 'serverpilot' );
+	$sp = new \ServerPilot( config( 'serverpilot' ) );
 	$ok = false;
 	do {
 		sleep( 1 );
@@ -150,7 +150,7 @@ function wait_action( $action_id ) {
 }
 
 function enable_ssl( $app_id ) {
-	$sp = new \ServerPilot( 'serverpilot' );
+	$sp = new \ServerPilot( config( 'serverpilot' ) );
 	$data = $sp->ssl_auto( $app_id );
 	l( wait_action( $data->actionid ) );
 
@@ -173,7 +173,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		'multisite-subdirs' => $enable_multisite,
 	] );
 
-	$sp = new \ServerPilot( 'serverpilot' );
+	$sp = new \ServerPilot( config( 'serverpilot' ) );
 
 	try {
 		$password = generate_random_password();
@@ -187,7 +187,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		$domain = generate_random_subdomain() . '.' . config( 'domain' );
 		$app = $sp->app_create( $user->data->name, $user->data->id, $php_version, array( $domain ), $wordpress_options );
 		wait_action( $app->actionid );
-		log_new_site( $app->data );
+		// log_new_site( $app->data );
 		if ( $add_ssl ) {
 			enable_ssl( $app->data->id );
 		}
@@ -262,13 +262,13 @@ function log_new_site( $data ) {
 }
 
 function delete_sysuser( $id ) {
-	$sp = new \ServerPilot( 'serverpilot' );
+	$sp = new \ServerPilot( config( 'serverpilot' ) );
 	return $sp->sysuser_delete( $id );
 }
 
 function purge_sites() {
 	$sites = sites_to_be_purged();
-	$sp = new \ServerPilot( 'serverpilot' );
+	$sp = new \ServerPilot( config( 'serverpilot' ) );
 	$system_users  = $sp->sysuser_list()->data;
 	$site_users = array_map(
 		function ( $site ) {
@@ -435,20 +435,12 @@ function add_scripts() {
 
 function add_rest_api_endpoints() {
 	add_post_endpoint( 'create', function ( $request ) {
-		//echo $request->data;
-		$defaults = [
-			'runtime' => 'php5.6',
-			'ssl' => false,
-			'jetpack' => false,
-			'jetpack-beta' => false,
-			'multisite-subdirs' => false,
-			'multisite-subdomains' => false,
-		];
-		$params = $request-> get_json_params() ? $request-> get_json_params() : [];
+		$data = create_wordpress( 'php5.6', false, true, false );
+		$url = 'http://' . $data->domains[0];
+
 		$output = [
-			'url' => 'http://sample.jurassic.ninja',
+			'url' => $url,
 		];
-		$features = array_merge( $defaults, $output );
 		return $output;
 	} );
 }
