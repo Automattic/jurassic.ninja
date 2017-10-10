@@ -405,6 +405,17 @@ function add_options_page() {
 				),
 			),
 		),
+		'jurassic_ninja_sites_admin' => array(
+			'page_title' => __( 'Sites Admin', 'jurassic_ninja' ),
+			'parent_slug' => 'jurassic_ninja',
+			'sections' => array(
+				'section-one' => array(
+					'title' => __( 'Section One', 'jurassic_ninja' ),
+					'text' => '<p>' . __( 'All about the sites', 'jurassic_ninja' ) . '</p>',
+					'include' => plugin_dir_path( __FILE__ ) . 'views/sites.php',
+				),
+			),
+		),
 	] );
 }
 
