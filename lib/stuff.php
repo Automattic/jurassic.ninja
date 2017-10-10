@@ -40,10 +40,25 @@ try {
 		'password' => config( 'db_password' ),
 	] );
 } catch ( \Exception $e ) {
-	$db = null;
+	class MockIt {
+		function update() {
+
+		}
+		function error() {
+			return '$';
+		}
+		function delete() {
+			return '';
+		}
+		function query() {
+			return '';
+		}
+	}
+	$db = new MockIt();
 }
 
 function db() {
+	global $db;
 	return $db;
 }
 
@@ -437,6 +452,20 @@ function add_rest_api_endpoints() {
 		$output = [
 			'url' => $url,
 		];
+		return $output;
+	} );
+
+	add_post_endpoint( 'extend', function ( $request ) {
+		$body = $request->get_json_params() ? $request->get_json_params() : [];
+		if ( ! isset( $body['domain'] ) ) {
+			return new \WP_Error( 'no_domain_in_body', __( 'You must pass a valid "domain" prop in the body' ) );
+		}
+		extend_site_life( $body['domain'] );
+
+		$output = [
+			'url' => $body['domain'],
+		];
+
 		return $output;
 	} );
 }

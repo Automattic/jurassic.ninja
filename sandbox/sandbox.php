@@ -48,8 +48,12 @@ function jurassic_ninja_wp_login() {
 	if ( empty( $auto_login ) ) {
 		$urlparts = wp_parse_url( site_url() );
 		$domain = $urlparts['host'];
-		$url = "https://jurassic.ninja/api/extend/$domain";
-		wp_remote_post( $url );
+		$url = 'https://jurassic.ninja/api/extend';
+		wp_remote_post( $url, [
+			'body' => [
+				'domain' => $domain,
+			],
+		] );
 	} else {
 		$urlparts = wp_parse_url( site_url() );
 		$domain = $urlparts ['host'];
