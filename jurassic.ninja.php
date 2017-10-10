@@ -16,3 +16,5 @@ require_once __DIR__ . '/lib/stuff.php';
 add_options_page();
 add_scripts();
 add_rest_api_endpoints();
+add_cron_job();
+
