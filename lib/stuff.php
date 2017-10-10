@@ -468,4 +468,18 @@ function add_rest_api_endpoints() {
 
 		return $output;
 	} );
+
+	add_post_endpoint( 'checkin', function ( $request ) {
+		$body = $request->get_json_params() ? $request->get_json_params() : [];
+		if ( ! isset( $body['domain'] ) ) {
+			return new \WP_Error( 'no_domain_in_body', __( 'You must pass a valid "domain" prop in the body' ) );
+		}
+		mark_site_as_checked_in( $body['domain'] );
+
+		$output = [
+			'url' => $body['domain'],
+		];
+
+		return $output;
+	} );
 }

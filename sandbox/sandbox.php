@@ -57,8 +57,14 @@ function jurassic_ninja_wp_login() {
 	} else {
 		$urlparts = wp_parse_url( site_url() );
 		$domain = $urlparts ['host'];
-		$url = "https://jurassic.ninja/api/checkin/$domain";
-		wp_remote_post( $url );
+		$url = 'https://jurassic.ninja/api/checkin/';
+		wp_remote_post( $url, [
+			'body' => [
+				'domain' => $domain,
+			],
+		] );
+	}
+	// REDIRECT TO redirect_to INSTEAD
 		wp_redirect( '/wp-admin' );
 		exit( 0 );
 	}
