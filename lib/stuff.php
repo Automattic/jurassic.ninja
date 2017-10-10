@@ -20,13 +20,23 @@ function config( $key = null ) {
 // Just call it to trigger an exception if the config global is not defined
 config();
 
-$db = new Medoo([
-	'database_type' => 'mysql',
-	'database_name' => 'sites',
-	'server' => 'localhost',
-	'username' => config( 'db' )['username'],
-	'password' => config( 'db' )['password'],
-] );
+$db = null;
+
+try {
+	$db = new Medoo([
+		'database_type' => 'mysql',
+		'database_name' => 'sites',
+		'server' => 'localhost',
+		'username' => config( 'db' )['username'],
+		'password' => config( 'db' )['password'],
+	] );
+} catch ( \Exception $e ) {
+	$db = null;
+}
+
+function db() {
+	return $db;
+}
 
 function l( $stuff ) {
 	error_log( print_r( $stuff, true ) );
@@ -210,32 +220,32 @@ function sites_to_be_purged() {
 function expired_sites() {
 	global $db;
 	$interval = config( 'SITES_EXPIRATION' );
-	return $db->query( "select * from sites where last_logged_in IS NOT NULL AND last_logged_in < DATE_SUB( NOW(), $interval )" )->fetchAll();
+	return db()->query( "select * from sites where last_logged_in IS NOT NULL AND last_logged_in < DATE_SUB( NOW(), $interval )" )->fetchAll();
 }
 
 function sites_never_logged_in() {
 	global $db;
 	$interval = config( 'SITES_NEVER_LOGGED_IN_EXPIRATION' );
-	return $db->query( "select * from sites where last_logged_in is NULL and created < DATE_SUB( NOW(), $interval )" )->fetchAll();
+	return db()->query( "select * from sites where last_logged_in is NULL and created < DATE_SUB( NOW(), $interval )" )->fetchAll();
 }
 
 function sites_never_checked_in() {
 	global $db;
 	$interval = config( 'SITES_NEVER_CHECKED_IN_EXPIRATION' );
-	return $db->query( "select * from sites where checked_in is NULL and created < DATE_SUB( NOW(), $interval )" )->fetchAll();
+	return db()->query( "select * from sites where checked_in is NULL and created < DATE_SUB( NOW(), $interval )" )->fetchAll();
 }
 
 function log_new_site( $data ) {
 	global $db;
 
-	$db->insert('sites',
+	db()->insert('sites',
 		[
 			'username' => $data->name,
 			'domain' => $data->domains[0],
 			'#created' => 'NOW()',
 		]
 	);
-	l( $db->error() );
+	l( db()->error() );
 }
 
 function delete_sysuser( $id ) {
@@ -273,43 +283,43 @@ function purge_sites() {
 function extend_site_life( $domain ) {
 	global $db;
 
-	$db->update( 'sites',
+	db()->update( 'sites',
 		[
 			'#last_logged_in' => 'NOW()',
 		], [
 			'domain' => $domain,
 		]
 	);
-	l( $db->error() );
+	l( db()->error() );
 }
 
 function mark_site_as_checked_in( $domain ) {
 	global $db;
 
-	$db->update( 'sites',
+	db()->update( 'sites',
 		[
 			'#checked_in' => 'NOW()',
 		], [
 			'domain' => $domain,
 		]
 	);
-	l( $db->error() );
+	l( db()->error() );
 }
 
 function log_purged_site( $data ) {
 	global $db;
-	$db->insert('purged', [
+	db()->insert('purged', [
 		'username' => $data['username'],
 		'domain' => $data['domain'],
 		'created' => $data['created'],
 		'last_logged_in' => $data['last_logged_in'],
 		'checked_in' => $data['checked_in'],
 	] );
-	$db->delete( 'sites', [
+	db()->delete( 'sites', [
 		'AND' => [
 			'username' => $data['username'],
 			'domain' => $data['domain'],
 		],
 	] );
-	l( $db->error() );
+	l( db()->error() );
 }
