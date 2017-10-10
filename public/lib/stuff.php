@@ -206,19 +206,19 @@ function sites_to_be_purged() {
 
 function expired_sites() {
 	global $db;
-	$interval = 'INTERVAL 1 WEEK';
+	$interval = config( 'SITES_EXPIRATION' );
 	return $db->query( "select * from sites where last_logged_in IS NOT NULL AND last_logged_in < DATE_SUB( NOW(), $interval )" )->fetchAll();
 }
 
 function sites_never_logged_in() {
 	global $db;
-	$interval = 'INTERVAL 1 WEEK';
+	$interval = config( 'SITES_NEVER_LOGGED_IN_EXPIRATION' );
 	return $db->query( "select * from sites where last_logged_in is NULL and created < DATE_SUB( NOW(), $interval )" )->fetchAll();
 }
 
 function sites_never_checked_in() {
 	global $db;
-	$interval = 'INTERVAL 10 HOUR';
+	$interval = config( 'SITES_NEVER_CHECKED_IN_EXPIRATION' );
 	return $db->query( "select * from sites where checked_in is NULL and created < DATE_SUB( NOW(), $interval )" )->fetchAll();
 }
 
