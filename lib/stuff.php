@@ -100,7 +100,7 @@ function generate_random_subdomain() {
 
 function run_command_on_behalf( $user, $password, $cmd ) {
 	$domain = config( 'domain' );
-	$run = "sshpass -p $password ssh $user@$domain '$cmd'";
+	$run = "sshpass -p $password ssh -oStrictHostKeyChecking=no $user@$domain '$cmd'";
 	return shell_exec( $run );
 }
 
