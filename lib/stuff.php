@@ -2,10 +2,9 @@
 
 namespace jn;
 
-require __DIR__ . '/../../config.inc.php';
-require __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../config.inc.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
- 
 use Medoo\Medoo;
 
 function config( $key = null ) {
