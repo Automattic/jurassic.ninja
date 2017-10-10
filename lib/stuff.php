@@ -29,10 +29,6 @@ function config( $key = null ) {
 // Just call it to trigger an exception if the config global is not defined
 //config();
 
-add_options_page();
-add_scripts();
-add_rest_api_endpoints();
-
 $db = null;
 
 try {
