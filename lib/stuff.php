@@ -317,18 +317,6 @@ function add_scripts() {
 	} );
 }
 
-function add_cron_job() {
-	if ( ! wp_next_scheduled( 'jurassic_ninja_purge' ) ) {
-		wp_schedule_event( time(), 'hourly', 'jurassic_ninja_purge' );
-	}
-
-	add_action( 'jurassic_ninja_purge', 'jn\jurassic_ninja_purge' );
-
-	function jurassic_ninja_purge() {
-		purge_sites();
-	}
-}
-
 function add_rest_api_endpoints() {
 	add_post_endpoint( 'create', function ( $request ) {
 		$data = create_wordpress( 'php5.6', false, true, false );
