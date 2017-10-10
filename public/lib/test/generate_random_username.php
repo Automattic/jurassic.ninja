@@ -1,4 +1,4 @@
 <?php
 
 require_once __DIR__ . '/../stuff.php';
-echo generate_random_username();
+echo jn\generate_random_username();
