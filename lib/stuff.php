@@ -28,6 +28,7 @@ function config( $key = null ) {
 //config();
 
 add_options_page();
+add_scripts();
 
 $db = null;
 
@@ -336,7 +337,8 @@ function log_purged_site( $data ) {
 function add_options_page() {
 	$options_page = new \RationalOptionPages( [
 		'jurassic-ninja' => array(
-			'page_title' => __( 'Jurassic Ninja', 'jurassic-ninja' ),
+			'page_title' => __( 'Jurassic Ninja Settings', 'jurassic-ninja' ),
+			'menu_slug' => 'jurassic_ninja',
 			'sections' => array(
 				'domain' => array(
 					'title' => __( 'Sites', 'jurassic-ninja' ),
@@ -420,4 +422,10 @@ function add_options_page() {
 			),
 		),
 	] );
+}
+
+function add_scripts() {
+	add_action( 'wp_enqueue_scripts', function () {
+		wp_enqueue_script( 'jurassicninja.js', plugins_url( '', __FILE__ ) . '/../jurassicninja.js', false, false, true );
+	} );
 }
