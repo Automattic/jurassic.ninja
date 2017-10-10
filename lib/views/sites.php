@@ -2,9 +2,7 @@
 
 namespace jn;
 
-global $wpdb;
-
-$sites = $wpdb->get_results( 'select * from sites', \ARRAY_A );
+$sites = db()->get_results( 'select * from sites', \ARRAY_A );
 $just_site_domains = array_map( function ( $site ) {
 	return $site['domain'];
 }, $sites );

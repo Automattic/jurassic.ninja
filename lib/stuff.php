@@ -26,35 +26,6 @@ function config( $key = null ) {
 	}
 	return $options[ $key ];
 }
-// Just call it to trigger an exception if the config global is not defined
-//config();
-
-$db = null;
-
-try {
-	$db = $wpdb;
-} catch ( \Exception $e ) {
-	class MockIt {
-		function update() {
-
-		}
-		function error() {
-			return '$';
-		}
-		function delete() {
-			return '';
-		}
-		function query() {
-			return '';
-		}
-	}
-	$db = new MockIt();
-}
-
-function db() {
-	global $db;
-	return $db;
-}
 
 function l( $stuff ) {
 	error_log( print_r( $stuff, true ) );
@@ -356,41 +327,6 @@ function add_cron_job() {
 	function jurassic_ninja_purge() {
 		purge_sites();
 	}
-}
-
-function prefix_create_table() {
-	global $wpdb;
-
-	$charset_collate = $wpdb->get_charset_collate();
-
-	$sql = "CREATE TABLE sites (
-		`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-		username text not null,
-		domain text not null,
-		created datetime ,
-		last_logged_in datetime ,
-		checked_in datetime
-	) $charset_collate;";
-
-	$sql2 = "CREATE TABLE purged (
-		`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-		username text not null,
-		domain text not null,
-		created datetime ,
-		last_logged_in datetime ,
-		checked_in datetime
-	) $charset_collate;";
-
-	if ( ! function_exists( 'dbDelta' ) ) {
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-	}
-
-	dbDelta( $sql );
-	dbDelta( $sql2 );
-}
-
-function create_tables( $plugin_file ) {
-	register_activation_hook( $plugin_file, 'jn\prefix_create_table' );
 }
 
 function add_rest_api_endpoints() {
