@@ -12,6 +12,7 @@
 namespace jn;
 
 require_once __DIR__ . '/lib/stuff.php';
+require_once __DIR__ . '/lib/settings-stuff.php';
 
 add_options_page();
 add_scripts();
