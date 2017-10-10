@@ -16,21 +16,28 @@ $sites_from_serverpilot = array_filter( $sp->app_list()->data, function ( $site 
 } );
 
 ?>
-<table>
+<table class="fixed widefat">
 	<thead>
 		<tr>
-			<th> Site </th>
-			<th> Exists in logs </th>
+			<th class="manage-column column-columnname"><?php echo esc_html( 'Site' ); ?> </th>
+			<th class="manage-column column-columnname"><?php echo esc_html( 'System user' ); ?> </th>
+			<th class="manage-column column-columnname"><?php echo esc_html( 'Exists in logs' ); ?> </th>
 		</tr>
 	</thead>
+	<tbody>
 <?php
 foreach ( $sites_from_serverpilot as $site ) {
+	$in_logs = in_array( $site->domains[0], $just_site_domains, true );
 	?>
-	<tr>
-		<td><?php echo esc_html( $site->domains[0] ); ?></td>
-		<td><?php echo esc_html( in_array( $site->domains[0], $just_site_domains) ) ? 'Yes' : 'No' ; ?></td>
+	<tr class="active">
+		<td class="column-columnname">
+			<a target="_blank" href="<?php echo 'http://' . esc_attr( $site->domains[0] ); ?>" rel="noopener nofollow"<strong><?php echo esc_html( $site->domains[0] ); ?></strong></a>
+		</td>
+		<td class="column-columnname"><?php echo esc_html( $site->name ); ?></td>
+		<td class="column-columnname"><?php echo esc_html( $in_logs ? __( 'Yes' ) : _( 'No' ) ) ; ?></td>
 	</tr>
 	<?php
 }
 	?>
+	</tbody>
 </table>
