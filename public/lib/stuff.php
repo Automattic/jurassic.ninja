@@ -1,13 +1,17 @@
 <?php
+
+namespace jn;
+
 require __DIR__ . '/../../config.inc.php';
 require __DIR__ . '/../vendor/autoload.php';
 
+ 
 use Medoo\Medoo;
 
 function config( $key = null ) {
 	global $global_config;
 	if ( ! isset( $global_config ) ) {
-		throw new Exception( 'Error Finding config variable', 1 );
+		throw new \Exception( 'Error Finding config variable', 1 );
 	}
 	if ( $key && isset( $global_config[ $key ] ) ) {
 		return $global_config[ $key ];
@@ -36,7 +40,7 @@ function generate_random_username() {
 
 function generate_new_user( $password ) {
 	$username = generate_random_username();
-	$sp = new ServerPilot( config( 'serverpilot' ) );
+	$sp = new \ServerPilot( config( 'serverpilot' ) );
 	$user = $sp->sysuser_create( config( 'SERVER_ID' ), $username, $password );
 	return $user;
 }
@@ -113,7 +117,7 @@ function enable_multisite( $user, $password, $domain, $subdomain_based = false )
 }
 
 function wait_action( $action_id ) {
-	$sp = new ServerPilot( config( 'serverpilot' ) );
+	$sp = new \ServerPilot( config( 'serverpilot' ) );
 	$ok = false;
 	do {
 		sleep( 1 );
@@ -124,7 +128,7 @@ function wait_action( $action_id ) {
 }
 
 function enable_ssl( $app_id ) {
-	$sp = new ServerPilot( config( 'serverpilot' ) );
+	$sp = new \ServerPilot( config( 'serverpilot' ) );
 	$data = $sp->ssl_auto( $app_id );
 	l( wait_action( $data->actionid ) );
 
@@ -147,7 +151,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		'multisite-subdirs' => $enable_multisite,
 	] );
 
-	$sp = new ServerPilot( config( 'serverpilot' ) );
+	$sp = new \ServerPilot( config( 'serverpilot' ) );
 
 	try {
 		$password = generate_random_password();
@@ -175,7 +179,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 			enable_multisite( $user->data->name, $password, $domain );
 		}
 		return $app->data;
-	} catch ( ServerPilotException $e ) {
+	} catch ( \ServerPilotException $e ) {
 		// echo $e->getCode() . ': ' .$e->getMessage();
 		return null;
 	}
@@ -236,13 +240,13 @@ function log_new_site( $data ) {
 }
 
 function delete_sysuser( $id ) {
-	$sp = new ServerPilot( config( 'serverpilot' ) );
+	$sp = new \ServerPilot( config( 'serverpilot' ) );
 	return $sp->sysuser_delete( $id );
 }
 
 function purge_sites() {
 	$sites = sites_to_be_purged();
-	$sp = new ServerPilot( config( 'serverpilot' ) );
+	$sp = new \ServerPilot( config( 'serverpilot' ) );
 	$system_users  = $sp->sysuser_list()->data;
 	$site_users = array_map(
 		function ( $site ) {

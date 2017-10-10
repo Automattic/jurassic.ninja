@@ -42,7 +42,7 @@ $app->post( '/anticsrf', function ( $request, $response, $args ) {
 $app->run();
 
 function rest_api_create( Request $request, Response $response ) {
-	$data = create_wordpress( 'php5.6', false, true, false );
+	$data = jn\create_wordpress( 'php5.6', false, true, false );
 	$url = 'http://' . $data->domains[0];
 	$reply = array(
 		'url' => $url,
@@ -51,21 +51,21 @@ function rest_api_create( Request $request, Response $response ) {
 }
 
 function rest_api_extend( Request $request, Response $response, $domain ) {
-	extend_site_life( $domain );
+	jn\extend_site_life( $domain );
 	return $response->withJson( $domain );
 }
 
 function rest_api_check_in( Request $request, Response $response, $domain ) {
-	mark_site_as_checked_in( $domain );
+	jn\mark_site_as_checked_in( $domain );
 	return $response->withJson( $domain );
 }
 
 function rest_api_purge( Request $request, Response $response, $domain ) {
-	purge_sites();
+	jn\purge_sites();
 	return $response->withJson( $purged_sites );
 }
 
 function rest_api_site_expiration_time( Request $request, Response $response, $domain ) {
-	$data = get_site_expiration_date();
+	$data = jn\get_site_expiration_date();
 	return $response->withJson( $data );
 }
