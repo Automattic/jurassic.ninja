@@ -4,8 +4,10 @@ namespace jn;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/RationalOptionPages.php';
+require_once __DIR__ . '/rest-api-stuff.php';
 
 define( 'OPTIONS_KEY', 'jurassic-ninja' );
+define( 'REST_API_NAMESPACE', 'jurassic.ninja' );
 
 use Medoo\Medoo;
 
@@ -29,6 +31,7 @@ function config( $key = null ) {
 
 add_options_page();
 add_scripts();
+add_rest_api_endpoints();
 
 $db = null;
 
@@ -427,5 +430,25 @@ function add_options_page() {
 function add_scripts() {
 	add_action( 'wp_enqueue_scripts', function () {
 		wp_enqueue_script( 'jurassicninja.js', plugins_url( '', __FILE__ ) . '/../jurassicninja.js', false, false, true );
+	} );
+}
+
+function add_rest_api_endpoints() {
+	add_post_endpoint( 'create', function ( $request ) {
+		//echo $request->data;
+		$defaults = [
+			'runtime' => 'php5.6',
+			'ssl' => false,
+			'jetpack' => false,
+			'jetpack-beta' => false,
+			'multisite-subdirs' => false,
+			'multisite-subdomains' => false,
+		];
+		$params = $request-> get_json_params() ? $request-> get_json_params() : [];
+		$output = [
+			'url' => 'http://sample.jurassic.ninja',
+		];
+		$features = array_merge( $defaults, $output );
+		return $output;
 	} );
 }
