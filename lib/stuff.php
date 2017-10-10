@@ -9,8 +9,6 @@ require_once __DIR__ . '/rest-api-stuff.php';
 define( 'OPTIONS_KEY', 'jurassic-ninja' );
 define( 'REST_API_NAMESPACE', 'jurassic.ninja' );
 
-use Medoo\Medoo;
-
 function l( $stuff ) {
 	error_log( print_r( $stuff, true ) );
 }
