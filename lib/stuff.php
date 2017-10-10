@@ -105,7 +105,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		);
 		$domain = generate_random_subdomain() . '.' . config( 'domain' );
 		$app = $sp->app_create( $user->data->name, $user->data->id, $php_version, array( $domain ), $wordpress_options );
-		wait_action( $app->actionid );
+		wait_for_serverpilot_action( $app->actionid );
 		log_new_site( $app->data );
 		if ( $add_ssl ) {
 			enable_ssl( $app->data->id );
@@ -150,7 +150,7 @@ function enable_multisite( $user, $password, $domain, $subdomain_based = false )
 function enable_ssl( $app_id ) {
 	$sp = new \ServerPilot( config( 'serverpilot' ) );
 	$data = $sp->ssl_auto( $app_id );
-	l( wait_action( $data->actionid ) );
+	l( wait_for_serverpilot_action( $data->actionid ) );
 
 }
 
@@ -326,7 +326,7 @@ function sites_to_be_purged() {
 	return array_merge( $expired, $never_logged_in, $unused );
 }
 
-function wait_action( $action_id ) {
+function wait_for_serverpilot_action( $action_id ) {
 	$sp = new \ServerPilot( config( 'serverpilot' ) );
 	$ok = false;
 	do {
