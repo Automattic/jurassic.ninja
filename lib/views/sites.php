@@ -10,8 +10,7 @@ $just_site_domains = array_map( function ( $site ) {
 	return $site['domain'];
 }, $sites );
 
-$sp = new \ServerPilot( config( 'serverpilot' ) );
-$sites_from_serverpilot = array_filter( $sp->app_list()->data, function ( $site ) {
+$sites_from_serverpilot = array_filter( sp()->app_list()->data, function ( $site ) {
 	return 'jurassic.ninja' !== $site->name;
 } );
 

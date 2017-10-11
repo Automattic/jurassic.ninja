@@ -9,6 +9,7 @@ require_once __DIR__ . '/rest-api-stuff.php';
 define( 'OPTIONS_KEY', 'jurassic-ninja' );
 define( 'REST_API_NAMESPACE', 'jurassic.ninja' );
 
+$serverpilot_instance = null;
 /**
  * Force the site to log the creator in on the first time they visit the site
  * @param string $user     System user for ssh.
@@ -121,7 +122,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		'multisite-subdirs' => $enable_multisite,
 	] );
 
-	$sp = new \ServerPilot( config( 'serverpilot' ) );
+	$sp = sp();
 
 	try {
 		$password = generate_random_password();
@@ -175,7 +176,7 @@ function create_slug( $str, $delimiter = '-' ) {
  * @return [type]     [description]
  */
 function delete_sysuser( $id ) {
-	$sp = new \ServerPilot( config( 'serverpilot' ) );
+	$sp = sp();
 	return $sp->sysuser_delete( $id );
 }
 
@@ -206,7 +207,7 @@ function enable_multisite( $user, $password, $domain, $subdomain_based = false )
  * @return [type]         [description]
  */
 function enable_ssl( $app_id ) {
-	$sp = new \ServerPilot( config( 'serverpilot' ) );
+	$sp = sp();
 	$data = $sp->ssl_auto( $app_id );
 	l( wait_for_serverpilot_action( $data->actionid ) );
 
@@ -247,7 +248,7 @@ function extend_site_life( $domain ) {
  */
 function generate_new_user( $password ) {
 	$username = generate_random_username();
-	$sp = new \ServerPilot( config( 'serverpilot' ) );
+	$sp = sp();
 	$user = $sp->sysuser_create( config( 'serverpilot_server_id' ), $username, $password );
 	return $user;
 }
@@ -357,7 +358,7 @@ function mark_site_as_checked_in( $domain ) {
  */
 function purge_sites() {
 	$sites = sites_to_be_purged();
-	$sp = new \ServerPilot( config( 'serverpilot' ) );
+	$sp = sp();
 	$system_users  = $sp->sysuser_list()->data;
 	$site_users = array_map(
 		function ( $site ) {
@@ -452,12 +453,23 @@ function sites_to_be_purged() {
 }
 
 /**
+ * Returns a ServerPilot instance
+ * @return [type] [description]
+ */
+function sp() {
+	global $serverpilot_instance;
+	if ( ! $serverpilot_instance ) {
+		$serverpilot_instance = new \ServerPilot( config( 'serverpilot' ) );
+	}
+	return $serverpilot_instance;
+}
+/**
  * Locks the process by looping until ServerPilots says the action is completed
  * @param  string $action_id The ServerPilot Id for an action
  * @return string            The status of the action
  */
 function wait_for_serverpilot_action( $action_id ) {
-	$sp = new \ServerPilot( config( 'serverpilot' ) );
+	$sp = sp();
 	$ok = false;
 	do {
 		sleep( 1 );
@@ -466,4 +478,3 @@ function wait_for_serverpilot_action( $action_id ) {
 	} while ( ! $ok );
 	return $status;
 }
-
