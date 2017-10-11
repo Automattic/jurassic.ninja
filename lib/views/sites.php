@@ -20,7 +20,7 @@ $server_pilot_apps = array_filter( sp()->app_list()->data, function ( $site ) {
 		<tr>
 			<th class="manage-column column-columnname"><?php echo esc_html_e( '#' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Site' ); ?> </th>
-			<th class="manage-column column-columnname"><?php echo esc_html_e( 'System user' ); ?> </th>
+			<th class="manage-column column-columnname"><?php echo esc_html_e( 'App name' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Exists in logs' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Created on' ); ?> </th>
 		</tr>
@@ -40,7 +40,7 @@ foreach ( $server_pilot_apps as $site ) {
 		</td>
 		<td class="column-columnname"><?php echo esc_html( $site->name ); ?></td>
 		<td class="column-columnname"><?php echo $in_logs ? esc_html_e( 'Yes' ) : esc_html_e( 'No' ); ?></td>
-		<td class="column-columnname"><?php echo esc_html( $created ); ?></td>
+		<td class="column-columnname"><?php echo $in_logs ? esc_html( mysql2date( 'l, F j - g:i', get_date_from_gmt( $created ) ) ) : ''; ?></td>
 	</tr>
 	<?php
 }
