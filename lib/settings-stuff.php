@@ -56,12 +56,6 @@ function add_options_page() {
 							'text' => __( 'Default interval for considering a site to be expired', 'sample-domain' ),
 							'placeholder' => 'INTERVAL 7 DAY',
 						),
-						'sites_never_logged_in_expiration' => array(
-							'id' => 'sites_never_logged_in_expiration',
-							'title' => __( 'Unlogged sites lifespan', 'sample-domain' ),
-							'text' => __( 'Default interval for considering a site to be expired if the admin never logged in again wp-admin', 'sample-domain' ),
-							'placeholder' => 'INTERVAL 7 DAY',
-						),
 						'sites_never_checked_in_expiration' => array(
 							'id' => 'sites_never_checked_in_expiration',
 							'title' => __( 'Unvisited sites lifespan', 'sample-domain' ),

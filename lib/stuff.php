@@ -220,7 +220,11 @@ function enable_ssl( $app_id ) {
 function expired_sites() {
 	global $db;
 	$interval = config( 'sites_expiration' );
-	return db()->get_results( "select * from sites where last_logged_in IS NOT NULL AND last_logged_in < DATE_SUB( NOW(), $interval )", \ARRAY_A );
+	return db()->get_results(
+		"select * from sites where ( last_logged_in IS NOT NULL AND last_logged_in < DATE_SUB( NOW(), $interval ) )
+		OR ( last_logged_in is NULL and created < DATE_SUB( NOW(), $interval ) )",
+		\ARRAY_A
+	);
 }
 
 /**
@@ -427,16 +431,6 @@ function sites_never_checked_in() {
 
 /**
  * Calculates and returns sites on which the creator has never logged in with credentials.
- * @return [type] [description]
- */
-function sites_never_logged_in() {
-	global $db;
-	$interval = config( 'sites_never_logged_in_expiration' );
-	return db()->get_results( "select * from sites where last_logged_in is NULL and created < DATE_SUB( NOW(), $interval )", \ARRAY_A );
-}
-
-/**
- * Calculates and returns sites on which the creator has never logged in with credentials.
  * The sites include:
  *     expired_sites + sites_never_checked_in + sites_never_logged_in
  *
@@ -447,9 +441,8 @@ function sites_to_be_purged() {
 	// TODO BETTER STRATEGY FOR WIPING OUT EARLY THOSE SITES THAT NEVER GOT VISITED AT ALL
 	// CURRENTLY THE last_logged_in datetime is filled if the user logs in with user/password
 	// and not on the first time they reach the site's dashboard.
-	$never_logged_in = sites_never_logged_in();
 	$unused = sites_never_checked_in();
-	return array_merge( $expired, $never_logged_in, $unused );
+	return array_merge( $expired, $unused );
 }
 
 /**
