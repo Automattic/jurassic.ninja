@@ -47,6 +47,11 @@ function prefix_create_table() {
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 	}
 
-	dbDelta( $sql );
-	dbDelta( $sql2 );
+	try {
+		@dbDelta( $sql );
+		@dbDelta( $sql2 );
+
+	} catch ( \Exception $e ) {
+		push_error( new \WP_Error( 'error_creating_administartive_tables' ) );
+	}
 }
