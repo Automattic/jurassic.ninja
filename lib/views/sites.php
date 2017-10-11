@@ -23,6 +23,8 @@ $server_pilot_apps = array_filter( sp()->app_list()->data, function ( $site ) {
 			<th class="manage-column column-columnname"><?php echo esc_html_e( 'App name' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Exists in logs' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Created on' ); ?> </th>
+			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Checked in on' ); ?> </th>
+			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Last logged in on' ); ?> </th>
 		</tr>
 	</thead>
 	<tbody>
@@ -32,6 +34,8 @@ foreach ( $server_pilot_apps as $site ) {
 	$in_logs = array_key_exists( $domain, $db_sites_indexed );
 	$db_id = $in_logs ? $db_sites_indexed[ $domain ]['id'] : '';
 	$created = $in_logs ? $db_sites_indexed[ $domain ]['created'] : '';
+	$last_logged_in = $in_logs ? $db_sites_indexed[ $domain ]['last_logged_in'] : '';
+	$checked_in = $in_logs ? $db_sites_indexed[ $domain ]['checked_in'] : '';
 	?>
 	<tr class="active">
 		<td class="column-columnname"><?php echo esc_html( $db_id ); ?></td>
@@ -41,6 +45,8 @@ foreach ( $server_pilot_apps as $site ) {
 		<td class="column-columnname"><?php echo esc_html( $site->name ); ?></td>
 		<td class="column-columnname"><?php echo $in_logs ? esc_html_e( 'Yes' ) : esc_html_e( 'No' ); ?></td>
 		<td class="column-columnname"><?php echo $in_logs ? esc_html( mysql2date( 'l, F j - g:i', get_date_from_gmt( $created ) ) ) : ''; ?></td>
+		<td class="column-columnname"><?php echo $in_logs && $checked_in ? esc_html( mysql2date( 'l, F j - g:i', get_date_from_gmt( $checked_in ) ) ) : ''; ?></td>
+		<td class="column-columnname"><?php echo $in_logs && $last_logged_in ? esc_html( mysql2date( 'l, F j - g:i', get_date_from_gmt( $last_logged_in ) ) ) : ''; ?></td>
 	</tr>
 	<?php
 }
