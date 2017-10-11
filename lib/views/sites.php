@@ -20,7 +20,7 @@ $server_pilot_apps = array_filter( sp()->app_list()->data, function ( $site ) {
 		<tr>
 			<th class="manage-column column-columnname"><?php echo esc_html_e( '#' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Site' ); ?> </th>
-			<th class="manage-column column-columnname"><?php echo esc_html_e( 'App name' ); ?> </th>
+			<th class="manage-column column-columnname"><?php echo esc_html_e( 'System user' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Exists in logs' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Created on' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Checked in on' ); ?> </th>
@@ -34,6 +34,7 @@ foreach ( $server_pilot_apps as $site ) {
 	$in_logs = array_key_exists( $domain, $db_sites_indexed );
 	$db_id = $in_logs ? $db_sites_indexed[ $domain ]['id'] : '';
 	$created = $in_logs ? $db_sites_indexed[ $domain ]['created'] : '';
+	$sysusername = $in_logs ? $db_sites_indexed[ $domain ]['username'] : '';
 	$last_logged_in = $in_logs ? $db_sites_indexed[ $domain ]['last_logged_in'] : '';
 	$checked_in = $in_logs ? $db_sites_indexed[ $domain ]['checked_in'] : '';
 	?>
@@ -42,7 +43,7 @@ foreach ( $server_pilot_apps as $site ) {
 		<td class="column-columnname">
 			<a target="_blank" href="<?php echo 'http://' . esc_attr( $domain ); ?>" rel="noopener nofollow"<strong><?php echo esc_html( $domain ); ?></strong></a>
 		</td>
-		<td class="column-columnname"><?php echo esc_html( $site->name ); ?></td>
+		<td class="column-columnname"><?php echo esc_html( $sysusername ); ?></td>
 		<td class="column-columnname"><?php echo $in_logs ? esc_html_e( 'Yes' ) : esc_html_e( 'No' ); ?></td>
 		<td class="column-columnname"><?php echo $in_logs ? esc_html( mysql2date( 'l, F j - g:i', get_date_from_gmt( $created ) ) ) : ''; ?></td>
 		<td class="column-columnname"><?php echo $in_logs && $checked_in ? esc_html( mysql2date( 'l, F j - g:i', get_date_from_gmt( $checked_in ) ) ) : ''; ?></td>
