@@ -10,6 +10,7 @@ define( 'OPTIONS_KEY', 'jurassic-ninja' );
 define( 'REST_API_NAMESPACE', 'jurassic.ninja' );
 
 $serverpilot_instance = null;
+
 /**
  * Force the site to log the creator in on the first time they visit the site
  * @param string $user     System user for ssh.
@@ -218,7 +219,6 @@ function enable_ssl( $app_id ) {
  * @return Array List of sites
  */
 function expired_sites() {
-	global $db;
 	$interval = config( 'sites_expiration' );
 	return db()->get_results(
 		"select * from sites where ( last_logged_in IS NOT NULL AND last_logged_in < DATE_SUB( NOW(), $interval ) )
@@ -233,8 +233,6 @@ function expired_sites() {
  * @return [type]         [description]
  */
 function extend_site_life( $domain ) {
-	global $db;
-
 	db()->update( 'sites',
 		[
 			'last_logged_in' => current_time( 'mysql', 1 ),
@@ -302,8 +300,6 @@ function l( $stuff ) {
  * @return [type]       [description]
  */
 function log_new_site( $data ) {
-	global $db;
-
 	db()->insert( 'sites',
 		[
 			'username' => $data->name,
@@ -320,7 +316,6 @@ function log_new_site( $data ) {
  * @return [type]       [description]
  */
 function log_purged_site( $data ) {
-	global $db;
 	db()->insert( 'purged', [
 		'username' => $data['username'],
 		'domain' => $data['domain'],
@@ -342,8 +337,6 @@ function log_purged_site( $data ) {
  * @return [type]         [description]
  */
 function mark_site_as_checked_in( $domain ) {
-	global $db;
-
 	db()->update( 'sites',
 		[
 			'checked_in' => current_time( 'mysql', 1 ),
@@ -424,7 +417,6 @@ function run_command_on_behalf( $user, $password, $cmd ) {
  * @return [type] [description]
  */
 function sites_never_checked_in() {
-	global $db;
 	$interval = config( 'sites_never_checked_in_expiration' );
 	return db()->get_results( "select * from sites where checked_in is NULL and created < DATE_SUB( NOW(), $interval )", \ARRAY_A );
 }
