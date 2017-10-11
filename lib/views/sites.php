@@ -6,9 +6,7 @@ require_once __DIR__ . '/../db-stuff.php';
 
 $sites = db()->get_results( 'select * from sites', \ARRAY_A );
 
-$just_site_domains = array_map( function ( $site ) {
-	return $site['domain'];
-}, $sites );
+$just_site_domains = array_column( $sites, 'domain' );
 
 $sites_from_serverpilot = array_filter( sp()->app_list()->data, function ( $site ) {
 	return 'jurassic.ninja' !== $site->name;
