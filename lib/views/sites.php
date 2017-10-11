@@ -45,9 +45,9 @@ foreach ( $server_pilot_apps as $site ) {
 		</td>
 		<td class="column-columnname"><?php echo esc_html( $sysusername ); ?></td>
 		<td class="column-columnname"><?php echo $in_logs ? esc_html_e( 'Yes' ) : esc_html_e( 'No' ); ?></td>
-		<td class="column-columnname"><?php echo $in_logs ? esc_html( mysql2date( 'l, F j - g:i', get_date_from_gmt( $created ) ) ) : ''; ?></td>
-		<td class="column-columnname"><?php echo $in_logs && $checked_in ? esc_html( mysql2date( 'l, F j - g:i', get_date_from_gmt( $checked_in ) ) ) : ''; ?></td>
-		<td class="column-columnname"><?php echo $in_logs && $last_logged_in ? esc_html( mysql2date( 'l, F j - g:i', get_date_from_gmt( $last_logged_in ) ) ) : ''; ?></td>
+		<td class="column-columnname"><?php echo $in_logs ? esc_html( mysql2date( 'l, F j - g:i a', get_date_from_gmt( $created ) ) ) : ''; ?></td>
+		<td class="column-columnname"><?php echo $in_logs && $checked_in ? esc_html( mysql2date( 'l, F j - g:i a', get_date_from_gmt( $checked_in ) ) ) : ''; ?></td>
+		<td class="column-columnname"><?php echo $in_logs && $last_logged_in ? esc_html( mysql2date( 'l, F j - g:i a', get_date_from_gmt( $last_logged_in ) ) ) : ''; ?></td>
 	</tr>
 	<?php
 }
