@@ -7,12 +7,13 @@ namespace jn;
  * @param  string $key The particular option we want to access
  * @return string      The option value. All of the are just strings.
  */
-function config( $key = null ) {
+function config( $key = null, $default = null ) {
 	$options = get_option( OPTIONS_KEY );
 
 	if ( ! ( $options ) ) {
 		throw new \Exception( 'Error Finding config variable', 1 );
 	}
+
 	// Create the array needed by ServerPilot() here so I don't have to copy/paste this around
 	if ( 'serverpilot' === $key ) {
 		return [
@@ -20,6 +21,11 @@ function config( $key = null ) {
 			'key' => config( 'serverpilot_client_key' ),
 		];
 	}
+
+	if ( ! isset( $options[ $key ] ) ) {
+		return func_num_args() === 2 ? $default : null ;
+	}
+
 	return $options[ $key ];
 }
 
@@ -65,6 +71,13 @@ function add_options_page() {
 							'text' => __( 'Default interval for considering a site to be expired if the admin never visited wp-admin. Expressed in MySQL interval format.', 'jurassic-ninja' ),
 							'placeholder' => 'INTERVAL 2 HOUR',
 							'value' => 'INTERVAL 2 HOUR',
+						),
+						'add_jetpack_by_default' => array(
+							'id' => 'add_jetpack_by_default',
+							'title' => __( 'Add Jetpack to every launched WordPress', 'jurassic-ninja' ),
+							'text' => __( 'Install and activate Jetpack on launch', 'jurassic-ninja' ),
+							'type' => 'checkbox',
+							'checked' => true,
 						),
 					),
 				),
