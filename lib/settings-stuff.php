@@ -2,6 +2,11 @@
 
 namespace jn;
 
+/**
+ * Access a plugin option
+ * @param  string $key The particular option we want to access
+ * @return string      The option value. All of the are just strings.
+ */
 function config( $key = null ) {
 	$options = get_option( OPTIONS_KEY );
 
@@ -18,6 +23,11 @@ function config( $key = null ) {
 	return $options[ $key ];
 }
 
+/**
+ * Creates two pages for the plugin
+ *     - The options page
+ *     - The Site Admin page
+ */
 function add_options_page() {
 	$options_page = new \RationalOptionPages( [
 		'jurassic-ninja' => array(

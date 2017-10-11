@@ -7,6 +7,14 @@ function db() {
 	return $wpdb;
 }
 
+/**
+ * Used by the main plugin file to register a hook
+ * for the activation process.
+ * It will create a few tables needed for janitorial matters
+ *
+ * @param  string $plugin_file Naothing super useful. the plugin path
+ * @return [type]              [description]
+ */
 function create_tables( $plugin_file ) {
 	register_activation_hook( $plugin_file, 'jn\prefix_create_table' );
 }
