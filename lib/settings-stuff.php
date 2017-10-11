@@ -36,33 +36,33 @@ function add_options_page() {
 			'sections' => array(
 				'domain' => array(
 					'title' => __( 'Sites', 'jurassic-ninja' ),
-					'text' => '<p>' . __( 'Configure ServerPilot client Id and Key', 'jurassic-ninja' ) . '</p>',
+					'text' => '<p>' . __( 'Configure some defaults for the launched sites here.', 'jurassic-ninja' ) . '</p>',
 					'fields' => array(
 						'domain' => array(
 							'id' => 'domain',
-							'title' => __( 'The main domain for your WordPresses', 'jurassic-ninja' ),
-							'text' => __( 'Every created site will be created with a subodmain xxx.jurassic.ninja' ),
+							'title' => __( 'The parent domain for each launched WordPress', 'jurassic-ninja' ),
+							'text' => __( 'Every created site will be created with a subodmain abcd.jurassic.ninja' ),
 							'placeholder' => 'jurassic.ninja',
 							'value' => 'jurassic.ninja',
 						),
 						'default_admin_email_address' => array(
 							'id' => 'default_admin_email_address',
-							'title' => __( 'Default Admin Email Address for each WordPress', 'sample-domain' ),
+							'title' => __( 'Default Admin Email Address for each launched WordPress', 'jurassic-ninja' ),
 							'type' => 'email',
 							'placeholder' => 'test@test.com',
 							'value' => 'test@test.com',
 						),
 						'sites_expiration' => array(
 							'id' => 'sites_expiration',
-							'title' => __( 'Sites lifespan', 'sample-domain' ),
-							'text' => __( 'Default interval for considering a site to be expired', 'sample-domain' ),
+							'title' => __( 'Sites lifespan', 'jurassic-ninja' ),
+							'text' => __( 'Default interval for considering a site to be expired. Expressed in MySQL interval format.', 'jurassic-ninja' ),
 							'placeholder' => 'INTERVAL 7 DAY',
 							'value' => 'INTERVAL 7 DAY',
 						),
 						'sites_never_checked_in_expiration' => array(
 							'id' => 'sites_never_checked_in_expiration',
-							'title' => __( 'Unvisited sites lifespan', 'sample-domain' ),
-							'text' => __( 'Default interval for considering a site to be expired if the admin never visited wp-admin', 'sample-domain' ),
+							'title' => __( 'Unvisited sites lifespan', 'jurassic-ninja' ),
+							'text' => __( 'Default interval for considering a site to be expired if the admin never visited wp-admin. Expressed in MySQL interval format.', 'jurassic-ninja' ),
 							'placeholder' => 'INTERVAL 2 HOUR',
 							'value' => 'INTERVAL 2 HOUR',
 						),
@@ -70,22 +70,22 @@ function add_options_page() {
 				),
 				'serverpilot' => array(
 					'title' => __( 'ServerPilot Configuration', 'jurassic-ninja' ),
-					'text' => '<p>' . __( 'Configure ServerPilot client Id and Key', 'jurassic-ninja' ) . '</p>',
+					'text' => '<p>' . __( 'Configure ServerPilot client Id and Key. This need to be one of the paid plans. At least a Coach Plan', 'jurassic-ninja' ) . '</p>',
 					'fields' => array(
 						'serverpilot_server_id' => array(
 							'id' => 'serverpilot_server_id',
 							'title' => __( 'ServerPilot Server Id', 'jurassic-ninja' ),
-							'text' => __( 'Your ServerPilot Server.' ),
+							'text' => __( 'A ServerPilot Server Id.' ),
 						),
 						'serverpilot_client_id' => array(
 							'id' => 'serverpilot_client_id',
 							'title' => __( 'ServerPilot Client Id', 'jurassic-ninja' ),
-							'text' => __( 'Your ServerPilot Client id.' ),
+							'text' => __( 'A ServerPilot Client id.' ),
 						),
 						'serverpilot_client_key' => array(
 							'id' => 'serverpilot_client_key',
 							'title' => __( 'ServerPilot Key', 'jurassic-ninja' ),
-							'text' => __( 'Your ServerPilot Client key.' ),
+							'text' => __( 'A ServerPilot Client key.' ),
 						),
 					),
 				),
