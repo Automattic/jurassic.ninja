@@ -21,3 +21,4 @@ add_scripts();
 add_rest_api_endpoints();
 add_cron_job();
 create_tables( __FILE__ );
+
