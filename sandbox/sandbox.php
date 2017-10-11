@@ -63,8 +63,6 @@ function jurassic_ninja_wp_login() {
 				'domain' => $domain,
 			],
 		] );
-	}
-	// REDIRECT TO redirect_to INSTEAD
 		wp_safe_redirect( '/wp-admin' );
 		exit( 0 );
 	}
