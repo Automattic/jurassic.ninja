@@ -15,7 +15,12 @@ function add_cron_job() {
 
 	add_action( 'jurassic_ninja_purge', 'jn\jurassic_ninja_purge' );
 
-	function jurassic_ninja_purge() {
-		purge_sites();
-	}
+}
+
+/**
+ * Attempts to purge sites calculated as ready to be purged
+ * @return [type] [description]
+ */
+function jurassic_ninja_purge() {
+	purge_sites();
 }
