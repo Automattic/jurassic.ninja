@@ -46,58 +46,6 @@ function add_jetpack( $user, $password ) {
 }
 
 /**
- * Adds a REST interface to this plugin
- */
-function add_rest_api_endpoints() {
-	add_post_endpoint( 'create', function ( $request ) {
-		$data = create_wordpress( 'php5.6', false, true, false );
-		$url = 'http://' . $data->domains[0];
-
-		$output = [
-			'url' => $url,
-		];
-		return $output;
-	} );
-
-	add_post_endpoint( 'extend', function ( $request ) {
-		$body = $request->get_json_params() ? $request->get_json_params() : [];
-		if ( ! isset( $body['domain'] ) ) {
-			return new \WP_Error( 'no_domain_in_body', __( 'You must pass a valid "domain" prop in the body' ) );
-		}
-		extend_site_life( $body['domain'] );
-
-		$output = [
-			'url' => $body['domain'],
-		];
-
-		return $output;
-	} );
-
-	add_post_endpoint( 'checkin', function ( $request ) {
-		$body = $request->get_json_params() ? $request->get_json_params() : [];
-		if ( ! isset( $body['domain'] ) ) {
-			return new \WP_Error( 'no_domain_in_body', __( 'You must pass a valid "domain" prop in the body' ) );
-		}
-		mark_site_as_checked_in( $body['domain'] );
-
-		$output = [
-			'url' => $body['domain'],
-		];
-
-		return $output;
-	} );
-}
-
-/**
- * Adds javascript needed by this plugin
- */
-function add_scripts() {
-	add_action( 'wp_enqueue_scripts', function () {
-		wp_enqueue_script( 'jurassicninja.js', plugins_url( '', __FILE__ ) . '/../jurassicninja.js', false, false, true );
-	} );
-}
-
-/**
  * Creates a new WordPress instance on the managed server
  * @param  string  $php_version      The PHP runtime versino to run the app on.
  * @param  boolean $add_ssl          Should we add SSL for the site?

@@ -3,6 +3,49 @@
 namespace jn;
 
 /**
+ * Adds a REST interface to this plugin
+ */
+function add_rest_api_endpoints() {
+	add_post_endpoint( 'create', function ( $request ) {
+		$data = create_wordpress( 'php5.6', false, true, false );
+		$url = 'http://' . $data->domains[0];
+
+		$output = [
+			'url' => $url,
+		];
+		return $output;
+	} );
+
+	add_post_endpoint( 'extend', function ( $request ) {
+		$body = $request->get_json_params() ? $request->get_json_params() : [];
+		if ( ! isset( $body['domain'] ) ) {
+			return new \WP_Error( 'no_domain_in_body', __( 'You must pass a valid "domain" prop in the body' ) );
+		}
+		extend_site_life( $body['domain'] );
+
+		$output = [
+			'url' => $body['domain'],
+		];
+
+		return $output;
+	} );
+
+	add_post_endpoint( 'checkin', function ( $request ) {
+		$body = $request->get_json_params() ? $request->get_json_params() : [];
+		if ( ! isset( $body['domain'] ) ) {
+			return new \WP_Error( 'no_domain_in_body', __( 'You must pass a valid "domain" prop in the body' ) );
+		}
+		mark_site_as_checked_in( $body['domain'] );
+
+		$output = [
+			'url' => $body['domain'],
+		];
+
+		return $output;
+	} );
+}
+
+/**
  * Adds a callback to a REST endpoint for the POST method.
  * Depends on global constant REST_API_NAMESPACE.
  *
