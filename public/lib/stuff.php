@@ -96,7 +96,9 @@ function add_auto_login( $user, $password ) {
 
 function add_companion_plugin( $user, $password ) {
 	$wp_home = "~/apps/$user/public";
+	$companion_api_base_url = 'https://jurassic.ninja/api';
 	$companion_plugin_url = 'https://github.com/oskosk/companion/archive/master.zip';
+	run_command_on_behalf( $user, $password, "cd $wp_home && wp option add  companion_api_base_url '$companion_api_base_url'" );
 	$cmd = "cd $wp_home && wp plugin install --force $companion_plugin_url && wp plugin activate companion" ;
 	run_command_on_behalf( $user, $password, $cmd );
 
