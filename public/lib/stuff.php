@@ -89,15 +89,15 @@ function run_command_on_behalf( $user, $password, $cmd ) {
 function add_auto_login( $user, $password ) {
 	$domain = config( 'DOMAIN' );
 	$wp_home = "~/apps/$user/public";
-	$cmd = "cd $wp_home && wp option add auto_login 1 && wp option add sandbox_password '$password'";
+	$cmd = "cd $wp_home && wp option add auto_login 1 && wp option add jurassic_ninja_admin_password '$password'";
 	run_command_on_behalf( $user, $password, $cmd );
 
 }
 
-function copy_sandbox_plugin( $user, $password ) {
+function add_companion_plugin( $user, $password ) {
 	$wp_home = "~/apps/$user/public";
-
-	$cmd = "cp -a /home/sandbox $wp_home/wp-content/plugins/ && cd $wp_home && wp plugin activate sandbox" ;
+	$companion_plugin_url = 'https://github.com/oskosk/companion/archive/master.zip';
+	$cmd = "cd $wp_home && wp plugin install --force $companion_plugin_url && wp plugin activate companion" ;
 	run_command_on_behalf( $user, $password, $cmd );
 
 }
@@ -173,7 +173,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 			add_jetpack( $user->data->name, $password );
 		}
 		add_auto_login( $user->data->name, $password );
-		copy_sandbox_plugin( $user->data->name, $password );
+		add_companion_plugin( $user->data->name, $password );
 		$sp->sysuser_update( $user->data->id, null );
 		if ( $enable_multisite ) {
 			enable_multisite( $user->data->name, $password, $domain );
