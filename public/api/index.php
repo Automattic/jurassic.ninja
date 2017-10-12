@@ -16,8 +16,8 @@ $container['csrf'] = function ( $c ) {
 };
 
 $app->post( '/create', rest_api_create );
-$app->post( '/extend/', rest_api_extend );
-$app->post( '/checkin/', rest_api_check_in );
+$app->post( '/extend', rest_api_extend );
+$app->post( '/checkin', rest_api_check_in );
 $app->post( '/purge', rest_api_purge );
 $app->get( '/expiration/{domain}', rest_api_site_expiration_time );
 
