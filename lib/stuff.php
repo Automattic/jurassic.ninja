@@ -407,7 +407,6 @@ function wait_for_serverpilot_action( $action_id ) {
 	do {
 		sleep( 1 );
 		$status = $sp->action_info( $action_id );
-		$ok = 'open' === $status->data->status ? false : true;
-	} while ( ! $ok );
+	} while ( 'open' === $status->data->status );
 	return $status;
 }
