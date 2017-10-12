@@ -16,8 +16,8 @@ $container['csrf'] = function ( $c ) {
 };
 
 $app->post( '/create', rest_api_create );
-$app->post( '/extend/{domain}', rest_api_extend );
-$app->post( '/checkin/{domain}', rest_api_check_in );
+$app->post( '/extend/', rest_api_extend );
+$app->post( '/checkin/', rest_api_check_in );
 $app->post( '/purge', rest_api_purge );
 $app->get( '/expiration/{domain}', rest_api_site_expiration_time );
 
@@ -50,12 +50,17 @@ function rest_api_create( Request $request, Response $response ) {
 	return $response->withJson( $reply );
 }
 
-function rest_api_extend( Request $request, Response $response, $domain ) {
+function rest_api_extend( Request $request, Response $response ) {
+	$domain = $request->getParsedBody();
+	$domain = $domain['domain'];
 	jn\extend_site_life( $domain );
 	return $response->withJson( $domain );
 }
 
-function rest_api_check_in( Request $request, Response $response, $domain ) {
+function rest_api_check_in( Request $request, Response $response ) {
+	$domain = $request->getParsedBody();
+	$domain = $domain['domain'];
+
 	jn\mark_site_as_checked_in( $domain );
 	return $response->withJson( $domain );
 }
