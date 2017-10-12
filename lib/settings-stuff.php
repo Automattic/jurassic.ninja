@@ -79,6 +79,13 @@ function add_options_page() {
 							'type' => 'checkbox',
 							'checked' => true,
 						),
+						'purge_sites_when_cron_runs' => array(
+							'id' => 'purge_sites_when_cron_runs',
+							'title' => __( 'Run the cron task that purges sites when they expire', 'jurassic-ninja' ),
+							'text' => __( 'Purge sites when they expire (Hourly)', 'jurassic-ninja' ),
+							'type' => 'checkbox',
+							'checked' => true,
+						),
 					),
 				),
 				'serverpilot' => array(

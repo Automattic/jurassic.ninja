@@ -3,6 +3,7 @@
 namespace jn;
 
 require_once __DIR__ . '/db-stuff.php';
+require_once __DIR__ . '/settings-stuff.php';
 
 /**
  * Used by the main plugin file to register a cron job
@@ -22,5 +23,7 @@ function add_cron_job() {
  * @return [type] [description]
  */
 function jurassic_ninja_purge() {
-	purge_sites();
+	if ( config( 'purge_sites_when_cron_runs', true ) ) {
+		purge_sites();
+	}
 }
