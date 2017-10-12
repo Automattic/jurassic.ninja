@@ -2,12 +2,10 @@
 
 /*
  * Plugin Name: Jurassic Ninja
- * Plugin URI:  https://github.com/oskosk/jurassic.ninja
  * Description: Launch ephemeral instances of WordPress + Jetpack using ServerPilot and an Ubuntu Box.
  * Version: 1.0
  * Author: Osk
- * Author URI: https://github.com/oskosk
- * */
+ **/
 
 namespace jn;
 
