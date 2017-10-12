@@ -15,7 +15,7 @@ $server_pilot_apps = array_filter( sp()->app_list()->data, function ( $site ) {
 } );
 
 ?>
-<table class="fixed widefat">
+<table class="fixed widefat striped">
 	<thead>
 		<tr>
 			<th class="manage-column column-columnname"><?php echo esc_html_e( '#' ); ?> </th>
