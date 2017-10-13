@@ -22,13 +22,24 @@ function doitforme( $ ) {
 }
 
 function createSite() {
-	return fetch( '/wp-json/jurassic.ninja/create', { method: 'post' } )
+	const url = restApiSettings.root;
+	const nonce = restApiSettings.nonce;
+	return fetch( url + 'jurassic.ninja/create', {
+		method: 'post',
+		credentials: 'same-origin',
+		headers: {
+			'X-WP-Nonce': nonce,
+		}
+	} )
 		.then( checkStatusAndErrors ).then( parseJson )
 }
 
 function checkStatusAndErrors( response ) {
 	if ( response.status === 503 ) {
 		throw new Error( 'Site launching is turned off right now' );
+	}
+	if ( response.status === 403 ) {
+		throw new Error( 'Launching sites is currently restricted to authenticated users' );
 	}
 	if ( response.status !== 200 ) {
 		throw new Error( 'The API responded in a weird way' );

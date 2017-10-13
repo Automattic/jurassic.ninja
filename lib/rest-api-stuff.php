@@ -6,6 +6,12 @@ namespace jn;
  * Adds a REST interface to this plugin
  */
 function add_rest_api_endpoints() {
+	$options = [
+		'permission_callback' => function () {
+			return config( 'lock_launching', false ) ? current_user_can( 'manage_options' ) : true ;
+		},
+	];
+
 	add_post_endpoint( 'create', function ( $request ) {
 		if ( ! config( 'enable_launching', true ) ) {
 			return new \WP_Error( 'site_launching_disabled', __( 'Site launching is disabled right now' ), [
@@ -21,7 +27,7 @@ function add_rest_api_endpoints() {
 			'url' => $url,
 		];
 		return $output;
-	} );
+	}, $options );
 
 	add_post_endpoint( 'extend', function ( $request ) {
 		$body = $request->get_json_params() ? $request->get_json_params() : [];
