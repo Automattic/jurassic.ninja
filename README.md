@@ -3,20 +3,49 @@ A frontend to launching ephemeral WordPress instances that auto-destroy after so
 
 ## Usage
 
-Install the Plugin
+### Requirements
+
+* An ubuntu box managed by ServerPilot
+* A ServerPilot plan. One of the paid plans. Coach plan is OK. This is to take advantage of multiple sysusers management
+* `sshpasss` installed on the box.
+* `wp cli` and `composer` (which is already installed by ServerPilot).
+* **Have a domain name you fully control**.
+	* Add wildcard A record for every subdomain under that domain, pointing to the box's IP addresss.
+
+### Installation
+
+**Warning**: On plugin activation, this plugin will create two tables on the same DB your WordPress is running.
+
+#### Install the Plugin
+
+
+Install it
 
 ```sh
 wp plugin install https://github.com/oskosk/jurassic.ninja/archive/master.zip
-cd wp-content/plugins/jurassic.ninja-master
-composer install
-wp plugin activate jurassic.ninja
 ```
 
-### Create a /create page_title
+Install composer dependencies
+```sh
+cd wp-content/plugins/jurassic.ninja-master
+composer install
+```
 
-Create a page titled Created, make sure its slug is `/created`.
+**Activate the plugin**
+```
+wp plugin activate jurassic.ninja
+```
+### Create needed pages
 
-Add this using the Text version of the editor:
+All of the frontend magic is done by a little piece of Javascript that detected if it's being
+loaded on the `/create` route and if it's the case it just launches a request in the background
+to the plugin's API in order to launche a new site.
+
+#### Create a /create page_title
+
+Create a page titled **Create**. Make sure its slug is `/create`.
+
+And add this using the Text version of the editor:
 
 ```
 <img id="img1" src="https://media.giphy.com/media/uIRyMKFfmoHyo/giphy.gif" style="display:none" />
@@ -24,8 +53,10 @@ Add this using the Text version of the editor:
 <p class="lead" id="progress">Launching a fresh WP with a Jetpack ...</p>
 ```
 
+#### Create a home page with a link to `/create`.
+
 ### Configure Jurassic Ninja Settings page in wp-admin
 
 1. Visit the Jurassic Ninja Settings page in wp-admin.
 2. Configure your Server pilot client id, client key and server id.
-3.
+3. Configure the top-domain on which this
