@@ -23,6 +23,7 @@ function add_auto_login( $user, $password ) {
 	run_command_on_behalf( $user, $password, $cmd );
 	add_companion_plugin( $user, $password );
 }
+
 /**
  * Install and activates the Jurassic Ninja companion plugin on the site.
  * @param string $user     System user for ssh.
@@ -45,6 +46,18 @@ function add_companion_plugin( $user, $password ) {
 function add_jetpack( $user, $password ) {
 	$wp_home = "~/apps/$user/public";
 	run_command_on_behalf( $user, $password, "cd $wp_home && wp plugin install jetpack && wp plugin activate jetpack" );
+}
+
+/**
+* Install and activates Jetpack Beta Tester plugin on the site.
+ * @param string $user     System user for ssh.
+ * @param string $password System password for ssh.
+ */
+function add_jetpack_beta_plugin( $user, $password ) {
+	$wp_home = "~/apps/$user/public";
+	$jetpack_beta_plugin_url = 'https://github.com/Automattic/jetpack-beta/archive/master.zip';
+	$cmd = "cd $wp_home && wp plugin install $jetpack_beta_plugin_url && wp plugin activate jetpack-beta" ;
+	run_command_on_behalf( $user, $password, $cmd );
 }
 
 /**
@@ -93,6 +106,9 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		}
 		if ( $add_jetpack ) {
 			add_jetpack( $user->data->name, $password );
+		}
+		if ( $add_jetpack_beta ) {
+			add_jetpack_beta_plugin( $user->data->name, $password );
 		}
 		add_auto_login( $user->data->name, $password );
 
