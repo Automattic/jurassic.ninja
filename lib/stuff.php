@@ -358,7 +358,7 @@ function random_string( $length = 32 ) {
  */
 function run_command_on_behalf( $user, $password, $cmd ) {
 	$domain = config( 'domain' );
-	$run = "sshpass -p $password ssh -oStrictHostKeyChecking=no $user@$domain '$cmd'";
+	$run = "SSHPASS=$password sshpass -e ssh -oStrictHostKeyChecking=no $user@$domain '$cmd'";
 	return shell_exec( $run );
 }
 
