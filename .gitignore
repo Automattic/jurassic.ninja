@@ -1,5 +1,2 @@
-config.inc.php
 composer.lock
 vendor/
-public/vendor/
-public/composer.lock
