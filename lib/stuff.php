@@ -185,7 +185,7 @@ function enable_ssl( $app_id ) {
  * @return Array List of sites
  */
 function expired_sites() {
-	$interval = config( 'sites_expiration' );
+	$interval = config( 'sites_expiration', 'INTERVAL 7 DAY' );
 	return db()->get_results(
 		"select * from sites where ( last_logged_in IS NOT NULL AND last_logged_in < DATE_SUB( NOW(), $interval ) )
 		OR ( last_logged_in is NULL and created < DATE_SUB( NOW(), $interval ) )",
@@ -383,7 +383,7 @@ function run_command_on_behalf( $user, $password, $cmd ) {
  * @return [type] [description]
  */
 function sites_never_checked_in() {
-	$interval = config( 'sites_never_checked_in_expiration' );
+	$interval = config( 'sites_never_checked_in_expiration', 'INTERVAL 1 HOUR' );
 	return db()->get_results( "select * from sites where checked_in is NULL and created < DATE_SUB( NOW(), $interval )", \ARRAY_A );
 }
 
