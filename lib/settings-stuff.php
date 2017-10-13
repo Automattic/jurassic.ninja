@@ -116,8 +116,7 @@ function add_options_page() {
 			'parent_slug' => 'jurassic_ninja',
 			'sections' => array(
 				'section-one' => array(
-					'title' => __( 'Alive sites', 'jurassic_ninja' ),
-					'text' => '<p>' . __( 'These are all the sites that are currently running.', 'jurassic_ninja' ) . '</p>',
+					'title' => __( 'Launched sites', 'jurassic_ninja' ),
 					'include' => plugin_dir_path( __FILE__ ) . 'views/sites.php',
 				),
 			),

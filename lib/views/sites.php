@@ -15,10 +15,12 @@ $server_pilot_apps = array_filter( sp()->app_list()->data, function ( $site ) {
 } );
 
 ?>
+<p>
+	<?php printf( esc_html__( 'There are %d launched instances right now.' ), count( $server_pilot_apps ) ); ?>
 <table class="fixed widefat striped">
 	<thead>
 		<tr>
-			<th class="manage-column column-columnname"><?php echo esc_html_e( '#' ); ?> </th>
+			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Local Id' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Site' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html_e( 'System user' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Exists in logs' ); ?> </th>
