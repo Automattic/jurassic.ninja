@@ -66,25 +66,31 @@ function add_jetpack_beta_plugin( $user, $password ) {
  * @param  boolean $add_ssl          Should we add SSL for the site?
  * @param  boolean $add_jetpack      Should we add Jetpack to the site?
  * @param  boolean $add_jetpack_beta Should we add Jetpack Beta Tester plugin to the site?
- * @param  boolean $enable_multisite Should we enable multisite on the site ?
+ * @param  boolean $enable_subdir_multisite Should we enable subdir-based multisite on the site?
+ * @param  boolean $enable_subdir_multisite Should we enable subdomain-based multisite on the site?
  * @return ?Array                    null or the app data as returned by ServerPilot's API on creation.
  */
-function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpack = false, $add_jetpack_beta = false, $enable_multisite = false ) {
+function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpack = false, $add_jetpack_beta = false, $enable_subdir_multisite = false, $enable_subdomain_multisite = false ) {
 	$defaults = [
 		'runtime' => 'php5.6',
 		'ssl' => false,
 		'jetpack' => false,
 		'jetpack-beta' => false,
-		'multisite-subdirs' => false,
-		'multisite-subdomains' => false,
+		'subdir_multisite' => false,
+		'subdomain_multisite' => false,
 	];
 	$options = array_merge( $defaults, [
 		'runtime' => $php_version,
 		'ssl' => $add_ssl,
 		'jetpack' => $add_jetpack,
 		'jetpack-beta' => $add_jetpack_beta,
-		'multisite-subdirs' => $enable_multisite,
+		'subdir_multisite' => $enable_subdir_multisite,
+		'subdomain_multisite' => $enable_subdomain_multisite,
 	] );
+
+	if ( $enable_subdir_multisite && $enable_subdomain_multisite ) {
+		throw new \Exception( 'not-both-multisite-types', __( "Don't try to enable both types of multiste" ) );
+	}
 
 	$sp = sp();
 
@@ -98,7 +104,9 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 			'admin_email' => config( 'default_admin_email_address' ),
 		);
 		$domain = generate_random_subdomain() . '.' . config( 'domain' );
-		$app = $sp->app_create( $user->data->name, $user->data->id, $php_version, array( $domain ), $wordpress_options );
+		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
+		$domain_arg = $enable_subdomain_multisite ? array( $domain, '*.' . $domain ) : array( $domain );
+		$app = $sp->app_create( $user->data->name, $user->data->id, $php_version, $domain_arg, $wordpress_options );
 		wait_for_serverpilot_action( $app->actionid );
 		log_new_site( $app->data );
 		if ( $add_ssl ) {
@@ -113,8 +121,12 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		add_auto_login( $user->data->name, $password );
 
 		$sp->sysuser_update( $user->data->id, null );
-		if ( $enable_multisite ) {
-			enable_multisite( $user->data->name, $password, $domain );
+
+		if ( $enable_subdir_multisite ) {
+			enable_subdir_multisite( $user->data->name, $password, $domain );
+		}
+		if ( $enable_subdomain_multisite ) {
+			enable_subdomain_multisite( $user->data->name, $password, $domain );
 		}
 		return $app->data;
 	} catch ( \ServerPilotException $e ) {
@@ -148,20 +160,37 @@ function delete_sysuser( $id ) {
 }
 
 /**
- * Enables multisite on a WordPress instance
+ * Enables subdir-based multisite on a WordPress instance
  * @param string $user              System user for ssh.
  * @param string $password          System password for ssh.
- * @param  string  $domain          The main domain for the site
- * @param  boolean $subdomain_based Should it be subdomain-based instead of subdir-based ?
+ * @param string  $domain          The main domain for the site
  * @return [type]                   [description]
  */
-function enable_multisite( $user, $password, $domain, $subdomain_based = false ) {
+function enable_subdir_multisite( $user, $password, $domain ) {
 	$wp_home = "~/apps/$user/public";
 	$email = config( 'default_admin_email_address' );
 	l( $domain );
-	$cmd = "cd $wp_home && wp core multisite-install --title=\"My Primary WordPress Site on my Network\" --url=\"$domain\" --admin_email=\"$email\"";
+	$cmd = "cd $wp_home && wp core multisite-install --title=\"My Primary WordPress Site on my subdir-based Network\" --url=\"$domain\" --admin_email=\"$email\" --skip-email";
 	run_command_on_behalf( $user, $password, $cmd );
-	run_command_on_behalf( $user, $password, "cd $wp_home && cp .htaccess .htaccess-not-multisite && cp /home/templates/multisite-htaccess .htaccess" );
+	run_command_on_behalf( $user, $password, "cd $wp_home && cp .htaccess .htaccess-not-multisite && wget 'https://gist.githubusercontent.com/oskosk/f5febd1bb65a2ace3d35feac949b47fd/raw/6ea8ffa013056f6793d3e8775329ec74d3304835/gistfile1.txt' -O .htaccess" );
+}
+
+/**
+ * Enables subdomain-based multisite on a WordPress instance
+ * @param string $user              System user for ssh.
+ * @param string $password          System password for ssh.
+ * @param string  $domain          The main domain for the site.
+ * @return [type]                   [description]
+ */
+function enable_subdomain_multisite( $user, $password, $domain ) {
+	$wp_home = "~/apps/$user/public";
+	$email = config( 'default_admin_email_address' );
+	l( $domain );
+	$cmd = "cd $wp_home && wp core multisite-install --title=\"My Primary WordPress Site on my subdomain-based Network\" --url=\"$domain\" --admin_email=\"$email\" --subdomains --skip-email";
+	run_command_on_behalf( $user, $password, $cmd );
+	run_command_on_behalf( $user, $password, "cd $wp_home && cp .htaccess .htaccess-not-multisite && wget 'https://gist.githubusercontent.com/oskosk/8cac852c793df5e4946463e2e55dfdd6/raw/a60ce4122a69c1dd36c623c9b999c36c9c8d3db8/gistfile1.txt' -O .htaccess" );
+	// For some reason, the option auto_login gets set to 0, like if there were a sort of inside login happening magically.
+	run_command_on_behalf( $user, $password, "cd $wp_home && wp option update auto_login 1" );
 }
 
 /**
@@ -207,6 +236,20 @@ function extend_site_life( $domain ) {
 		]
 	);
 	l( db()->last_error );
+}
+
+/**
+ * Given an array of domains as ServerPilot returns in its API endpoint for an app
+ * excludes, the wildcard entries from the array and returns it.
+ * @param  Array  $domains The array of domains for an app as returned by ServerPilot's API
+ * @return string          The main domain
+ */
+function figure_out_main_domain( $domains ) {
+	$valid = array_filter( $domains, function ( $domain ) {
+		return false === strpos( $domain, '*.' );
+	} );
+	// reset() trick to get first item
+	return reset( $valid );
 }
 
 /**
