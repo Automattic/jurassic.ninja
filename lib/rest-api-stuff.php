@@ -14,8 +14,8 @@ function add_rest_api_endpoints() {
 		}
 		$add_jetpack_by_default = config( 'add_jetpack_by_default', true );
 		$add_jetpack_beta_by_default = config( 'add_jetpack_beta_by_default', false );
-		$data = create_wordpress( 'php5.6', false, $add_jetpack_by_default, $add_jetpack_beta_by_default, false );
-		$url = 'http://' . $data->domains[0];
+		$data = create_wordpress( 'php5.6', false, $add_jetpack_by_default, $add_jetpack_beta_by_default, false, false );
+		$url = 'http://' . figure_out_main_domain( $data->domains );
 
 		$output = [
 			'url' => $url,

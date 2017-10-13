@@ -32,7 +32,7 @@ $server_pilot_apps = array_filter( sp()->app_list()->data, function ( $site ) {
 	<tbody>
 <?php
 foreach ( $server_pilot_apps as $site ) {
-	$domain = $site->domains[0];
+	$domain = figure_out_main_domain( $site->domains );
 	$in_logs = array_key_exists( $domain, $db_sites_indexed );
 	$db_id = $in_logs ? $db_sites_indexed[ $domain ]['id'] : '';
 	$created = $in_logs ? $db_sites_indexed[ $domain ]['created'] : '';
