@@ -16,6 +16,12 @@ A frontend to launching ephemeral WordPress instances that auto-destroy after so
 
 **Warning**: On plugin activation, this plugin will create two tables on the same DB your WordPress is running.
 
+Basically the steps are
+
+1. Install the plugin and activate it.
+2. Create the needed pages (home and `/create`).
+3. 1. Configure ServerPilot credentials.
+
 #### Install the Plugin
 
 
@@ -35,11 +41,11 @@ composer install
 ```
 wp plugin activate jurassic.ninja
 ```
-### Create needed pages
+#### Create needed pages
 
-All of the frontend magic is done by a little piece of Javascript that detected if it's being
-loaded on the `/create` route and if it's the case it just launches a request in the background
-to the plugin's API in order to launche a new site.
+All of the frontend magic is done by a little piece of Javascript that detects if current page is
+on the `/create` route and if it's the case it just launches a request in the background
+to the plugin's REST API in order to launch a new site.
 
 #### Create a /create page_title
 
@@ -55,8 +61,10 @@ And add this using the Text version of the editor:
 
 #### Create a home page with a link to `/create`.
 
-### Configure Jurassic Ninja Settings page in wp-admin
+1. Create a new page and configure it a static front page with a link to `/create`.
+
+#### Configure Jurassic Ninja Settings page in wp-admin
 
 1. Visit the Jurassic Ninja Settings page in wp-admin.
 2. Configure your Server pilot client id, client key and server id.
-3. Configure the top-domain on which this
+3. Configure the top-domain on which this is going to create sites.
