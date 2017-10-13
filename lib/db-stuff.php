@@ -26,21 +26,23 @@ function prefix_create_table() {
 	$charset_collate = $wpdb->get_charset_collate();
 
 	$sql = "CREATE TABLE sites (
-		`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		`id` INT NOT NULL AUTO_INCREMENT,
 		username text not null,
 		domain text not null,
 		created datetime ,
 		last_logged_in datetime ,
-		checked_in datetime
+		checked_in datetime,
+		PRIMARY KEY  (id)
 	) $charset_collate;";
 
 	$sql2 = "CREATE TABLE purged (
-		`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		`id` INT NOT NULL AUTO_INCREMENT,
 		username text not null,
 		domain text not null,
 		created datetime ,
 		last_logged_in datetime ,
-		checked_in datetime
+		checked_in datetime,
+		PRIMARY KEY  (id)
 	) $charset_collate;";
 
 	if ( ! function_exists( 'dbDelta' ) ) {
