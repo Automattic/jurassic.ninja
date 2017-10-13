@@ -86,6 +86,13 @@ function add_options_page() {
 							'type' => 'checkbox',
 							'checked' => true,
 						),
+						'enable_launching' => array(
+							'id' => 'enable_launching',
+							'title' => __( 'Enable the launching of sites', 'jurassic-ninja' ),
+							'text' => __( 'Uncheck if site creation should be turned off', 'jurassic-ninja' ),
+							'type' => 'checkbox',
+							'checked' => true,
+						),
 					),
 				),
 				'serverpilot' => array(
