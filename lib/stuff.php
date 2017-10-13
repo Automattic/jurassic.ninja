@@ -21,7 +21,7 @@ function add_auto_login( $user, $password ) {
 	$wp_home = "~/apps/$user/public";
 	$cmd = "cd $wp_home && wp option add auto_login 1 && wp option add jurassic_ninja_admin_password '$password'";
 	run_command_on_behalf( $user, $password, $cmd );
-
+	add_companion_plugin( $user, $password );
 }
 /**
  * Install and activates the Jurassic Ninja companion plugin on the site.
@@ -95,7 +95,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 			add_jetpack( $user->data->name, $password );
 		}
 		add_auto_login( $user->data->name, $password );
-		add_companion_plugin( $user->data->name, $password );
+
 		$sp->sysuser_update( $user->data->id, null );
 		if ( $enable_multisite ) {
 			enable_multisite( $user->data->name, $password, $domain );
