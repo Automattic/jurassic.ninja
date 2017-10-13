@@ -7,8 +7,14 @@ namespace jn;
  */
 function add_rest_api_endpoints() {
 	add_post_endpoint( 'create', function ( $request ) {
+		if ( ! config( 'enable_launching', true ) ) {
+			return new \WP_Error( 'site_launching_disabled', __( 'Site launching is disabled right now' ), [
+				'status' => 503,
+			] );
+		}
 		$add_jetpack_by_default = config( 'add_jetpack_by_default', true );
-		$data = create_wordpress( 'php5.6', false, $add_jetpack_by_default, false );
+		$add_jetpack_beta_by_default = config( 'add_jetpack_beta_by_default', false );
+		$data = create_wordpress( 'php5.6', false, $add_jetpack_by_default, $add_jetpack_beta_by_default, false );
 		$url = 'http://' . $data->domains[0];
 
 		$output = [
@@ -98,9 +104,12 @@ function add_endpoint( $namespace, $path, $callback, $register_rest_route_option
 		try {
 			global $response;
 			$data = $callback( $request );
-
 			$response['status'] = 'ok';
 			$response['data'] = $data;
+
+			if ( is_wp_error( $data ) ) {
+				$response = $data;
+			}
 		} catch ( Exception $e ) {
 			global $response;
 			$response = [
