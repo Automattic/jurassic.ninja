@@ -50,7 +50,22 @@ function config_errors() {
 	if ( ! config( 'default_admin_email_address' ) ) {
 		$unconfigured[] = __( 'Main Admin Email Address', 'jurassic-ninja' );
 	};
+
+	$server_pilot_settings_set = config( 'serverpilot_client_key' ) && config( 'serverpilot_client_id' )
+		&& config( 'serverpilot_server_id' );
+	if ( $server_pilot_settings_set ) {
+		try {
+			sp()->server_info( config( 'serverpilot_server_id' ) );
+		} catch ( \ServerPilotException $e ) {
+			$unconfigured[] = __( 'valid ServerPilot Id, Key and Server Id for a paid plan', 'jurassic-ninja' );
+		}
+	}
+
 	return $unconfigured;
+}
+
+function validate_serverpilot_credentials() {
+
 }
 
 /**
