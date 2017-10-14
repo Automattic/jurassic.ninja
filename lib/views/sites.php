@@ -4,6 +4,16 @@ namespace jn;
 
 require_once __DIR__ . '/../db-stuff.php';
 
+if ( config_errors() ) {
+	?>
+	<p>
+		<?php
+			echo esc_html__( 'This section is disabled until you fix configuration errors shown above.', 'jurassic-ninja' );
+			exit( 1 );
+		?>
+	</p>
+	<?php
+}
 $db_sites = db()->get_results( 'select * from sites', \ARRAY_A );
 
 $just_site_domains = array_column( $db_sites, 'domain' );
@@ -16,17 +26,17 @@ $server_pilot_apps = array_filter( sp()->app_list()->data, function ( $site ) {
 
 ?>
 <p>
-	<?php printf( esc_html__( 'There are %d launched instances right now.' ), count( $server_pilot_apps ) ); ?>
+	<?php printf( esc_html__( 'There are %s launched instances right now.' ), count( $server_pilot_apps ) ); ?>
 <table class="fixed widefat striped">
 	<thead>
 		<tr>
-			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Local Id' ); ?> </th>
-			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Site' ); ?> </th>
-			<th class="manage-column column-columnname"><?php echo esc_html_e( 'System user' ); ?> </th>
-			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Exists in logs' ); ?> </th>
-			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Created on' ); ?> </th>
-			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Checked in on' ); ?> </th>
-			<th class="manage-column column-columnname"><?php echo esc_html_e( 'Last logged in on' ); ?> </th>
+			<th class="manage-column column-columnname"><?php echo esc_html__( 'Local Id' ); ?> </th>
+			<th class="manage-column column-columnname"><?php echo esc_html__( 'Site' ); ?> </th>
+			<th class="manage-column column-columnname"><?php echo esc_html__( 'System user' ); ?> </th>
+			<th class="manage-column column-columnname"><?php echo esc_html__( 'Exists in logs' ); ?> </th>
+			<th class="manage-column column-columnname"><?php echo esc_html__( 'Created on' ); ?> </th>
+			<th class="manage-column column-columnname"><?php echo esc_html__( 'Checked in on' ); ?> </th>
+			<th class="manage-column column-columnname"><?php echo esc_html__( 'Last logged in on' ); ?> </th>
 		</tr>
 	</thead>
 	<tbody>
@@ -46,7 +56,7 @@ foreach ( $server_pilot_apps as $site ) {
 			<a target="_blank" href="<?php echo 'http://' . esc_attr( $domain ); ?>" rel="noopener nofollow"<strong><?php echo esc_html( $domain ); ?></strong></a>
 		</td>
 		<td class="column-columnname"><?php echo esc_html( $sysusername ); ?></td>
-		<td class="column-columnname"><?php echo $in_logs ? esc_html_e( 'Yes' ) : esc_html_e( 'No' ); ?></td>
+		<td class="column-columnname"><?php echo $in_logs ? esc_html__( 'Yes' ) : esc_html__( 'No' ); ?></td>
 		<td class="column-columnname"><?php echo $in_logs ? esc_html( mysql2date( 'l, F j - g:i a', get_date_from_gmt( $created ) ) ) : ''; ?></td>
 		<td class="column-columnname"><?php echo $in_logs && $checked_in ? esc_html( mysql2date( 'l, F j - g:i a', get_date_from_gmt( $checked_in ) ) ) : ''; ?></td>
 		<td class="column-columnname"><?php echo $in_logs && $last_logged_in ? esc_html( mysql2date( 'l, F j - g:i a', get_date_from_gmt( $last_logged_in ) ) ) : ''; ?></td>

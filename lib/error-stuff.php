@@ -9,14 +9,13 @@ function add_error_notices() {
 }
 
 function admin_notices_errors() {
-	if ( ! count( errors() ) ) {
+	$config_errors = config_errors();
+	if ( ! count( errors() ) && ! count( $config_errors ) ) {
 		return;
 	}
 	?>
-	<div class="notice notice-error is-dismissible">
-		<p>
-			<strong><?php echo esc_html_e( 'There were some Jurassic errors' ); ?></storng>
-		</p>
+	<div class="notice notice-warning is-dismissible">
+		<h4><?php echo esc_html__( 'Jurassic ninja' ); ?></h4>
 		<ul>
 			<?php
 			foreach ( errors() as $error ) {
@@ -27,9 +26,22 @@ function admin_notices_errors() {
 			<?php
 			}
 			?>
+			<?php
+			if ( $config_errors ) {
+				$s = join( ', ', config_errors() );
+				$config_url = menu_page_url( 'jurassic_ninja', false );
+				$e = sprintf( __( "You need to first <a href='%s'>configure</a> %s to be able to launch sites" ), $config_url,  $s );
+				echo $e;
+			}
+			?>
 		</ul>
 	</div>
 <?php
+}
+
+function errors() {
+	global $errors;
+	return $errors;
 }
 
 function push_error( $err ) {
@@ -37,7 +49,3 @@ function push_error( $err ) {
 	$errors[] = $err;
 }
 
-function errors() {
-	global $errors;
-	return $errors;
-}

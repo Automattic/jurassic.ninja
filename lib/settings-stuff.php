@@ -4,8 +4,9 @@ namespace jn;
 
 /**
  * Access a plugin option
- * @param  string $key The particular option we want to access
- * @return string      The option value. All of the are just strings.
+ * @param  String $key The particular option we want to access
+ * @param  Mixed  $default As with get_option you can specify a defaul value to return if the option is not set
+ * @return String      The option value. All of the are just strings.
  */
 function config( $key = null, $default = null ) {
 	$options = get_option( OPTIONS_KEY );
@@ -30,6 +31,51 @@ function config( $key = null, $default = null ) {
 }
 
 /**
+ * Checks if the settings are not blank and returns an array informing
+ * which ones are not configured yet.
+ *
+ * @return Array problems found when checking settings.
+ */
+function config_errors() {
+	$unconfigured = [];
+
+	if ( ! config( 'serverpilot_client_key' ) ) {
+		$unconfigured[] = __( 'ServerPilot Client Key', 'jurassic-ninja' );
+	};
+	if ( ! config( 'serverpilot_client_id' ) ) {
+		$unconfigured[] = __( 'ServerPilot Client Id', 'jurassic-ninja' );
+	};
+
+	if ( ! config( 'serverpilot_server_id' ) ) {
+		$unconfigured[] = __( 'ServerPilot Server Id', 'jurassic-ninja' );
+	};
+
+	if ( ! config( 'domain' ) ) {
+		$unconfigured[] = __( 'Parent Domain', 'jurassic-ninja' );
+	};
+
+	if ( ! config( 'default_admin_email_address' ) ) {
+		$unconfigured[] = __( 'Main Admin Email Address', 'jurassic-ninja' );
+	};
+
+	$server_pilot_settings_set = config( 'serverpilot_client_key' ) && config( 'serverpilot_client_id' )
+		&& config( 'serverpilot_server_id' );
+	if ( $server_pilot_settings_set ) {
+		try {
+			sp()->server_info( config( 'serverpilot_server_id' ) );
+		} catch ( \ServerPilotException $e ) {
+			$unconfigured[] = __( 'valid ServerPilot Id, Key and Server Id for a paid plan', 'jurassic-ninja' );
+		}
+	}
+
+	return $unconfigured;
+}
+
+function validate_serverpilot_credentials() {
+
+}
+
+/**
  * Creates two pages for the plugin
  *     - The options page
  *     - The Site Admin page
@@ -39,6 +85,7 @@ function add_options_page() {
 		'jurassic-ninja' => array(
 			'page_title' => __( 'Jurassic Ninja Settings', 'jurassic-ninja' ),
 			'menu_slug' => 'jurassic_ninja',
+			'menu_title' => __( 'Jurassic Ninja' ),
 			'sections' => array(
 				'domain' => array(
 					'title' => __( 'Sites', 'jurassic-ninja' ),
@@ -133,7 +180,9 @@ function add_options_page() {
 			),
 		),
 		'jurassic_ninja_sites_admin' => array(
-			'page_title' => __( 'Sites Admin', 'jurassic_ninja' ),
+			'page_title' => __( 'Jurassic Ninja Sites Admin', 'jurassic_ninja' ),
+			'menu_title' => __( 'Sites Admin', 'jurassic_ninja' ),
+			'menu_slug' => 'jurassic_ninja_sites_admin',
 			'parent_slug' => 'jurassic_ninja',
 			'sections' => array(
 				'section-one' => array(
