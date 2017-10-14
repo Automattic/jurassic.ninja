@@ -55,7 +55,7 @@ foreach ( $serverpilot_apps as $site ) {
 		<td class="column-columnname">
 			<a target="_blank" href="<?php echo 'http://' . esc_attr( $domain ); ?>" rel="noopener nofollow"<strong><?php echo esc_html( $domain ); ?></strong></a>
 		</td>
-		<td class="column-columnname"><?php echo esc_html( $sysusername ); ?></td>
+		<td class="column-columnname"><a rel="noreferrer noopener" target="_blank" href="<?php echo esc_attr( "https://manage.serverpilot.io/#sysusers/$sysusername" );?>"><?php esc_html_e( $sysusername ); ?></a></td>
 		<td class="column-columnname"><?php echo $in_logs ? esc_html__( 'Yes' ) : esc_html__( 'No' ); ?></td>
 		<td class="column-columnname"><?php echo $in_logs ? esc_html( mysql2date( 'l, F j - g:i a', get_date_from_gmt( $created ) ) ) : ''; ?></td>
 		<td class="column-columnname"><?php echo $in_logs && $checked_in ? esc_html( mysql2date( 'l, F j - g:i a', get_date_from_gmt( $checked_in ) ) ) : ''; ?></td>
