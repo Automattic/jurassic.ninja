@@ -30,7 +30,7 @@ function admin_noticies() {
 			if ( $settings_problems ) {
 				$s = join( ', ', settings_problems() );
 				$config_url = menu_page_url( 'jurassic_ninja', false );
-				$e = sprintf( __( "You need to first <a href='%s'>configure</a> %s to be able to launch sites" ), $config_url,  $s );
+				$e = sprintf( __( "You need to first <a href='%1\$s'>configure</a> %2\$s to be able to launch sites" ), $config_url,  $s );
 				echo $e;
 			}
 			?>
