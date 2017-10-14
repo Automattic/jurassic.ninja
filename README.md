@@ -33,7 +33,7 @@ wp plugin install https://github.com/oskosk/jurassic.ninja/archive/master.zip
 
 Install composer dependencies
 ```sh
-cd wp-content/plugins/jurassic.ninja-master
+cd wp-content/plugins/jurassic.ninja
 composer install
 ```
 
