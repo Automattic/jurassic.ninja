@@ -15,7 +15,7 @@ function admin_notices_errors() {
 	}
 	?>
 	<div class="notice notice-warning is-dismissible">
-		<h4><?php echo esc_html_e( 'Jurassic ninja' ); ?></h4>
+		<h4><?php echo esc_html__( 'Jurassic ninja' ); ?></h4>
 		<ul>
 			<?php
 			foreach ( errors() as $error ) {
