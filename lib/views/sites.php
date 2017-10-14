@@ -4,11 +4,11 @@ namespace jn;
 
 require_once __DIR__ . '/../db-stuff.php';
 
-if ( config_errors() ) {
+if ( settings_problems() ) {
 	?>
 	<p>
 		<?php
-			echo esc_html__( 'This section is disabled until you fix configuration errors shown above.', 'jurassic-ninja' );
+			echo esc_html__( 'This section is disabled until you fix settings problems shown above in the notice.', 'jurassic-ninja' );
 			exit( 1 );
 		?>
 	</p>
@@ -20,13 +20,13 @@ $just_site_domains = array_column( $db_sites, 'domain' );
 
 $db_sites_indexed = array_combine( $just_site_domains, $db_sites );
 
-$server_pilot_apps = array_filter( sp()->app_list()->data, function ( $site ) {
+$serverpilot_apps = array_filter( sp()->app_list()->data, function ( $site ) {
 	return 'jurassic.ninja' !== $site->name;
 } );
 
 ?>
 <p>
-	<?php printf( esc_html__( 'There are %s launched instances right now.' ), count( $server_pilot_apps ) ); ?>
+	<?php printf( esc_html__( 'There are %s launched instances right now.' ), count( $serverpilot_apps ) ); ?>
 <table class="fixed widefat striped">
 	<thead>
 		<tr>
@@ -41,7 +41,7 @@ $server_pilot_apps = array_filter( sp()->app_list()->data, function ( $site ) {
 	</thead>
 	<tbody>
 <?php
-foreach ( $server_pilot_apps as $site ) {
+foreach ( $serverpilot_apps as $site ) {
 	$domain = figure_out_main_domain( $site->domains );
 	$in_logs = array_key_exists( $domain, $db_sites_indexed );
 	$db_id = $in_logs ? $db_sites_indexed[ $domain ]['id'] : '';
@@ -55,7 +55,7 @@ foreach ( $server_pilot_apps as $site ) {
 		<td class="column-columnname">
 			<a target="_blank" href="<?php echo 'http://' . esc_attr( $domain ); ?>" rel="noopener nofollow"<strong><?php echo esc_html( $domain ); ?></strong></a>
 		</td>
-		<td class="column-columnname"><?php echo esc_html( $sysusername ); ?></td>
+		<td class="column-columnname"><a rel="noreferrer noopener" target="_blank" href="<?php echo esc_attr( "https://manage.serverpilot.io/#sysusers/$sysusername" );?>"><?php esc_html_e( $sysusername ); ?></a></td>
 		<td class="column-columnname"><?php echo $in_logs ? esc_html__( 'Yes' ) : esc_html__( 'No' ); ?></td>
 		<td class="column-columnname"><?php echo $in_logs ? esc_html( mysql2date( 'l, F j - g:i a', get_date_from_gmt( $created ) ) ) : ''; ?></td>
 		<td class="column-columnname"><?php echo $in_logs && $checked_in ? esc_html( mysql2date( 'l, F j - g:i a', get_date_from_gmt( $checked_in ) ) ) : ''; ?></td>

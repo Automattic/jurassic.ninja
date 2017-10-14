@@ -17,7 +17,7 @@ $serverpilot_instance = null;
  * @param string $password System password for ssh.
  */
 function add_auto_login( $user, $password ) {
-	$domain = config( 'domain' );
+	$domain = settings( 'domain' );
 	$wp_home = "~/apps/$user/public";
 	$cmd = "cd $wp_home && wp option add auto_login 1 && wp option add jurassic_ninja_admin_password '$password'";
 	run_command_on_behalf( $user, $password, $cmd );
@@ -101,9 +101,9 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 			'site_title' => 'My WordPress Site',
 			'admin_user' => 'demo',
 			'admin_password' => $password,
-			'admin_email' => config( 'default_admin_email_address' ),
+			'admin_email' => settings( 'default_admin_email_address' ),
 		);
-		$domain = generate_random_subdomain() . '.' . config( 'domain' );
+		$domain = generate_random_subdomain() . '.' . settings( 'domain' );
 		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
 		$domain_arg = $enable_subdomain_multisite ? array( $domain, '*.' . $domain ) : array( $domain );
 		$app = $sp->app_create( $user->data->name, $user->data->id, $php_version, $domain_arg, $wordpress_options );
@@ -168,7 +168,7 @@ function delete_sysuser( $id ) {
  */
 function enable_subdir_multisite( $user, $password, $domain ) {
 	$wp_home = "~/apps/$user/public";
-	$email = config( 'default_admin_email_address' );
+	$email = settings( 'default_admin_email_address' );
 	l( $domain );
 	$cmd = "cd $wp_home && wp core multisite-install --title=\"My Primary WordPress Site on my subdir-based Network\" --url=\"$domain\" --admin_email=\"$email\" --skip-email";
 	run_command_on_behalf( $user, $password, $cmd );
@@ -184,7 +184,7 @@ function enable_subdir_multisite( $user, $password, $domain ) {
  */
 function enable_subdomain_multisite( $user, $password, $domain ) {
 	$wp_home = "~/apps/$user/public";
-	$email = config( 'default_admin_email_address' );
+	$email = settings( 'default_admin_email_address' );
 	l( $domain );
 	$cmd = "cd $wp_home && wp core multisite-install --title=\"My Primary WordPress Site on my subdomain-based Network\" --url=\"$domain\" --admin_email=\"$email\" --subdomains --skip-email";
 	run_command_on_behalf( $user, $password, $cmd );
@@ -214,7 +214,7 @@ function enable_ssl( $app_id ) {
  * @return Array List of sites
  */
 function expired_sites() {
-	$interval = config( 'sites_expiration', 'INTERVAL 7 DAY' );
+	$interval = settings( 'sites_expiration', 'INTERVAL 7 DAY' );
 	return db()->get_results(
 		"select * from sites where ( last_logged_in IS NOT NULL AND last_logged_in < DATE_SUB( NOW(), $interval ) )
 		OR ( last_logged_in is NULL and created < DATE_SUB( NOW(), $interval ) )",
@@ -260,7 +260,7 @@ function figure_out_main_domain( $domains ) {
 function generate_new_user( $password ) {
 	$username = generate_random_username();
 	$sp = sp();
-	$user = $sp->sysuser_create( config( 'serverpilot_server_id' ), $username, $password );
+	$user = $sp->sysuser_create( settings( 'serverpilot_server_id' ), $username, $password );
 	return $user;
 }
 
@@ -416,7 +416,7 @@ function random_string( $length = 32 ) {
  * @return string          The command output
  */
 function run_command_on_behalf( $user, $password, $cmd ) {
-	$domain = config( 'domain' );
+	$domain = settings( 'domain' );
 	$run = "SSHPASS=$password sshpass -e ssh -oStrictHostKeyChecking=no $user@$domain '$cmd'";
 	return shell_exec( $run );
 }
@@ -426,7 +426,7 @@ function run_command_on_behalf( $user, $password, $cmd ) {
  * @return [type] [description]
  */
 function sites_never_checked_in() {
-	$interval = config( 'sites_never_checked_in_expiration', 'INTERVAL 1 HOUR' );
+	$interval = settings( 'sites_never_checked_in_expiration', 'INTERVAL 1 HOUR' );
 	return db()->get_results( "select * from sites where checked_in is NULL and created < DATE_SUB( NOW(), $interval )", \ARRAY_A );
 }
 
@@ -454,7 +454,7 @@ function sp() {
 	global $serverpilot_instance;
 	if ( ! $serverpilot_instance ) {
 		try {
-			$serverpilot_instance = new \ServerPilot( config( 'serverpilot' ) );
+			$serverpilot_instance = new \ServerPilot( settings( 'serverpilot' ) );
 		} catch ( \ServerPilotException $e ) {
 			push_error( $e );
 		}

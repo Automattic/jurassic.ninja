@@ -8,7 +8,7 @@ namespace jn;
  * @param  Mixed  $default As with get_option you can specify a defaul value to return if the option is not set
  * @return String      The option value. All of the are just strings.
  */
-function config( $key = null, $default = null ) {
+function settings( $key = null, $default = null ) {
 	$options = get_option( OPTIONS_KEY );
 
 	if ( ! ( $options ) ) {
@@ -18,8 +18,8 @@ function config( $key = null, $default = null ) {
 	// Create the array needed by ServerPilot() here so I don't have to copy/paste this around
 	if ( 'serverpilot' === $key ) {
 		return [
-			'id' => config( 'serverpilot_client_id' ),
-			'key' => config( 'serverpilot_client_key' ),
+			'id' => $options['serverpilot_client_id'],
+			'key' => $options['serverpilot_client_key'],
 		];
 	}
 
@@ -36,37 +36,39 @@ function config( $key = null, $default = null ) {
  *
  * @return Array problems found when checking settings.
  */
-function config_errors() {
+function settings_problems() {
 	$unconfigured = [];
 
-	if ( ! config( 'serverpilot_client_key' ) ) {
+	if ( ! settings( 'serverpilot_client_key' ) ) {
 		$unconfigured[] = __( 'ServerPilot Client Key', 'jurassic-ninja' );
 	};
-	if ( ! config( 'serverpilot_client_id' ) ) {
+	if ( ! settings( 'serverpilot_client_id' ) ) {
 		$unconfigured[] = __( 'ServerPilot Client Id', 'jurassic-ninja' );
 	};
 
-	if ( ! config( 'serverpilot_server_id' ) ) {
+	if ( ! settings( 'serverpilot_server_id' ) ) {
 		$unconfigured[] = __( 'ServerPilot Server Id', 'jurassic-ninja' );
 	};
 
-	if ( ! config( 'domain' ) ) {
+	if ( ! settings( 'domain' ) ) {
 		$unconfigured[] = __( 'Parent Domain', 'jurassic-ninja' );
 	};
 
-	if ( ! config( 'default_admin_email_address' ) ) {
+	if ( ! settings( 'default_admin_email_address' ) ) {
 		$unconfigured[] = __( 'Main Admin Email Address', 'jurassic-ninja' );
 	};
 
-	$server_pilot_settings_set = config( 'serverpilot_client_key' ) && config( 'serverpilot_client_id' )
-		&& config( 'serverpilot_server_id' );
-	if ( $server_pilot_settings_set ) {
-		try {
-			sp()->server_info( config( 'serverpilot_server_id' ) );
-		} catch ( \ServerPilotException $e ) {
-			$unconfigured[] = __( 'valid ServerPilot Id, Key and Server Id for a paid plan', 'jurassic-ninja' );
-		}
-	}
+	// Comment this out until I find a better way to do this without querying
+	// ServerPilot's API on each page load :troll:
+	// $serverpilot_settings_set = settings( 'serverpilot_client_key' ) && settings( 'serverpilot_client_id' )
+	// 	&& settings( 'serverpilot_server_id' );
+	// if ( $serverpilot_settings_set ) {
+	// 	try {
+	// 		sp()->server_info( settings( 'serverpilot_server_id' ) );
+	// 	} catch ( \ServerPilotException $e ) {
+	// 		$unconfigured[] = __( 'valid ServerPilot Id, Key and Server Id for a paid plan', 'jurassic-ninja' );
+	// 	}
+	// }
 
 	return $unconfigured;
 }

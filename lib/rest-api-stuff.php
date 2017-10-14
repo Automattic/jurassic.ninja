@@ -8,18 +8,18 @@ namespace jn;
 function add_rest_api_endpoints() {
 	$options = [
 		'permission_callback' => function () {
-			return config( 'lock_launching', false ) ? current_user_can( 'manage_options' ) : true ;
+			return settings( 'lock_launching', false ) ? current_user_can( 'manage_options' ) : true ;
 		},
 	];
 
 	add_post_endpoint( 'create', function ( $request ) {
-		if ( ! config( 'enable_launching', true ) ) {
+		if ( ! settings( 'enable_launching', true ) ) {
 			return new \WP_Error( 'site_launching_disabled', __( 'Site launching is disabled right now' ), [
 				'status' => 503,
 			] );
 		}
-		$add_jetpack_by_default = config( 'add_jetpack_by_default', true );
-		$add_jetpack_beta_by_default = config( 'add_jetpack_beta_by_default', false );
+		$add_jetpack_by_default = settings( 'add_jetpack_by_default', true );
+		$add_jetpack_beta_by_default = settings( 'add_jetpack_beta_by_default', false );
 		$data = create_wordpress( 'php5.6', false, $add_jetpack_by_default, $add_jetpack_beta_by_default, false, false );
 		$url = 'http://' . figure_out_main_domain( $data->domains );
 

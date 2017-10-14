@@ -23,7 +23,7 @@ function add_cron_job() {
  * @return [type] [description]
  */
 function jurassic_ninja_purge() {
-	if ( config( 'purge_sites_when_cron_runs', true ) ) {
+	if ( settings( 'purge_sites_when_cron_runs', true ) ) {
 		purge_sites();
 	}
 }
