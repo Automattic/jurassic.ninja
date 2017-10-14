@@ -4,6 +4,13 @@ namespace jn;
 
 require_once __DIR__ . '/../db-stuff.php';
 
+if ( config_errors() ) {
+	?>
+	<p>
+		<?php esc_html_e( 'This section is disabled until you fix configuration errors shown above.' ); exit(1)?>
+	</p>
+	<?php
+}
 $db_sites = db()->get_results( 'select * from sites', \ARRAY_A );
 
 $just_site_domains = array_column( $db_sites, 'domain' );
@@ -16,7 +23,7 @@ $server_pilot_apps = array_filter( sp()->app_list()->data, function ( $site ) {
 
 ?>
 <p>
-	<?php printf( esc_html__( 'There are %d launched instances right now.' ), count( $server_pilot_apps ) ); ?>
+	<?php printf( esc_html_e( 'There are %d launched instances right now.' ), count( $server_pilot_apps ) ); ?>
 <table class="fixed widefat striped">
 	<thead>
 		<tr>

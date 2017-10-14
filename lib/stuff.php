@@ -453,7 +453,11 @@ function sites_to_be_purged() {
 function sp() {
 	global $serverpilot_instance;
 	if ( ! $serverpilot_instance ) {
-		$serverpilot_instance = new \ServerPilot( config( 'serverpilot' ) );
+		try {
+			$serverpilot_instance = new \ServerPilot( config( 'serverpilot' ) );
+		} catch ( \ServerPilotException $e ) {
+			push_error( $e );
+		}
 	}
 	return $serverpilot_instance;
 }

@@ -29,6 +29,30 @@ function config( $key = null, $default = null ) {
 	return $options[ $key ];
 }
 
+function config_errors() {
+	$unconfigured = [];
+
+	if ( ! config( 'serverpilot_client_key' ) ) {
+		$unconfigured[] = __( 'ServerPilot Client Key', 'jurassic-ninja' );
+	};
+	if ( ! config( 'serverpilot_client_id' ) ) {
+		$unconfigured[] = __( 'ServerPilot Client Id', 'jurassic-ninja' );
+	};
+
+	if ( ! config( 'serverpilot_server_id' ) ) {
+		$unconfigured[] = __( 'ServerPilot Server Id', 'jurassic-ninja' );
+	};
+
+	if ( ! config( 'domain' ) ) {
+		$unconfigured[] = __( 'Parent Domain', 'jurassic-ninja' );
+	};
+
+	if ( ! config( 'default_admin_email_address' ) ) {
+		$unconfigured[] = __( 'Main Admin Email Address', 'jurassic-ninja' );
+	};
+	return $unconfigured;
+}
+
 /**
  * Creates two pages for the plugin
  *     - The options page
