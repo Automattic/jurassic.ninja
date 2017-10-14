@@ -58,15 +58,17 @@ function settings_problems() {
 		$unconfigured[] = __( 'Main Admin Email Address', 'jurassic-ninja' );
 	};
 
-	$serverpilot_settings_set = settings( 'serverpilot_client_key' ) && settings( 'serverpilot_client_id' )
-		&& settings( 'serverpilot_server_id' );
-	if ( $serverpilot_settings_set ) {
-		try {
-			sp()->server_info( settings( 'serverpilot_server_id' ) );
-		} catch ( \ServerPilotException $e ) {
-			$unconfigured[] = __( 'valid ServerPilot Id, Key and Server Id for a paid plan', 'jurassic-ninja' );
-		}
-	}
+	// Comment this out until I find a better way to do this without querying
+	// ServerPilot's API on each page load :troll:
+	// $serverpilot_settings_set = settings( 'serverpilot_client_key' ) && settings( 'serverpilot_client_id' )
+	// 	&& settings( 'serverpilot_server_id' );
+	// if ( $serverpilot_settings_set ) {
+	// 	try {
+	// 		sp()->server_info( settings( 'serverpilot_server_id' ) );
+	// 	} catch ( \ServerPilotException $e ) {
+	// 		$unconfigured[] = __( 'valid ServerPilot Id, Key and Server Id for a paid plan', 'jurassic-ninja' );
+	// 	}
+	// }
 
 	return $unconfigured;
 }
