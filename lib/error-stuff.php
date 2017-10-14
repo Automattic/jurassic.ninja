@@ -9,7 +9,9 @@ function add_error_notices() {
 }
 
 function admin_noticies() {
-	$settings_problems = settings_problems();
+	// The function_exists() check is just for the case when the plugin has just been activated
+	// but composer dependencies were not installed.
+	$settings_problems = function_exists( 'jn\settings_problems' ) ? settings_problems() : null;
 	if ( ! count( errors() ) && ! count( $settings_problems ) ) {
 		return;
 	}
