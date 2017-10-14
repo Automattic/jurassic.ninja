@@ -16,13 +16,18 @@ require_once __DIR__ . '/lib/settings-stuff.php';
 require_once __DIR__ . '/lib/stuff.php';
 
 add_options_page();
+// Settings problems include credentials and IDs not configured or invalid
 if ( ! settings_problems() ) {
+	// Include the JS only under the /create route.
 	add_scripts();
+	// Serve the API root and nonce only under the /create route
 	add_rest_nonce();
+	// Add /create /checkin and /extend endpoints
 	add_rest_api_endpoints();
 	add_cron_job();
 }
 
+// Yeah create two tables for tracking the launched sites.
 create_tables( __FILE__ );
 add_error_notices();
 
