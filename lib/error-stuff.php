@@ -5,10 +5,10 @@ namespace jn;
 $errors = [];
 
 function add_error_notices() {
-	add_action( 'admin_notices', 'jn\admin_notices_errors' );
+	add_action( 'admin_notices', 'jn\admin_noticies' );
 }
 
-function admin_notices_errors() {
+function admin_noticies() {
 	$config_errors = config_errors();
 	if ( ! count( errors() ) && ! count( $config_errors ) ) {
 		return;
