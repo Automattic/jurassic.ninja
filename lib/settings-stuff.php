@@ -58,9 +58,9 @@ function settings_problems() {
 		$unconfigured[] = __( 'Main Admin Email Address', 'jurassic-ninja' );
 	};
 
-	$server_pilot_settings_set = settings( 'serverpilot_client_key' ) && settings( 'serverpilot_client_id' )
+	$serverpilot_settings_set = settings( 'serverpilot_client_key' ) && settings( 'serverpilot_client_id' )
 		&& settings( 'serverpilot_server_id' );
-	if ( $server_pilot_settings_set ) {
+	if ( $serverpilot_settings_set ) {
 		try {
 			sp()->server_info( settings( 'serverpilot_server_id' ) );
 		} catch ( \ServerPilotException $e ) {

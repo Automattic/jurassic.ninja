@@ -20,13 +20,13 @@ $just_site_domains = array_column( $db_sites, 'domain' );
 
 $db_sites_indexed = array_combine( $just_site_domains, $db_sites );
 
-$server_pilot_apps = array_filter( sp()->app_list()->data, function ( $site ) {
+$serverpilot_apps = array_filter( sp()->app_list()->data, function ( $site ) {
 	return 'jurassic.ninja' !== $site->name;
 } );
 
 ?>
 <p>
-	<?php printf( esc_html__( 'There are %s launched instances right now.' ), count( $server_pilot_apps ) ); ?>
+	<?php printf( esc_html__( 'There are %s launched instances right now.' ), count( $serverpilot_apps ) ); ?>
 <table class="fixed widefat striped">
 	<thead>
 		<tr>
@@ -41,7 +41,7 @@ $server_pilot_apps = array_filter( sp()->app_list()->data, function ( $site ) {
 	</thead>
 	<tbody>
 <?php
-foreach ( $server_pilot_apps as $site ) {
+foreach ( $serverpilot_apps as $site ) {
 	$domain = figure_out_main_domain( $site->domains );
 	$in_logs = array_key_exists( $domain, $db_sites_indexed );
 	$db_id = $in_logs ? $db_sites_indexed[ $domain ]['id'] : '';
