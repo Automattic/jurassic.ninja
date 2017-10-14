@@ -4,11 +4,11 @@ namespace jn;
 
 require_once __DIR__ . '/../db-stuff.php';
 
-if ( config_errors() ) {
+if ( settings_problems() ) {
 	?>
 	<p>
 		<?php
-			echo esc_html__( 'This section is disabled until you fix configuration errors shown above.', 'jurassic-ninja' );
+			echo esc_html__( 'This section is disabled until you fix settings problems shown above in the notice.', 'jurassic-ninja' );
 			exit( 1 );
 		?>
 	</p>

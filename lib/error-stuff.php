@@ -9,8 +9,8 @@ function add_error_notices() {
 }
 
 function admin_noticies() {
-	$config_errors = config_errors();
-	if ( ! count( errors() ) && ! count( $config_errors ) ) {
+	$settings_problems = settings_problems();
+	if ( ! count( errors() ) && ! count( $settings_problems ) ) {
 		return;
 	}
 	?>
@@ -27,8 +27,8 @@ function admin_noticies() {
 			}
 			?>
 			<?php
-			if ( $config_errors ) {
-				$s = join( ', ', config_errors() );
+			if ( $settings_problems ) {
+				$s = join( ', ', settings_problems() );
 				$config_url = menu_page_url( 'jurassic_ninja', false );
 				$e = sprintf( __( "You need to first <a href='%s'>configure</a> %s to be able to launch sites" ), $config_url,  $s );
 				echo $e;

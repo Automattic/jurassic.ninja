@@ -16,7 +16,7 @@ require_once __DIR__ . '/lib/settings-stuff.php';
 require_once __DIR__ . '/lib/stuff.php';
 
 add_options_page();
-if ( ! config_errors() ) {
+if ( ! settings_problems() ) {
 	add_scripts();
 	add_rest_nonce();
 	add_rest_api_endpoints();

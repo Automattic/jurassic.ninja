@@ -36,7 +36,7 @@ function config( $key = null, $default = null ) {
  *
  * @return Array problems found when checking settings.
  */
-function config_errors() {
+function settings_problems() {
 	$unconfigured = [];
 
 	if ( ! config( 'serverpilot_client_key' ) ) {
