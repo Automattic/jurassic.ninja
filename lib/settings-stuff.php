@@ -4,8 +4,9 @@ namespace jn;
 
 /**
  * Access a plugin option
- * @param  string $key The particular option we want to access
- * @return string      The option value. All of the are just strings.
+ * @param  String $key The particular option we want to access
+ * @param  Mixed  $default As with get_option you can specify a defaul value to return if the option is not set
+ * @return String      The option value. All of the are just strings.
  */
 function config( $key = null, $default = null ) {
 	$options = get_option( OPTIONS_KEY );
@@ -29,6 +30,12 @@ function config( $key = null, $default = null ) {
 	return $options[ $key ];
 }
 
+/**
+ * Checks if the settings are not blank and returns an array informing
+ * which ones are not configured yet.
+ *
+ * @return Array problems found when checking settings.
+ */
 function config_errors() {
 	$unconfigured = [];
 
@@ -78,6 +85,7 @@ function add_options_page() {
 		'jurassic-ninja' => array(
 			'page_title' => __( 'Jurassic Ninja Settings', 'jurassic-ninja' ),
 			'menu_slug' => 'jurassic_ninja',
+			'menu_title' => __( 'Jurassic Ninja' ),
 			'sections' => array(
 				'domain' => array(
 					'title' => __( 'Sites', 'jurassic-ninja' ),
@@ -172,7 +180,9 @@ function add_options_page() {
 			),
 		),
 		'jurassic_ninja_sites_admin' => array(
-			'page_title' => __( 'Sites Admin', 'jurassic_ninja' ),
+			'page_title' => __( 'Jurassic Ninja Sites Admin', 'jurassic_ninja' ),
+			'menu_title' => __( 'Sites Admin', 'jurassic_ninja' ),
+			'menu_slug' => 'jurassic_ninja_sites_admin',
 			'parent_slug' => 'jurassic_ninja',
 			'sections' => array(
 				'section-one' => array(
