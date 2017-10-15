@@ -66,7 +66,11 @@ function add_scripts() {
 
 function add_rest_nonce() {
 	add_action( 'wp_enqueue_scripts', function() {
-		if ( 'create' === get_page_uri() ) {
+		// Add the nonce under the /create path and
+		// if the user is admin, add it also on /specialops
+		if ( 'create' === get_page_uri()
+			|| current_user_can( 'manage_options' ) && 'specialops' === get_page_uri() ) {
+
 			wp_localize_script( 'jurassicninja.js', 'restApiSettings', array(
 				'root' => esc_url_raw( rest_url() ),
 				'nonce' => wp_create_nonce( 'wp_rest' ),
