@@ -2,6 +2,8 @@
 
 namespace jn;
 
+define( 'SETTINGS_KEY', 'jurassic-ninja-settings' );
+
 /**
  * Access a plugin option
  * @param  String $key The particular option we want to access
@@ -9,7 +11,7 @@ namespace jn;
  * @return String      The option value. All of the are just strings.
  */
 function settings( $key = null, $default = null ) {
-	$options = get_option( OPTIONS_KEY );
+	$options = get_option( SETTINGS_KEY );
 
 	if ( ! ( $options ) ) {
 		throw new \Exception( 'Error Finding config variable', 1 );
@@ -73,10 +75,6 @@ function settings_problems() {
 	return $unconfigured;
 }
 
-function validate_serverpilot_credentials() {
-
-}
-
 /**
  * Creates two pages for the plugin
  *     - The options page
@@ -85,10 +83,22 @@ function validate_serverpilot_credentials() {
 function add_options_page() {
 	$options_page = new \RationalOptionPages( [
 		'jurassic-ninja' => array(
-			'page_title' => __( 'Jurassic Ninja Settings', 'jurassic-ninja' ),
-			'menu_slug' => 'jurassic_ninja',
+			'page_title' => __( 'Jurassic Ninja Sites Admin', 'jurassic-ninja' ),
 			'menu_title' => __( 'Jurassic Ninja' ),
 			'icon_url' => 'dashicons-tickets',
+			'menu_slug' => 'jurassic_ninja',
+			'sections' => array(
+				'section-one' => array(
+					'title' => __( 'Launched sites', 'jurassic-ninja' ),
+					'include' => plugin_dir_path( __FILE__ ) . 'views/sites.php',
+				),
+			),
+		),
+		SETTINGS_KEY => array(
+			'page_title' => __( 'Jurassic Ninja Settings', 'jurassic-ninja' ),
+			'menu_title' => __( 'Settings', 'jurassic-ninja' ),
+			'menu_slug' => 'jurassic_ninja_settings',
+			'parent_slug' => 'jurassic_ninja',
 			'sections' => array(
 				'domain' => array(
 					'title' => __( 'Sites', 'jurassic-ninja' ),
@@ -179,18 +189,6 @@ function add_options_page() {
 							'text' => __( 'A ServerPilot Client key.' ),
 						),
 					),
-				),
-			),
-		),
-		'jurassic_ninja_sites_admin' => array(
-			'page_title' => __( 'Jurassic Ninja Sites Admin', 'jurassic_ninja' ),
-			'menu_title' => __( 'Sites Admin', 'jurassic_ninja' ),
-			'menu_slug' => 'jurassic_ninja_sites_admin',
-			'parent_slug' => 'jurassic_ninja',
-			'sections' => array(
-				'section-one' => array(
-					'title' => __( 'Launched sites', 'jurassic_ninja' ),
-					'include' => plugin_dir_path( __FILE__ ) . 'views/sites.php',
 				),
 			),
 		),
