@@ -12,6 +12,11 @@ function add_rest_api_endpoints() {
 		},
 	];
 
+	$specialops_options = [
+		'permission_callback' => function () {
+			return current_user_can( 'manage_options' );
+		},
+	];
 	add_post_endpoint( 'create', function ( $request ) {
 		if ( ! settings( 'enable_launching', true ) ) {
 			return new \WP_Error( 'site_launching_disabled', __( 'Site launching is disabled right now' ), [
@@ -28,6 +33,39 @@ function add_rest_api_endpoints() {
 		];
 		return $output;
 	}, $options );
+
+	add_post_endpoint( 'specialops/create', function ( $request ) {
+		$body = $request->get_json_params() ? $request->get_json_params() : [];
+		if ( ! settings( 'enable_launching', true ) ) {
+			return new \WP_Error( 'site_launching_disabled', __( 'Site launching is disabled right now' ), [
+				'status' => 503,
+			] );
+		}
+		$defaults = [
+			'runtime' => 'php5.6',
+			'ssl' => false,
+			'jetpack' => false,
+			'jetpack-beta' => false,
+			'subdir_multisite' => false,
+			'subdomain_multisite' => false,
+		];
+
+		$options = array_merge( $defaults, $body );
+		$data = create_wordpress(
+			$options['runtime'],
+			false,
+			$options['jetpack'],
+			$options['jetpack-beta'],
+			$options['subdir_multisite'],
+			$options['subdomain_multisite']
+		);
+		$url = 'http://' . figure_out_main_domain( $data->domains );
+
+		$output = [
+			'url' => $url,
+		];
+		return $output;
+	}, $specialops_options );
 
 	add_post_endpoint( 'extend', function ( $request ) {
 		$body = $request->get_json_params() ? $request->get_json_params() : [];

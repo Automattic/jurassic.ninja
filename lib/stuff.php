@@ -170,7 +170,7 @@ function enable_subdir_multisite( $user, $password, $domain ) {
 	$wp_home = "~/apps/$user/public";
 	$email = settings( 'default_admin_email_address' );
 	l( $domain );
-	$cmd = "cd $wp_home && wp core multisite-install --title=\"My Primary WordPress Site on my subdir-based Network\" --url=\"$domain\" --admin_email=\"$email\" --skip-email";
+	$cmd = "cd $wp_home && wp core multisite-install --title=\"subdir-based Network\" --url=\"$domain\" --admin_email=\"$email\" --skip-email";
 	run_command_on_behalf( $user, $password, $cmd );
 	run_command_on_behalf( $user, $password, "cd $wp_home && cp .htaccess .htaccess-not-multisite && wget 'https://gist.githubusercontent.com/oskosk/f5febd1bb65a2ace3d35feac949b47fd/raw/6ea8ffa013056f6793d3e8775329ec74d3304835/gistfile1.txt' -O .htaccess" );
 }
@@ -186,7 +186,7 @@ function enable_subdomain_multisite( $user, $password, $domain ) {
 	$wp_home = "~/apps/$user/public";
 	$email = settings( 'default_admin_email_address' );
 	l( $domain );
-	$cmd = "cd $wp_home && wp core multisite-install --title=\"My Primary WordPress Site on my subdomain-based Network\" --url=\"$domain\" --admin_email=\"$email\" --subdomains --skip-email";
+	$cmd = "cd $wp_home && wp core multisite-install --title=\"subdomain-based Network\" --url=\"$domain\" --admin_email=\"$email\" --subdomains --skip-email";
 	run_command_on_behalf( $user, $password, $cmd );
 	run_command_on_behalf( $user, $password, "cd $wp_home && cp .htaccess .htaccess-not-multisite && wget 'https://gist.githubusercontent.com/oskosk/8cac852c793df5e4946463e2e55dfdd6/raw/a60ce4122a69c1dd36c623c9b999c36c9c8d3db8/gistfile1.txt' -O .htaccess" );
 	// For some reason, the option auto_login gets set to 0, like if there were a sort of inside login happening magically.
