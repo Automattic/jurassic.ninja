@@ -6,13 +6,13 @@ namespace jn;
  * Adds a REST interface to this plugin
  */
 function add_rest_api_endpoints() {
-	$options = [
+	$permission_callback = [
 		'permission_callback' => function () {
 			return settings( 'lock_launching', false ) ? current_user_can( 'manage_options' ) : true ;
 		},
 	];
 
-	$specialops_options = [
+	$specialops_permission_callback = [
 		'permission_callback' => function () {
 			return current_user_can( 'manage_options' );
 		},
@@ -32,7 +32,7 @@ function add_rest_api_endpoints() {
 			'url' => $url,
 		];
 		return $output;
-	}, $options );
+	}, $permission_callback );
 
 	add_post_endpoint( 'specialops/create', function ( $request ) {
 		$body = $request->get_json_params() ? $request->get_json_params() : [];
@@ -65,7 +65,7 @@ function add_rest_api_endpoints() {
 			'url' => $url,
 		];
 		return $output;
-	}, $specialops_options );
+	}, $specialops_permission_callback );
 
 	add_post_endpoint( 'extend', function ( $request ) {
 		$body = $request->get_json_params() ? $request->get_json_params() : [];
