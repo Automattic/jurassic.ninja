@@ -456,7 +456,7 @@ function sp() {
 		try {
 			$serverpilot_instance = new \ServerPilot( settings( 'serverpilot' ) );
 		} catch ( \ServerPilotException $e ) {
-			push_error( $e );
+			push_error( new \WP_error( $e->getCode(), $e->getMessage() ) );
 		}
 	}
 	return $serverpilot_instance;
