@@ -30,7 +30,7 @@ function admin_noticies() {
 
 			if ( $settings_problems ) {
 				$settings_problems = settings_problems();
-				$settings_url = menu_page_url( 'jurassic_ninja', false );
+				$settings_url = menu_page_url( 'jurassic_ninja_settings', false );
 				?>
 				<?php echo esc_html__( 'You need to get to ' ); ?>
 				<a href=<?php echo esc_html( $settings_url ); ?>><?php echo esc_html__( 'Jurassic Ninja Settings' ); ?></a>
