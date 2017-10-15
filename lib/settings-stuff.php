@@ -88,6 +88,7 @@ function add_options_page() {
 			'page_title' => __( 'Jurassic Ninja Settings', 'jurassic-ninja' ),
 			'menu_slug' => 'jurassic_ninja',
 			'menu_title' => __( 'Jurassic Ninja' ),
+			'icon_url' => 'dashicons-tickets',
 			'sections' => array(
 				'domain' => array(
 					'title' => __( 'Sites', 'jurassic-ninja' ),
