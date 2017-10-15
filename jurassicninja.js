@@ -1,5 +1,15 @@
 
 const CREATE_PAGE_SLUG = '/create';
+const SPECIALOPS_CREATE_PAGE_SLUG = '/specialops';
+
+const defaultFeatures = {
+	'runtime': 'php5.6',
+	'ssl': false,
+	'jetpack': false,
+	'jetpack-beta': false,
+	'subdir_multisite': false,
+	'subdomain_multisite': false,
+};
 
 function doitforme( $ ) {
 	$( function() {
@@ -21,6 +31,25 @@ function doitforme( $ ) {
 	} );
 }
 
+function doitforspecialops( $, features ) {
+	$( function() {
+		$( '#progress').show();
+		$( '#img1').show();
+		$( '#img2').hide();
+		createSiteForSpecialOps( features )
+			.then( response => {
+				$('#progress').html( `<a href="${ response.data.url }">The new WP is ready to go, visit it!</a>` );
+				$('#img1').hide();
+				$('#img2').show();
+			} )
+			.catch( err => {
+				$('#progress').text( `Oh No! There was a problem launching the new WP. (${ err.message }).` );
+				$('#img2').hide();
+				$('#img1').attr( 'src', 'https://i.imgur.com/vdyaxmx.gif');
+			} );
+	} );
+}
+
 function createSite() {
 	const url = restApiSettings.root;
 	const nonce = restApiSettings.nonce;
@@ -32,6 +61,24 @@ function createSite() {
 		}
 	} )
 		.then( checkStatusAndErrors ).then( parseJson )
+}
+
+function createSiteForSpecialOps( features ) {
+	features = Object.assign( {}, defaultFeatures, features );
+	const url = restApiSettings.root;
+	const nonce = restApiSettings.nonce;
+	return fetch( url + 'jurassic.ninja/specialops/create', {
+		method: 'post',
+		credentials: 'same-origin',
+		body: JSON.stringify( features ),
+		headers: {
+			'X-WP-Nonce': nonce,
+			'content-type': 'application/json',
+		}
+	} )
+		.then( checkStatusAndErrors ).then( parseJson )
+
+	;
 }
 
 function checkStatusAndErrors( response ) {
@@ -54,6 +101,27 @@ function parseJson( response ) {
 		} );
 }
 
+function collectFeatures() {
+	const reduce = Array.prototype.reduce;
+	const els = jQuery( 'input[type=checkbox][data-feature]' );
+	const features = reduce.call( els, function( acc, el ) {
+		return Object.assign( {}, acc, { [ jQuery( el ).data( 'feature' ) ] : true } );
+	}, {} )
+	return features;
+}
+
 if ( window.location.pathname.startsWith( CREATE_PAGE_SLUG ) ) {
 	doitforme( jQuery);
 }
+
+if ( window.location.pathname.startsWith( SPECIALOPS_CREATE_PAGE_SLUG ) ) {
+	jQuery( '[data-is-create-button]').click( function () {
+		const features = collectFeatures();
+		if ( jQuery( this ).data( 'feature' )  ) {
+			features[ jQuery( this ).data( 'feature' ) ] = true;
+		}
+		doitforspecialops( jQuery, features );
+		return false;
+	} )
+}
+
