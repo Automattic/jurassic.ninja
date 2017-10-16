@@ -117,7 +117,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		}
 
 		// Runs the command via SSH
-		// The commands to be run are result of applying the `jurassic_ninja_feature_command` filter
+		// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
 		run_commands_for_features( $user->data->name, $password );
 
 		update_sp_sysuser( $user->data->id, null );
@@ -277,7 +277,7 @@ function log_new_site( $data ) {
 	db()->insert( 'sites',
 		[
 			'username' => $data->name,
-			'domain' => $data->domains[0],
+			'domain' => figure_out_main_domain( $data->domains ),
 			'created' => current_time( 'mysql', 1 ),
 		]
 	);
