@@ -51,7 +51,7 @@ function add_jetpack_beta_plugin() {
 }
 
 /**
- * Creates a new WordPress instance on the managed server
+ * Launches a new WordPress instance on the managed server
  * @param  string  $php_version      The PHP runtime versino to run the app on.
  * @param  boolean $add_ssl          Should we add SSL for the site?
  * @param  boolean $add_jetpack      Should we add Jetpack to the site?
@@ -60,7 +60,7 @@ function add_jetpack_beta_plugin() {
  * @param  boolean $enable_subdir_multisite Should we enable subdomain-based multisite on the site?
  * @return ?Array                    null or the app data as returned by ServerPilot's API on creation.
  */
-function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpack = false, $add_jetpack_beta = false, $enable_subdir_multisite = false, $enable_subdomain_multisite = false ) {
+function launch_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpack = false, $add_jetpack_beta = false, $enable_subdir_multisite = false, $enable_subdomain_multisite = false ) {
 	$defaults = [
 		'runtime' => 'php5.6',
 		'ssl' => false,
