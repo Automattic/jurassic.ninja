@@ -103,7 +103,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 			add_jetpack();
 		}
 		if ( $add_jetpack_beta ) {
-			add_jetpack_beta_plugin( $user->data->name, $password );
+			add_jetpack_beta_plugin();
 		}
 
 		add_auto_login( $password );
