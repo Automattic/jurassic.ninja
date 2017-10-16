@@ -113,7 +113,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		}
 
 		if ( $enable_subdomain_multisite ) {
-			enable_subdomain_multisite( $user->data->name, $password, $domain );
+			enable_subdomain_multisite( $domain );
 		}
 
 		// Runs the command via SSH
@@ -157,24 +157,20 @@ function enable_subdir_multisite( $domain ) {
 
 /**
  * Enables subdomain-based multisite on a WordPress instance
- * @param string $user              System user for ssh.
- * @param string $password          System password for ssh.
  * @param string  $domain          The main domain for the site.
  * @return [type]                   [description]
  */
-function enable_subdomain_multisite( $user, $password, $domain ) {
-	$wp_home = "~/apps/$user/public";
+function enable_subdomain_multisite( $domain ) {
 	$file_url = SUBDOMAIN_MULTISITE_HTACCESS_TEMPLATE_URL;
 	$email = settings( 'default_admin_email_address' );
 	// For some reason, the option auto_login gets set to a 0 after enabling multisite-install,
 	// like if there were a sort of inside login happening magically.
-	$cmd = "
-	cd $wp_home && \
-		wp core multisite-install --title=\"subdomain-based Network\" --url=\"$domain\" --admin_email=\"$email\" --subdomains --skip-email && \
+	$cmd = "wp core multisite-install --title=\"subdomain-based Network\" --url=\"$domain\" --admin_email=\"$email\" --subdomains --skip-email && \
 	 	cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess && \
-		wp option update auto_login 1
-	";
-	run_command_on_behalf( $user, $password, $cmd );
+		wp option update auto_login 1";
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
 }
 
 /**
