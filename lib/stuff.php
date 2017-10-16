@@ -31,12 +31,12 @@ function add_auto_login( $password ) {
 
 /**
  * Install and activates Jetpack on the site.
- * @param string $user     System user for ssh.
- * @param string $password System password for ssh.
  */
-function add_jetpack( $user, $password ) {
-	$wp_home = "~/apps/$user/public";
-	run_command_on_behalf( $user, $password, "cd $wp_home && wp plugin install jetpack && wp plugin activate jetpack" );
+function add_jetpack() {
+	$cmd = 'wp plugin install jetpack && wp plugin activate jetpack';
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
 }
 
 /**
@@ -101,7 +101,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 			enable_ssl( $app->data->id );
 		}
 		if ( $add_jetpack ) {
-			add_jetpack( $user->data->name, $password );
+			add_jetpack();
 		}
 		if ( $add_jetpack_beta ) {
 			add_jetpack_beta_plugin( $user->data->name, $password );
