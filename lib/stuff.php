@@ -23,7 +23,7 @@ function add_auto_login( $password ) {
 	$cmd = "
 		wp option add auto_login 1 && wp option add jurassic_ninja_admin_password '$password' && \
 		wp option add companion_api_base_url '$companion_api_base_url' && \
-		wp plugin install --force $companion_plugin_url && wp plugin activate companion";
+		wp plugin install --force $companion_plugin_url --activate";
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );
@@ -33,7 +33,7 @@ function add_auto_login( $password ) {
  * Install and activates Jetpack on the site.
  */
 function add_jetpack() {
-	$cmd = 'wp plugin install jetpack && wp plugin activate jetpack';
+	$cmd = 'wp plugin install jetpack --activate';
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );
@@ -44,7 +44,7 @@ function add_jetpack() {
  */
 function add_jetpack_beta_plugin() {
 	$jetpack_beta_plugin_url = JETPACK_BETA_PLUGIN_URL;
-	$cmd = "wp plugin install $jetpack_beta_plugin_url && wp plugin activate jetpack-beta" ;
+	$cmd = "wp plugin install $jetpack_beta_plugin_url --activate" ;
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );
