@@ -14,15 +14,22 @@ define( 'SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubuserconten
 
 /**
  * Force the site to log the creator in on the first time they visit the site
+ * Installs and activates the Jurassic Ninja companion plugin on the site.
  * @param string $user     System user for ssh.
  * @param string $password System password for ssh.
  */
 function add_auto_login( $user, $password ) {
 	$domain = settings( 'domain' );
 	$wp_home = "~/apps/$user/public";
-	$cmd = "cd $wp_home && wp option add auto_login 1 && wp option add jurassic_ninja_admin_password '$password'";
+	$companion_api_base_url = rest_url( 'jurassic.ninja' );
+	$companion_plugin_url = COMPANION_PLUGIN_URL;
+	$cmd = "
+	cd $wp_home && \
+		wp option add auto_login 1 && wp option add jurassic_ninja_admin_password '$password' && \
+		wp option add companion_api_base_url '$companion_api_base_url' && \
+		wp plugin install --force $companion_plugin_url && wp plugin activate companion
+	";
 	run_command_on_behalf( $user, $password, $cmd );
-	add_companion_plugin( $user, $password );
 }
 
 /**
