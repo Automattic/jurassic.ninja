@@ -107,17 +107,20 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		}
 
 		add_auto_login( $password );
-		// Runs the command via SSH
-		// The commands to be run are result of applying the `jurassic_ninja_feature_command` filter
-		run_commands_for_features( $user->data->name, $password );
-		update_sp_sysuser( $user->data->id, null );
 
 		if ( $enable_subdir_multisite ) {
-			enable_subdir_multisite( $user->data->name, $password, $domain );
+			enable_subdir_multisite( $domain );
 		}
+
 		if ( $enable_subdomain_multisite ) {
 			enable_subdomain_multisite( $user->data->name, $password, $domain );
 		}
+
+		// Runs the command via SSH
+		// The commands to be run are result of applying the `jurassic_ninja_feature_command` filter
+		run_commands_for_features( $user->data->name, $password );
+
+		update_sp_sysuser( $user->data->id, null );
 		return $app->data;
 	} catch ( \ServerPilotException $e ) {
 		// echo $e->getCode() . ': ' .$e->getMessage();
@@ -135,26 +138,21 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 function create_slug( $str, $delimiter = '-' ) {
 	$slug = strtolower( trim( preg_replace( '/[\s-]+/', $delimiter, preg_replace( '/[^A-Za-z0-9-]+/', $delimiter, preg_replace( '/[&]/', 'and', preg_replace( '/[\']/', '', iconv( 'UTF-8', 'ASCII//TRANSLIT', $str ) ) ) ) ), $delimiter ) );
 	return $slug;
-
 }
 
 /**
  * Enables subdir-based multisite on a WordPress instance
- * @param string $user              System user for ssh.
- * @param string $password          System password for ssh.
  * @param string  $domain          The main domain for the site
  * @return [type]                   [description]
  */
-function enable_subdir_multisite( $user, $password, $domain ) {
-	$wp_home = "~/apps/$user/public";
+function enable_subdir_multisite( $domain ) {
 	$file_url = SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL;
 	$email = settings( 'default_admin_email_address' );
-	$cmd = "
-	cd $wp_home && \
-		wp core multisite-install --title=\"subdir-based Network\" --url=\"$domain\" --admin_email=\"$email\" --skip-email && \
-		cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess
-	";
-	run_command_on_behalf( $user, $password, $cmd );
+	$cmd = "wp core multisite-install --title=\"subdir-based Network\" --url=\"$domain\" --admin_email=\"$email\" --skip-email && \
+		cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess";
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
 }
 
 /**
