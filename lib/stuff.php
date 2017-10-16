@@ -157,9 +157,12 @@ function enable_subdir_multisite( $user, $password, $domain ) {
 	$wp_home = "~/apps/$user/public";
 	$file_url = SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL;
 	$email = settings( 'default_admin_email_address' );
-	$cmd = "cd $wp_home && wp core multisite-install --title=\"subdir-based Network\" --url=\"$domain\" --admin_email=\"$email\" --skip-email";
+	$cmd = "
+	cd $wp_home && \
+		wp core multisite-install --title=\"subdir-based Network\" --url=\"$domain\" --admin_email=\"$email\" --skip-email && \
+		cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess
+	";
 	run_command_on_behalf( $user, $password, $cmd );
-	run_command_on_behalf( $user, $password, "cd $wp_home && cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess" );
 }
 
 /**
