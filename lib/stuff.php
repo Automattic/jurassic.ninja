@@ -41,14 +41,13 @@ function add_jetpack() {
 
 /**
 * Install and activates Jetpack Beta Tester plugin on the site.
- * @param string $user     System user for ssh.
- * @param string $password System password for ssh.
  */
-function add_jetpack_beta_plugin( $user, $password ) {
-	$wp_home = "~/apps/$user/public";
+function add_jetpack_beta_plugin() {
 	$jetpack_beta_plugin_url = JETPACK_BETA_PLUGIN_URL;
-	$cmd = "cd $wp_home && wp plugin install $jetpack_beta_plugin_url && wp plugin activate jetpack-beta" ;
-	run_command_on_behalf( $user, $password, $cmd );
+	$cmd = "wp plugin install $jetpack_beta_plugin_url && wp plugin activate jetpack-beta" ;
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
 }
 
 /**
