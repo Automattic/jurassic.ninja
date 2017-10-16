@@ -49,6 +49,7 @@ function init() {
 		// Add wp-json /create /checkin and /extend endpoints
 		add_rest_api_endpoints();
 		add_cron_job();
+		add_admin_bar_node();
 	}
 
 	// Yeah create two tables for tracking the launched sites.
@@ -78,3 +79,18 @@ function add_rest_nonce() {
 		}
 	} );
 }
+
+function add_admin_bar_node() {
+	add_action( 'wp_before_admin_bar_render', function () {
+		global $wp_admin_bar;
+
+		$wp_admin_bar->add_node(array(
+			'id'    => 'wp-admin-bar-jurassic-ninja',
+			'title' => 'Jurassic Ninja Sites',
+			'href'  => menu_page_url( 'jurassic_ninja', false ),
+			'parent' => 'site-name',
+		));
+	} );
+}
+
+
