@@ -15,21 +15,18 @@ define( 'SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubuserconten
 /**
  * Force the site to log the creator in on the first time they visit the site
  * Installs and activates the Jurassic Ninja companion plugin on the site.
- * @param string $user     System user for ssh.
  * @param string $password System password for ssh.
  */
-function add_auto_login( $user, $password ) {
-	$domain = settings( 'domain' );
-	$wp_home = "~/apps/$user/public";
+function add_auto_login( $password ) {
 	$companion_api_base_url = rest_url( 'jurassic.ninja' );
 	$companion_plugin_url = COMPANION_PLUGIN_URL;
 	$cmd = "
-	cd $wp_home && \
 		wp option add auto_login 1 && wp option add jurassic_ninja_admin_password '$password' && \
 		wp option add companion_api_base_url '$companion_api_base_url' && \
-		wp plugin install --force $companion_plugin_url && wp plugin activate companion
-	";
-	run_command_on_behalf( $user, $password, $cmd );
+		wp plugin install --force $companion_plugin_url && wp plugin activate companion";
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
 }
 
 /**
@@ -109,8 +106,11 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		if ( $add_jetpack_beta ) {
 			add_jetpack_beta_plugin( $user->data->name, $password );
 		}
-		add_auto_login( $user->data->name, $password );
 
+		add_auto_login( $password );
+		// Runs the command via SSH
+		// The commands to be run are result of applying the `jurassic_ninja_feature_command` filter
+		run_commands_for_features( $user->data->name, $password );
 		update_sp_sysuser( $user->data->id, null );
 
 		if ( $enable_subdir_multisite ) {
@@ -396,6 +396,21 @@ function run_command_on_behalf( $user, $password, $cmd ) {
 	$domain = settings( 'domain' );
 	$run = "SSHPASS=$password sshpass -e ssh -oStrictHostKeyChecking=no $user@$domain '$cmd'";
 	return shell_exec( $run );
+}
+
+/**
+ * Runs a set of commands via ssh.
+ * The command string is a result of applying filter `jurassic_ninja_feature_command`
+ * @param  [type] $user     [description]
+ * @param  [type] $password [description]
+ * @return [type]           [description]
+ */
+function run_commands_for_features( $user, $password ) {
+	$wp_home = "~/apps/$user/public";
+	$cmd = "cd $wp_home";
+	$filter_output = apply_filters( 'jurassic_ninja_feature_command', $cmd );
+	error_log( "Running $filter_output");
+	run_command_on_behalf( $user, $password, $filter_output );
 }
 
 /**
