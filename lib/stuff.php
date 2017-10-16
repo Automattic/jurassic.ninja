@@ -12,8 +12,6 @@ define( 'JETPACK_BETA_PLUGIN_URL', 'https://github.com/Automattic/jetpack-beta/a
 define( 'SUBDOMAIN_MULTISITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubusercontent.com/oskosk/8cac852c793df5e4946463e2e55dfdd6/raw/a60ce4122a69c1dd36c623c9b999c36c9c8d3db8/gistfile1.txt' );
 define( 'SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubusercontent.com/oskosk/f5febd1bb65a2ace3d35feac949b47fd/raw/6ea8ffa013056f6793d3e8775329ec74d3304835/gistfile1.txt' );
 
-$serverpilot_instance = null;
-
 /**
  * Force the site to log the creator in on the first time they visit the site
  * @param string $user     System user for ssh.
@@ -95,8 +93,6 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		throw new \Exception( 'not-both-multisite-types', __( "Don't try to enable both types of multiste" ) );
 	}
 
-	$sp = sp();
-
 	try {
 		$password = generate_random_password();
 		$user = generate_new_user( $password );
@@ -109,8 +105,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		$domain = generate_random_subdomain() . '.' . settings( 'domain' );
 		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
 		$domain_arg = $enable_subdomain_multisite ? array( $domain, '*.' . $domain ) : array( $domain );
-		$app = $sp->app_create( $user->data->name, $user->data->id, $php_version, $domain_arg, $wordpress_options );
-		wait_for_serverpilot_action( $app->actionid );
+		$app = create_sp_app( $user->data->name, $user->data->id, $php_version, $domain_arg, $wordpress_options );
 		log_new_site( $app->data );
 		if ( $add_ssl ) {
 			enable_ssl( $app->data->id );
@@ -123,7 +118,7 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		}
 		add_auto_login( $user->data->name, $password );
 
-		$sp->sysuser_update( $user->data->id, null );
+		update_sp_sysuser( $user->data->id, null );
 
 		if ( $enable_subdir_multisite ) {
 			enable_subdir_multisite( $user->data->name, $password, $domain );
@@ -149,17 +144,6 @@ function create_slug( $str, $delimiter = '-' ) {
 	$slug = strtolower( trim( preg_replace( '/[\s-]+/', $delimiter, preg_replace( '/[^A-Za-z0-9-]+/', $delimiter, preg_replace( '/[&]/', 'and', preg_replace( '/[\']/', '', iconv( 'UTF-8', 'ASCII//TRANSLIT', $str ) ) ) ) ), $delimiter ) );
 	return $slug;
 
-}
-
-/**
- * Deletes a system user on the managed ServerPilot.
- * This deletes also all of the databases and WordPress instances of the user
- * @param  string $id The ServerPilot identifier for this user
- * @return [type]     [description]
- */
-function delete_sysuser( $id ) {
-	$sp = sp();
-	return $sp->sysuser_delete( $id );
 }
 
 /**
@@ -196,22 +180,6 @@ function enable_subdomain_multisite( $user, $password, $domain ) {
 	run_command_on_behalf( $user, $password, "cd $wp_home && cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess" );
 	// For some reason, the option auto_login gets set to 0, like if there were a sort of inside login happening magically.
 	run_command_on_behalf( $user, $password, "cd $wp_home && wp option update auto_login 1" );
-}
-
-/**
- * Tries to enable SSL on a ServerPilot app
- * This is currently not working so well due to the amount
- * of instances created by ServerPilot and the throttling mechanism
- * enforced by Let's Encrypt.
- *
- * @param  string $app_id The ServerPilot id for the app
- * @return [type]         [description]
- */
-function enable_ssl( $app_id ) {
-	$sp = sp();
-	$data = $sp->ssl_auto( $app_id );
-	l( wait_for_serverpilot_action( $data->actionid ) );
-
 }
 
 /**
@@ -264,8 +232,7 @@ function figure_out_main_domain( $domains ) {
  */
 function generate_new_user( $password ) {
 	$username = generate_random_username();
-	$sp = sp();
-	$user = $sp->sysuser_create( settings( 'serverpilot_server_id' ), $username, $password );
+	$user = create_sp_sysuser( $username, $password );
 	return $user;
 }
 
@@ -369,8 +336,7 @@ function mark_site_as_checked_in( $domain ) {
  */
 function purge_sites() {
 	$sites = sites_to_be_purged();
-	$sp = sp();
-	$system_users  = $sp->sysuser_list()->data;
+	$system_users  = get_sp_sysuser_list();
 	$site_users = array_map(
 		function ( $site ) {
 			return $site['username'];
@@ -381,7 +347,7 @@ function purge_sites() {
 			return in_array( $user->name, $site_users, true );
 	} );
 	foreach ( $purge as $user ) {
-		delete_sysuser( $user->id );
+		delete_sp_sysuser( $user->id );
 	}
 	foreach ( $sites as $site ) {
 		log_purged_site( $site );
@@ -451,32 +417,3 @@ function sites_to_be_purged() {
 	return array_merge( $expired, $unused );
 }
 
-/**
- * Returns a ServerPilot instance
- * @return [type] [description]
- */
-function sp() {
-	global $serverpilot_instance;
-	if ( ! $serverpilot_instance ) {
-		try {
-			$serverpilot_instance = new \ServerPilot( settings( 'serverpilot' ) );
-		} catch ( \ServerPilotException $e ) {
-			push_error( new \WP_error( $e->getCode(), $e->getMessage() ) );
-		}
-	}
-	return $serverpilot_instance;
-}
-/**
- * Locks the process by looping until ServerPilots says the action is completed
- * @param  string $action_id The ServerPilot Id for an action
- * @return string            The status of the action
- */
-function wait_for_serverpilot_action( $action_id ) {
-	$sp = sp();
-	$ok = false;
-	do {
-		sleep( 1 );
-		$status = $sp->action_info( $action_id );
-	} while ( 'open' === $status->data->status );
-	return $status;
-}
