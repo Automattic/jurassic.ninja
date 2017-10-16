@@ -35,6 +35,7 @@ function init_or_fail_if_no_dependencies_installed() {
 function init() {
 	require_once __DIR__ . '/lib/cron-stuff.php';
 	require_once __DIR__ . '/lib/db-stuff.php';
+	require_once __DIR__ . '/lib/serverpilot-stuff.php';
 	require_once __DIR__ . '/lib/settings-stuff.php';
 	require_once __DIR__ . '/lib/stuff.php';
 
