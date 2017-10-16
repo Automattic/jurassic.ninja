@@ -7,6 +7,10 @@ require_once __DIR__ . '/RationalOptionPages.php';
 require_once __DIR__ . '/rest-api-stuff.php';
 
 define( 'REST_API_NAMESPACE', 'jurassic.ninja' );
+define( 'COMPANION_PLUGIN_URL', 'https://github.com/oskosk/companion/archive/master.zip' );
+define( 'JETPACK_BETA_PLUGIN_URL', 'https://github.com/Automattic/jetpack-beta/archive/master.zip' );
+define( 'SUBDOMAIN_MULTISITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubusercontent.com/oskosk/8cac852c793df5e4946463e2e55dfdd6/raw/a60ce4122a69c1dd36c623c9b999c36c9c8d3db8/gistfile1.txt' );
+define( 'SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubusercontent.com/oskosk/f5febd1bb65a2ace3d35feac949b47fd/raw/6ea8ffa013056f6793d3e8775329ec74d3304835/gistfile1.txt' );
 
 $serverpilot_instance = null;
 
@@ -31,7 +35,7 @@ function add_auto_login( $user, $password ) {
 function add_companion_plugin( $user, $password ) {
 	$wp_home = "~/apps/$user/public";
 	$companion_api_base_url = rest_url( 'jurassic.ninja' );
-	$companion_plugin_url = 'https://github.com/oskosk/companion/archive/master.zip';
+	$companion_plugin_url = COMPANION_PLUGIN_URL;
 	run_command_on_behalf( $user, $password, "cd $wp_home && wp option add  companion_api_base_url '$companion_api_base_url'" );
 	$cmd = "cd $wp_home && wp plugin install --force $companion_plugin_url && wp plugin activate companion" ;
 	run_command_on_behalf( $user, $password, $cmd );
@@ -54,7 +58,7 @@ function add_jetpack( $user, $password ) {
  */
 function add_jetpack_beta_plugin( $user, $password ) {
 	$wp_home = "~/apps/$user/public";
-	$jetpack_beta_plugin_url = 'https://github.com/Automattic/jetpack-beta/archive/master.zip';
+	$jetpack_beta_plugin_url = JETPACK_BETA_PLUGIN_URL;
 	$cmd = "cd $wp_home && wp plugin install $jetpack_beta_plugin_url && wp plugin activate jetpack-beta" ;
 	run_command_on_behalf( $user, $password, $cmd );
 }
@@ -167,11 +171,12 @@ function delete_sysuser( $id ) {
  */
 function enable_subdir_multisite( $user, $password, $domain ) {
 	$wp_home = "~/apps/$user/public";
+	$file_url = SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL;
 	$email = settings( 'default_admin_email_address' );
 	l( $domain );
 	$cmd = "cd $wp_home && wp core multisite-install --title=\"subdir-based Network\" --url=\"$domain\" --admin_email=\"$email\" --skip-email";
 	run_command_on_behalf( $user, $password, $cmd );
-	run_command_on_behalf( $user, $password, "cd $wp_home && cp .htaccess .htaccess-not-multisite && wget 'https://gist.githubusercontent.com/oskosk/f5febd1bb65a2ace3d35feac949b47fd/raw/6ea8ffa013056f6793d3e8775329ec74d3304835/gistfile1.txt' -O .htaccess" );
+	run_command_on_behalf( $user, $password, "cd $wp_home && cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess" );
 }
 
 /**
@@ -183,11 +188,12 @@ function enable_subdir_multisite( $user, $password, $domain ) {
  */
 function enable_subdomain_multisite( $user, $password, $domain ) {
 	$wp_home = "~/apps/$user/public";
+	$file_url = SUBDOMAIN_MULTISITE_HTACCESS_TEMPLATE_URL;
 	$email = settings( 'default_admin_email_address' );
 	l( $domain );
 	$cmd = "cd $wp_home && wp core multisite-install --title=\"subdomain-based Network\" --url=\"$domain\" --admin_email=\"$email\" --subdomains --skip-email";
 	run_command_on_behalf( $user, $password, $cmd );
-	run_command_on_behalf( $user, $password, "cd $wp_home && cp .htaccess .htaccess-not-multisite && wget 'https://gist.githubusercontent.com/oskosk/8cac852c793df5e4946463e2e55dfdd6/raw/a60ce4122a69c1dd36c623c9b999c36c9c8d3db8/gistfile1.txt' -O .htaccess" );
+	run_command_on_behalf( $user, $password, "cd $wp_home && cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess" );
 	// For some reason, the option auto_login gets set to 0, like if there were a sort of inside login happening magically.
 	run_command_on_behalf( $user, $password, "cd $wp_home && wp option update auto_login 1" );
 }
