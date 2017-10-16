@@ -2,6 +2,10 @@
 
 namespace jn;
 
+if ( ! defined( '\\ABSPATH' ) ) {
+	exit;
+}
+
 $errors = [];
 
 function add_error_notices() {

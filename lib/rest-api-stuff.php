@@ -2,6 +2,10 @@
 
 namespace jn;
 
+if ( ! defined( '\\ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Adds a REST interface to this plugin
  */

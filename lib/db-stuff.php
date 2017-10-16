@@ -2,6 +2,10 @@
 
 namespace jn;
 
+if ( ! defined( '\\ABSPATH' ) ) {
+	exit;
+}
+
 function db() {
 	global $wpdb;
 	return $wpdb;

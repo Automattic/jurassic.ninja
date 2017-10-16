@@ -2,6 +2,10 @@
 
 namespace jn;
 
+if ( ! defined( '\\ABSPATH' ) ) {
+	exit;
+}
+
 define( 'SETTINGS_KEY', 'jurassic-ninja-settings' );
 
 /**

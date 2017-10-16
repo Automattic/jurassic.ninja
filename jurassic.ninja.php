@@ -9,6 +9,10 @@
 
 namespace jn;
 
+if ( ! defined( '\\ABSPATH' ) ) {
+	exit;
+}
+
 require_once __DIR__ . '/lib/error-stuff.php';
 
 add_error_notices();
