@@ -157,7 +157,6 @@ function enable_subdir_multisite( $user, $password, $domain ) {
 	$wp_home = "~/apps/$user/public";
 	$file_url = SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL;
 	$email = settings( 'default_admin_email_address' );
-	l( $domain );
 	$cmd = "cd $wp_home && wp core multisite-install --title=\"subdir-based Network\" --url=\"$domain\" --admin_email=\"$email\" --skip-email";
 	run_command_on_behalf( $user, $password, $cmd );
 	run_command_on_behalf( $user, $password, "cd $wp_home && cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess" );
@@ -174,12 +173,15 @@ function enable_subdomain_multisite( $user, $password, $domain ) {
 	$wp_home = "~/apps/$user/public";
 	$file_url = SUBDOMAIN_MULTISITE_HTACCESS_TEMPLATE_URL;
 	$email = settings( 'default_admin_email_address' );
-	l( $domain );
-	$cmd = "cd $wp_home && wp core multisite-install --title=\"subdomain-based Network\" --url=\"$domain\" --admin_email=\"$email\" --subdomains --skip-email";
+	// For some reason, the option auto_login gets set to a 0 after enabling multisite-install,
+	// like if there were a sort of inside login happening magically.
+	$cmd = "
+	cd $wp_home && \
+		wp core multisite-install --title=\"subdomain-based Network\" --url=\"$domain\" --admin_email=\"$email\" --subdomains --skip-email && \
+	 	cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess && \
+		wp option update auto_login 1
+	";
 	run_command_on_behalf( $user, $password, $cmd );
-	run_command_on_behalf( $user, $password, "cd $wp_home && cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess" );
-	// For some reason, the option auto_login gets set to 0, like if there were a sort of inside login happening magically.
-	run_command_on_behalf( $user, $password, "cd $wp_home && wp option update auto_login 1" );
 }
 
 /**
@@ -208,7 +210,9 @@ function extend_site_life( $domain ) {
 			'domain' => $domain,
 		]
 	);
-	l( db()->last_error );
+	if ( db()->last_error ) {
+		l( db()->last_error );
+	};
 }
 
 /**
@@ -288,7 +292,9 @@ function log_new_site( $data ) {
 			'created' => current_time( 'mysql', 1 ),
 		]
 	);
-	l( db()->last_error );
+	if ( db()->last_error ) {
+		l( db()->last_error );
+	};
 }
 
 /**
@@ -308,7 +314,9 @@ function log_purged_site( $data ) {
 		'username' => $data['username'],
 		'domain' => $data['domain'],
 	] );
-	l( db()->last_error );
+	if ( db()->last_error ) {
+		l( db()->last_error );
+	};
 }
 
 /**
@@ -325,7 +333,9 @@ function mark_site_as_checked_in( $domain ) {
 			'domain' => $domain,
 		]
 	);
-	l( db()->last_error );
+	if ( db()->last_error ) {
+		l( db()->last_error );
+	};
 }
 
 /**
