@@ -14,51 +14,40 @@ define( 'SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubuserconten
 
 /**
  * Force the site to log the creator in on the first time they visit the site
- * @param string $user     System user for ssh.
+ * Installs and activates the Jurassic Ninja companion plugin on the site.
  * @param string $password System password for ssh.
  */
-function add_auto_login( $user, $password ) {
-	$domain = settings( 'domain' );
-	$wp_home = "~/apps/$user/public";
-	$cmd = "cd $wp_home && wp option add auto_login 1 && wp option add jurassic_ninja_admin_password '$password'";
-	run_command_on_behalf( $user, $password, $cmd );
-	add_companion_plugin( $user, $password );
-}
-
-/**
- * Install and activates the Jurassic Ninja companion plugin on the site.
- * @param string $user     System user for ssh.
- * @param string $password System password for ssh.
- */
-function add_companion_plugin( $user, $password ) {
-	$wp_home = "~/apps/$user/public";
+function add_auto_login( $password ) {
 	$companion_api_base_url = rest_url( 'jurassic.ninja' );
 	$companion_plugin_url = COMPANION_PLUGIN_URL;
-	run_command_on_behalf( $user, $password, "cd $wp_home && wp option add  companion_api_base_url '$companion_api_base_url'" );
-	$cmd = "cd $wp_home && wp plugin install --force $companion_plugin_url && wp plugin activate companion" ;
-	run_command_on_behalf( $user, $password, $cmd );
+	$cmd = "
+		wp option add auto_login 1 && wp option add jurassic_ninja_admin_password '$password' && \
+		wp option add companion_api_base_url '$companion_api_base_url' && \
+		wp plugin install --force $companion_plugin_url --activate";
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
 }
 
 /**
  * Install and activates Jetpack on the site.
- * @param string $user     System user for ssh.
- * @param string $password System password for ssh.
  */
-function add_jetpack( $user, $password ) {
-	$wp_home = "~/apps/$user/public";
-	run_command_on_behalf( $user, $password, "cd $wp_home && wp plugin install jetpack && wp plugin activate jetpack" );
+function add_jetpack() {
+	$cmd = 'wp plugin install jetpack --activate';
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
 }
 
 /**
 * Install and activates Jetpack Beta Tester plugin on the site.
- * @param string $user     System user for ssh.
- * @param string $password System password for ssh.
  */
-function add_jetpack_beta_plugin( $user, $password ) {
-	$wp_home = "~/apps/$user/public";
+function add_jetpack_beta_plugin() {
 	$jetpack_beta_plugin_url = JETPACK_BETA_PLUGIN_URL;
-	$cmd = "cd $wp_home && wp plugin install $jetpack_beta_plugin_url && wp plugin activate jetpack-beta" ;
-	run_command_on_behalf( $user, $password, $cmd );
+	$cmd = "wp plugin install $jetpack_beta_plugin_url --activate" ;
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
 }
 
 /**
@@ -111,21 +100,27 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 			enable_ssl( $app->data->id );
 		}
 		if ( $add_jetpack ) {
-			add_jetpack( $user->data->name, $password );
+			add_jetpack();
 		}
 		if ( $add_jetpack_beta ) {
 			add_jetpack_beta_plugin( $user->data->name, $password );
 		}
-		add_auto_login( $user->data->name, $password );
 
-		update_sp_sysuser( $user->data->id, null );
+		add_auto_login( $password );
 
 		if ( $enable_subdir_multisite ) {
-			enable_subdir_multisite( $user->data->name, $password, $domain );
+			enable_subdir_multisite( $domain );
 		}
+
 		if ( $enable_subdomain_multisite ) {
-			enable_subdomain_multisite( $user->data->name, $password, $domain );
+			enable_subdomain_multisite( $domain );
 		}
+
+		// Runs the command via SSH
+		// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
+		run_commands_for_features( $user->data->name, $password );
+
+		update_sp_sysuser( $user->data->id, null );
 		return $app->data;
 	} catch ( \ServerPilotException $e ) {
 		// echo $e->getCode() . ': ' .$e->getMessage();
@@ -143,43 +138,39 @@ function create_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 function create_slug( $str, $delimiter = '-' ) {
 	$slug = strtolower( trim( preg_replace( '/[\s-]+/', $delimiter, preg_replace( '/[^A-Za-z0-9-]+/', $delimiter, preg_replace( '/[&]/', 'and', preg_replace( '/[\']/', '', iconv( 'UTF-8', 'ASCII//TRANSLIT', $str ) ) ) ) ), $delimiter ) );
 	return $slug;
-
 }
 
 /**
  * Enables subdir-based multisite on a WordPress instance
- * @param string $user              System user for ssh.
- * @param string $password          System password for ssh.
  * @param string  $domain          The main domain for the site
  * @return [type]                   [description]
  */
-function enable_subdir_multisite( $user, $password, $domain ) {
-	$wp_home = "~/apps/$user/public";
+function enable_subdir_multisite( $domain ) {
 	$file_url = SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL;
 	$email = settings( 'default_admin_email_address' );
-	l( $domain );
-	$cmd = "cd $wp_home && wp core multisite-install --title=\"subdir-based Network\" --url=\"$domain\" --admin_email=\"$email\" --skip-email";
-	run_command_on_behalf( $user, $password, $cmd );
-	run_command_on_behalf( $user, $password, "cd $wp_home && cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess" );
+	$cmd = "wp core multisite-install --title=\"subdir-based Network\" --url=\"$domain\" --admin_email=\"$email\" --skip-email && \
+		cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess";
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
 }
 
 /**
  * Enables subdomain-based multisite on a WordPress instance
- * @param string $user              System user for ssh.
- * @param string $password          System password for ssh.
  * @param string  $domain          The main domain for the site.
  * @return [type]                   [description]
  */
-function enable_subdomain_multisite( $user, $password, $domain ) {
-	$wp_home = "~/apps/$user/public";
+function enable_subdomain_multisite( $domain ) {
 	$file_url = SUBDOMAIN_MULTISITE_HTACCESS_TEMPLATE_URL;
 	$email = settings( 'default_admin_email_address' );
-	l( $domain );
-	$cmd = "cd $wp_home && wp core multisite-install --title=\"subdomain-based Network\" --url=\"$domain\" --admin_email=\"$email\" --subdomains --skip-email";
-	run_command_on_behalf( $user, $password, $cmd );
-	run_command_on_behalf( $user, $password, "cd $wp_home && cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess" );
-	// For some reason, the option auto_login gets set to 0, like if there were a sort of inside login happening magically.
-	run_command_on_behalf( $user, $password, "cd $wp_home && wp option update auto_login 1" );
+	// For some reason, the option auto_login gets set to a 0 after enabling multisite-install,
+	// like if there were a sort of inside login happening magically.
+	$cmd = "wp core multisite-install --title=\"subdomain-based Network\" --url=\"$domain\" --admin_email=\"$email\" --subdomains --skip-email && \
+	 	cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess && \
+		wp option update auto_login 1";
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
 }
 
 /**
@@ -208,7 +199,9 @@ function extend_site_life( $domain ) {
 			'domain' => $domain,
 		]
 	);
-	l( db()->last_error );
+	if ( db()->last_error ) {
+		l( db()->last_error );
+	};
 }
 
 /**
@@ -284,11 +277,13 @@ function log_new_site( $data ) {
 	db()->insert( 'sites',
 		[
 			'username' => $data->name,
-			'domain' => $data->domains[0],
+			'domain' => figure_out_main_domain( $data->domains ),
 			'created' => current_time( 'mysql', 1 ),
 		]
 	);
-	l( db()->last_error );
+	if ( db()->last_error ) {
+		l( db()->last_error );
+	};
 }
 
 /**
@@ -308,7 +303,9 @@ function log_purged_site( $data ) {
 		'username' => $data['username'],
 		'domain' => $data['domain'],
 	] );
-	l( db()->last_error );
+	if ( db()->last_error ) {
+		l( db()->last_error );
+	};
 }
 
 /**
@@ -325,7 +322,9 @@ function mark_site_as_checked_in( $domain ) {
 			'domain' => $domain,
 		]
 	);
-	l( db()->last_error );
+	if ( db()->last_error ) {
+		l( db()->last_error );
+	};
 }
 
 /**
@@ -390,6 +389,21 @@ function run_command_on_behalf( $user, $password, $cmd ) {
 	$domain = settings( 'domain' );
 	$run = "SSHPASS=$password sshpass -e ssh -oStrictHostKeyChecking=no $user@$domain '$cmd'";
 	return shell_exec( $run );
+}
+
+/**
+ * Runs a set of commands via ssh.
+ * The command string is a result of applying filter `jurassic_ninja_feature_command`
+ * @param  [type] $user     [description]
+ * @param  [type] $password [description]
+ * @return [type]           [description]
+ */
+function run_commands_for_features( $user, $password ) {
+	$wp_home = "~/apps/$user/public";
+	$cmd = "cd $wp_home";
+	$filter_output = apply_filters( 'jurassic_ninja_feature_command', $cmd );
+	error_log( "Running $filter_output");
+	run_command_on_behalf( $user, $password, $filter_output );
 }
 
 /**

@@ -105,7 +105,7 @@ function collectFeatures() {
 	const reduce = Array.prototype.reduce;
 	const els = jQuery( 'input[type=checkbox][data-feature]' );
 	const features = reduce.call( els, function( acc, el ) {
-		return Object.assign( {}, acc, { [ jQuery( el ).data( 'feature' ) ] : true } );
+		return Object.assign( {}, acc, { [ jQuery( el ).data( 'feature' ) ] : jQuery( el ).is( ':checked' ) } );
 	}, {} )
 	return features;
 }
@@ -116,9 +116,10 @@ if ( window.location.pathname.startsWith( CREATE_PAGE_SLUG ) ) {
 
 if ( window.location.pathname.startsWith( SPECIALOPS_CREATE_PAGE_SLUG ) ) {
 	jQuery( '[data-is-create-button]').click( function () {
+		const $this = jQuery( this );
 		const features = collectFeatures();
-		if ( jQuery( this ).data( 'feature' )  ) {
-			features[ jQuery( this ).data( 'feature' ) ] = true;
+		if ( $this.data( 'feature' )  ) {
+			features[ $this.data( 'feature' ) ] = true;
 		}
 		doitforspecialops( jQuery, features );
 		return false;
