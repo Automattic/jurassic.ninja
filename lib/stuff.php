@@ -40,11 +40,20 @@ function add_jetpack() {
 }
 
 /**
-* Install and activates Jetpack Beta Tester plugin on the site.
+ * Installs and activates Jetpack Beta Tester plugin on the site.
  */
 function add_jetpack_beta_plugin() {
 	$jetpack_beta_plugin_url = JETPACK_BETA_PLUGIN_URL;
 	$cmd = "wp plugin install $jetpack_beta_plugin_url --activate" ;
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
+}
+/**
+ * Installs and activates WordPress Beta Tester plugin on the site.
+ */
+function add_wordpress_beta_tester_plugin() {
+	$cmd = 'wp plugin install wordpress-beta-tester --activate' ;
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );
@@ -60,7 +69,7 @@ function add_jetpack_beta_plugin() {
  * @param  boolean $enable_subdir_multisite Should we enable subdomain-based multisite on the site?
  * @return ?Array                    null or the app data as returned by ServerPilot's API on creation.
  */
-function launch_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpack = false, $add_jetpack_beta = false, $enable_subdir_multisite = false, $enable_subdomain_multisite = false ) {
+function launch_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpack = false, $add_jetpack_beta = false, $enable_subdir_multisite = false, $enable_subdomain_multisite = false, $add_wordpress_beta_tester = false ) {
 	$defaults = [
 		'runtime' => 'php5.6',
 		'ssl' => false,
@@ -68,6 +77,7 @@ function launch_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		'jetpack-beta' => false,
 		'subdir_multisite' => false,
 		'subdomain_multisite' => false,
+		'wordpress-beta-tester' => false,
 	];
 	$options = array_merge( $defaults, [
 		'runtime' => $php_version,
@@ -76,6 +86,7 @@ function launch_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		'jetpack-beta' => $add_jetpack_beta,
 		'subdir_multisite' => $enable_subdir_multisite,
 		'subdomain_multisite' => $enable_subdomain_multisite,
+		'wordpress-beta-tester' => $add_wordpress_beta_tester,
 	] );
 
 	if ( $enable_subdir_multisite && $enable_subdomain_multisite ) {
@@ -104,6 +115,10 @@ function launch_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		}
 		if ( $add_jetpack_beta ) {
 			add_jetpack_beta_plugin();
+		}
+
+		if ( $add_wordpress_beta_tester ) {
+			add_wordpress_beta_tester_plugin();
 		}
 
 		add_auto_login( $password );

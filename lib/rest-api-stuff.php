@@ -48,6 +48,7 @@ function add_rest_api_endpoints() {
 			'jetpack-beta' => false,
 			'subdir_multisite' => false,
 			'subdomain_multisite' => false,
+			'wordpress-beta-tester' => false,
 		];
 
 		$options = array_merge( $defaults, $body );
@@ -57,7 +58,8 @@ function add_rest_api_endpoints() {
 			$options['jetpack'],
 			$options['jetpack-beta'],
 			$options['subdir_multisite'],
-			$options['subdomain_multisite']
+			$options['subdomain_multisite'],
+			$options['wordpress-beta-tester']
 		);
 		$url = 'http://' . figure_out_main_domain( $data->domains );
 
