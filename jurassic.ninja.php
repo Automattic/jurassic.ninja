@@ -90,7 +90,7 @@ function add_admin_bar_node() {
 		$wp_admin_bar->add_node(array(
 			'id'    => 'wp-admin-bar-jurassic-ninja',
 			'title' => 'Jurassic Ninja Sites',
-			'href'  => menu_page_url( 'jurassic_ninja', false ),
+			'href'  => admin_url( 'admin.php?page=jurassic_ninja' ),
 			'parent' => 'site-name',
 		));
 	} );
