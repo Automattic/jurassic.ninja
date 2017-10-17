@@ -23,9 +23,13 @@ function add_rest_api_endpoints() {
 				'status' => 503,
 			] );
 		}
-		$add_jetpack_by_default = settings( 'add_jetpack_by_default', true );
-		$add_jetpack_beta_by_default = settings( 'add_jetpack_beta_by_default', false );
-		$data = launch_wordpress( 'php5.6', false, $add_jetpack_by_default, $add_jetpack_beta_by_default, false, false );
+
+		$features = [
+			'jetpack' => settings( 'add_jetpack_by_default', true ),
+			'jetpack-beta' => settings( 'add_jetpack_beta_by_default', false ),
+		];
+
+		$data = launch_wordpress( 'php5.6', $features );
 		$url = 'http://' . figure_out_main_domain( $data->domains );
 
 		$output = [
@@ -35,32 +39,16 @@ function add_rest_api_endpoints() {
 	}, $permission_callback );
 
 	add_post_endpoint( 'specialops/create', function ( $request ) {
-		$body = $request->get_json_params() ? $request->get_json_params() : [];
+		$json_params = $request->get_json_params();
+		$features = $json_params && is_array( $json_params ) ? $json_params : [];
 		if ( ! settings( 'enable_launching', true ) ) {
 			return new \WP_Error( 'site_launching_disabled', __( 'Site launching is disabled right now' ), [
 				'status' => 503,
 			] );
 		}
-		$defaults = [
-			'runtime' => 'php5.6',
-			'ssl' => false,
-			'jetpack' => false,
-			'jetpack-beta' => false,
-			'subdir_multisite' => false,
-			'subdomain_multisite' => false,
-			'wordpress-beta-tester' => false,
-		];
 
-		$options = array_merge( $defaults, $body );
-		$data = launch_wordpress(
-			$options['runtime'],
-			false,
-			$options['jetpack'],
-			$options['jetpack-beta'],
-			$options['subdir_multisite'],
-			$options['subdomain_multisite'],
-			$options['wordpress-beta-tester']
-		);
+		$data = launch_wordpress( 'php5.6', $features );
+
 		$url = 'http://' . figure_out_main_domain( $data->domains );
 
 		$output = [
