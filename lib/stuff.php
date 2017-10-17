@@ -61,17 +61,18 @@ function add_wordpress_beta_tester_plugin() {
 
 /**
  * Launches a new WordPress instance on the managed server
- * @param  string  $php_version      The PHP runtime versino to run the app on.
- * @param  boolean $add_ssl          Should we add SSL for the site?
- * @param  boolean $add_jetpack      Should we add Jetpack to the site?
- * @param  boolean $add_jetpack_beta Should we add Jetpack Beta Tester plugin to the site?
- * @param  boolean $enable_subdir_multisite Should we enable subdir-based multisite on the site?
- * @param  boolean $enable_subdir_multisite Should we enable subdomain-based multisite on the site?
- * @return ?Array                    null or the app data as returned by ServerPilot's API on creation.
+ * @param  String  $runtime              The PHP runtime versino to run the app on.
+ * @param  Array  $features             Array of features to enable
+ *         boolean ssl                   Should we add SSL for the site?
+ *         boolean jetpack               Should we add Jetpack to the site?
+ *         boolean jetpack-beta          Should we add Jetpack Beta Tester plugin to the site?
+ *         boolean subdir_multisite      Should we enable subdir-based multisite on the site?
+ *         boolean subdir_multisite      Should we enable subdomain-based multisite on the site?
+ *         boolean wordpress-beta-tester Should we add Jetpack Beta Tester plugin to the site?
+ * @return Array|Null                    null or the app data as returned by ServerPilot's API on creation.
  */
-function launch_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpack = false, $add_jetpack_beta = false, $enable_subdir_multisite = false, $enable_subdomain_multisite = false, $add_wordpress_beta_tester = false ) {
-	$defaults = [
-		'runtime' => 'php5.6',
+function launch_wordpress( $runtime = 'php5.6', $requested_features ) {
+	$default_features = [
 		'ssl' => false,
 		'jetpack' => false,
 		'jetpack-beta' => false,
@@ -79,17 +80,9 @@ function launch_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		'subdomain_multisite' => false,
 		'wordpress-beta-tester' => false,
 	];
-	$options = array_merge( $defaults, [
-		'runtime' => $php_version,
-		'ssl' => $add_ssl,
-		'jetpack' => $add_jetpack,
-		'jetpack-beta' => $add_jetpack_beta,
-		'subdir_multisite' => $enable_subdir_multisite,
-		'subdomain_multisite' => $enable_subdomain_multisite,
-		'wordpress-beta-tester' => $add_wordpress_beta_tester,
-	] );
+	$features = array_merge( $default_features, $requested_features );
 
-	if ( $enable_subdir_multisite && $enable_subdomain_multisite ) {
+	if ( $features['subdir_multisite'] && $features['subdomain_multisite'] ) {
 		throw new \Exception( 'not-both-multisite-types', __( "Don't try to enable both types of multiste" ) );
 	}
 
@@ -104,30 +97,30 @@ function launch_wordpress( $php_version = 'php5.6', $add_ssl = false, $add_jetpa
 		);
 		$domain = generate_random_subdomain() . '.' . settings( 'domain' );
 		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
-		$domain_arg = $enable_subdomain_multisite ? array( $domain, '*.' . $domain ) : array( $domain );
-		$app = create_sp_app( $user->data->name, $user->data->id, $php_version, $domain_arg, $wordpress_options );
+		$domain_arg = $features['subdomain_multisite'] ? array( $domain, '*.' . $domain ) : array( $domain );
+		$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg, $wordpress_options );
 		log_new_site( $app->data );
-		if ( $add_ssl ) {
+		if ( $features['ssl'] ) {
 			enable_ssl( $app->data->id );
 		}
-		if ( $add_jetpack ) {
+		if ( $features['jetpack'] ) {
 			add_jetpack();
 		}
-		if ( $add_jetpack_beta ) {
+		if ( $features['jetpack-beta'] ) {
 			add_jetpack_beta_plugin();
 		}
 
-		if ( $add_wordpress_beta_tester ) {
+		if ( $features['wordpress-beta-tester'] ) {
 			add_wordpress_beta_tester_plugin();
 		}
 
 		add_auto_login( $password );
 
-		if ( $enable_subdir_multisite ) {
+		if ( $features['subdir_multisite'] ) {
 			enable_subdir_multisite( $domain );
 		}
 
-		if ( $enable_subdomain_multisite ) {
+		if ( $features['subdomain_multisite'] ) {
 			enable_subdomain_multisite( $domain );
 		}
 
