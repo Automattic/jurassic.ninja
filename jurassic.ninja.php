@@ -10,7 +10,9 @@
 namespace jn;
 
 require_once __DIR__ . '/lib/error-stuff.php';
+
 add_error_notices();
+
 init_or_fail_if_no_dependencies_installed();
 
 /**
