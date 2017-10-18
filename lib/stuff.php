@@ -426,6 +426,17 @@ function run_command_on_behalf( $user, $password, $cmd ) {
 function run_commands_for_features( $user, $password ) {
 	$wp_home = "~/apps/$user/public";
 	$cmd = "cd $wp_home";
+	/**
+	 * Filters the string of commands that will be run on behalf of the freshly created user
+	 * Use it like this, by concatenating the passed command with && and your command.
+	 *
+	 *    $cmd = 'wp plugin install whatever --activate';
+	 *    add_filter( 'jurassic_ninja_feature_command', function ( $previous_commands ) use ( $mycmd ) {
+	 *       return "$previous_commands && $mycmd";
+	 *    } );
+	 *
+	 * @param string $cmd commands chained for running
+	 */
 	$filter_output = apply_filters( 'jurassic_ninja_feature_command', $cmd );
 	error_log( "Running $filter_output");
 	run_command_on_behalf( $user, $password, $filter_output );
