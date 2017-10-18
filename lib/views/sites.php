@@ -20,9 +20,12 @@ $just_site_domains = array_column( $db_sites, 'domain' );
 
 $db_sites_indexed = array_combine( $just_site_domains, $db_sites );
 
-$serverpilot_apps = array_filter( get_sp_app_list(), function ( $site ) {
-	return 'jurassic.ninja' !== $site->name;
-} );
+/**
+ * Filters the array of apps returned by ServerPilot's API
+ *
+ * @param array $apps Apps returned by ServerPilot's API
+ */
+$serverpilot_apps = apply_filters( 'jurassic_ninja_serverpilot_apps_list', get_sp_app_list() );
 
 ?>
 <p>
