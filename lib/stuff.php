@@ -3,7 +3,9 @@
 namespace jn;
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/RationalOptionPages.php';
+if ( ! class_exists( 'RationalOptionPages' ) ) {
+	require_once __DIR__ . '/RationalOptionPages.php';
+}
 require_once __DIR__ . '/rest-api-stuff.php';
 
 define( 'REST_API_NAMESPACE', 'jurassic.ninja' );
