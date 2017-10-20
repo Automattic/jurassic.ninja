@@ -4,10 +4,14 @@
  * The thing is that ServerPilot PHP just throws if there's an error
  * so the wrappers defined here try/catch every call and return WP_Errors if The
  * library throws an exception
- * 
+ *
  */
 
 namespace jn;
+
+if ( ! defined( '\\ABSPATH' ) ) {
+	exit;
+}
 
 $serverpilot_instance = null;
 

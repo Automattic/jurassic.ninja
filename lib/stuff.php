@@ -2,6 +2,10 @@
 
 namespace jn;
 
+if ( ! defined( '\\ABSPATH' ) ) {
+	exit;
+}
+
 require_once __DIR__ . '/../vendor/autoload.php';
 if ( ! class_exists( 'RationalOptionPages' ) ) {
 	require_once __DIR__ . '/RationalOptionPages.php';
