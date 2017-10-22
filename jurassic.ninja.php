@@ -88,9 +88,7 @@ function add_rest_nonce() {
 	add_action( 'wp_enqueue_scripts', function() {
 		// Add the nonce under the /create path and
 		// if the user is admin, add it also on /specialops
-		if ( 'create' === get_page_uri()
-			|| ( current_user_can( 'manage_options' ) && 'specialops' === get_page_uri() ) ) {
-
+		if ( page_is_launching_page() ) {
 			wp_localize_script( 'jurassicninja.js', 'restApiSettings', array(
 				'root' => esc_url_raw( rest_url() ),
 				'nonce' => wp_create_nonce( 'wp_rest' ),
@@ -106,5 +104,14 @@ function add_scripts() {
 	add_action( 'wp_enqueue_scripts', function () {
 		wp_enqueue_script( 'jurassicninja.js', plugins_url( '', __FILE__ ) . '/jurassicninja.js', false, false, true );
 	} );
+}
+
+/**
+ * Returns true if currently on a /create or /specialops page
+ * @return boolean [description]
+ */
+function page_is_launching_page() {
+	return ( 'create' === get_page_uri()
+		|| ( current_user_can( 'manage_options' ) && 'specialops' === get_page_uri() ) );
 }
 
