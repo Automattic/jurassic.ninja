@@ -102,7 +102,9 @@ function add_rest_nonce() {
  */
 function add_scripts() {
 	add_action( 'wp_enqueue_scripts', function () {
-		wp_enqueue_script( 'jurassicninja.js', plugins_url( '', __FILE__ ) . '/jurassicninja.js', false, false, true );
+		if ( page_is_launching_page() ) {
+			wp_enqueue_script( 'jurassicninja.js', plugins_url( '', __FILE__ ) . '/jurassicninja.js', false, false, true );
+		}
 	} );
 }
 
