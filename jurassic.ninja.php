@@ -32,7 +32,7 @@ function init() {
 	require_once __DIR__ . '/lib/stuff.php';
 
 	//Create settings page
-	add_options_page();
+	add_settings_page();
 	// Settings problems include credentials and IDs not configured
 	if ( ! settings_problems() ) {
 		// Include the JS only under the page which has the /create slug.
