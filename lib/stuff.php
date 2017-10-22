@@ -26,10 +26,9 @@ define( 'SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubuserconten
 function add_auto_login( $password ) {
 	$companion_api_base_url = rest_url( 'jurassic.ninja' );
 	$companion_plugin_url = COMPANION_PLUGIN_URL;
-	$cmd = "
-		wp option add auto_login 1 && wp option add jurassic_ninja_admin_password '$password' && \
-		wp option add companion_api_base_url '$companion_api_base_url' && \
-		wp plugin install --force $companion_plugin_url --activate";
+	$cmd = "wp option add auto_login 1 && wp option add jurassic_ninja_admin_password '$password'"
+		. " && wp option add companion_api_base_url '$companion_api_base_url'"
+		. " && wp plugin install --force $companion_plugin_url --activate";
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );
@@ -177,8 +176,8 @@ function create_slug( $str, $delimiter = '-' ) {
 function enable_subdir_multisite( $domain ) {
 	$file_url = SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL;
 	$email = settings( 'default_admin_email_address' );
-	$cmd = "wp core multisite-install --title=\"subdir-based Network\" --url=\"$domain\" --admin_email=\"$email\" --skip-email && \
-		cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess";
+	$cmd = "wp core multisite-install --title=\"subdir-based Network\" --url=\"$domain\" --admin_email=\"$email\" --skip-email"
+		. " && cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess";
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );
@@ -194,9 +193,9 @@ function enable_subdomain_multisite( $domain ) {
 	$email = settings( 'default_admin_email_address' );
 	// For some reason, the option auto_login gets set to a 0 after enabling multisite-install,
 	// like if there were a sort of inside login happening magically.
-	$cmd = "wp core multisite-install --title=\"subdomain-based Network\" --url=\"$domain\" --admin_email=\"$email\" --subdomains --skip-email && \
-	 	cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess && \
-		wp option update auto_login 1";
+	$cmd = "wp core multisite-install --title=\"subdomain-based Network\" --url=\"$domain\" --admin_email=\"$email\" --subdomains --skip-email"
+		. " && cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess"
+		. ' && wp option update auto_login 1';
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );
