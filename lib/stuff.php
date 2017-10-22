@@ -24,7 +24,7 @@ define( 'SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubuserconten
  * @param string $password System password for ssh.
  */
 function add_auto_login( $password ) {
-	$companion_api_base_url = rest_url( 'jurassic.ninja' );
+	$companion_api_base_url = rest_url( REST_API_NAMESPACE );
 	$companion_plugin_url = COMPANION_PLUGIN_URL;
 	$cmd = "wp option add auto_login 1 && wp option add jurassic_ninja_admin_password '$password'"
 		. " && wp option add companion_api_base_url '$companion_api_base_url'"
