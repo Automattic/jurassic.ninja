@@ -281,7 +281,7 @@ function generate_random_subdomain() {
 
 /**
  * Generates a random username starting with userxxxxx
- * @return string A randome username
+ * @return string A random username
  */
 function generate_random_username() {
 	$length = 4;
