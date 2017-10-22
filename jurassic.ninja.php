@@ -15,21 +15,7 @@ if ( ! defined( '\\ABSPATH' ) ) {
 
 require_once __DIR__ . '/lib/error-stuff.php';
 
-add_error_notices();
-
 init_or_fail_if_no_dependencies_installed();
-
-/**
- * Checks if the vendor directory is present and just shows a warning and quits if it's not the case.
- * This can probably be removed if it makes sense to just include dependencies.
- */
-function init_or_fail_if_no_dependencies_installed() {
-	if ( ! is_dir( __DIR__ . '/vendor' ) ) {
-		push_error( new \WP_Error( 'no-dependencies', __( 'Run composer install first' ) ) );
-	} else {
-		init();
-	}
-}
 
 /**
  * Creates settings page, REST API extensions, cron jobs, and administrative tables.
@@ -64,14 +50,40 @@ function init() {
 }
 
 /**
-* Adds javascript needed by this plugin
-*/
-function add_scripts() {
-	add_action( 'wp_enqueue_scripts', function () {
-		wp_enqueue_script( 'jurassicninja.js', plugins_url( '', __FILE__ ) . '/jurassicninja.js', false, false, true );
+ * Checks if the vendor directory is present and just shows a warning and quits if it's not the case.
+ * This can probably be removed if it makes sense to just include dependencies.
+ */
+function init_or_fail_if_no_dependencies_installed() {
+	require_once __DIR__ . '/lib/error-stuff.php';
+
+	add_error_notices();
+	if ( ! is_dir( __DIR__ . '/vendor' ) ) {
+		push_error( new \WP_Error( 'no-dependencies', __( 'Run composer install first' ) ) );
+	} else {
+		init();
+	}
+}
+
+/**
+ * Adds a Topbar link to the Jurassic Ninja sites page.
+ */
+function add_admin_bar_node() {
+	add_action( 'wp_before_admin_bar_render', function () {
+		global $wp_admin_bar;
+
+		$wp_admin_bar->add_node(array(
+			'id'    => 'wp-admin-bar-jurassic-ninja',
+			'title' => 'Jurassic Ninja Sites',
+			'href'  => admin_url( 'admin.php?page=jurassic_ninja' ),
+			'parent' => 'site-name',
+		));
 	} );
 }
 
+/**
+ * Adds nonce for cookie-based authentication against the REST API extensions
+ * that this plugin creates.
+ */
 function add_rest_nonce() {
 	add_action( 'wp_enqueue_scripts', function() {
 		// Add the nonce under the /create path and
@@ -87,17 +99,12 @@ function add_rest_nonce() {
 	} );
 }
 
-function add_admin_bar_node() {
-	add_action( 'wp_before_admin_bar_render', function () {
-		global $wp_admin_bar;
-
-		$wp_admin_bar->add_node(array(
-			'id'    => 'wp-admin-bar-jurassic-ninja',
-			'title' => 'Jurassic Ninja Sites',
-			'href'  => admin_url( 'admin.php?page=jurassic_ninja' ),
-			'parent' => 'site-name',
-		));
+/**
+ * Adds javascript needed by this plugin
+ */
+function add_scripts() {
+	add_action( 'wp_enqueue_scripts', function () {
+		wp_enqueue_script( 'jurassicninja.js', plugins_url( '', __FILE__ ) . '/jurassicninja.js', false, false, true );
 	} );
 }
-
 
