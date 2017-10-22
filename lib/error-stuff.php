@@ -8,10 +8,17 @@ if ( ! defined( '\\ABSPATH' ) ) {
 
 $errors = [];
 
+/**
+ * Registers a hook to admin_notices
+ */
 function add_error_notices() {
 	add_action( 'admin_notices', 'jn\admin_noticies' );
 }
 
+/**
+ * Will show a persistent admin notice for errors and messages in wp-admin
+ * @return [type] [description]
+ */
 function admin_noticies() {
 	// The function_exists() check is just for the case when the plugin has just been activated
 	// but composer dependencies were not installed.
@@ -59,11 +66,19 @@ function list_in_words( $list = [] ) {
 	return $s;
 }
 
+/**
+ * Returns an array of WP_Errors pushed to this plugin's own stack of errors
+ * @return [Array] array of WP_Error
+ */
 function errors() {
 	global $errors;
 	return $errors;
 }
 
+/**
+ * Push an error to the stack of errors that will be shown on the admin notices
+ * @param  WP_Error  $err An error to be shown in the admin notice.
+ */
 function push_error( $err ) {
 	global $errors;
 	$errors[] = $err;
