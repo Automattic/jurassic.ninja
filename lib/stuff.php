@@ -337,6 +337,14 @@ function log_purged_site( $data ) {
 }
 
 /**
+ * Returns all of the sites managed and created by this instance of Jurassic Ninja
+ * @return Array The list of sites
+ */
+function managed_sites() {
+	return db()->get_results( 'select * from sites', \ARRAY_A );
+}
+
+/**
  * Updates the record for the site in the sites table indicating
  * that the creator has at least visited wp-admin once (the first time)
  * @param  string $domain The name of the site
