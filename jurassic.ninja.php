@@ -15,21 +15,7 @@ if ( ! defined( '\\ABSPATH' ) ) {
 
 require_once __DIR__ . '/lib/error-stuff.php';
 
-add_error_notices();
-
 init_or_fail_if_no_dependencies_installed();
-
-/**
- * Checks if the vendor directory is present and just shows a warning and quits if it's not the case.
- * This can probably be removed if it makes sense to just include dependencies.
- */
-function init_or_fail_if_no_dependencies_installed() {
-	if ( ! is_dir( __DIR__ . '/vendor' ) ) {
-		push_error( new \WP_Error( 'no-dependencies', __( 'Run composer install first' ) ) );
-	} else {
-		init();
-	}
-}
 
 /**
  * Creates settings page, REST API extensions, cron jobs, and administrative tables.
@@ -46,7 +32,7 @@ function init() {
 	require_once __DIR__ . '/lib/stuff.php';
 
 	//Create settings page
-	add_options_page();
+	add_settings_page();
 	// Settings problems include credentials and IDs not configured
 	if ( ! settings_problems() ) {
 		// Include the JS only under the page which has the /create slug.
@@ -64,29 +50,23 @@ function init() {
 }
 
 /**
-* Adds javascript needed by this plugin
-*/
-function add_scripts() {
-	add_action( 'wp_enqueue_scripts', function () {
-		wp_enqueue_script( 'jurassicninja.js', plugins_url( '', __FILE__ ) . '/jurassicninja.js', false, false, true );
-	} );
+ * Checks if the vendor directory is present and just shows a warning and quits if it's not the case.
+ * This can probably be removed if it makes sense to just include dependencies.
+ */
+function init_or_fail_if_no_dependencies_installed() {
+	require_once __DIR__ . '/lib/error-stuff.php';
+
+	add_error_notices();
+	if ( ! is_dir( __DIR__ . '/vendor' ) ) {
+		push_error( new \WP_Error( 'no-dependencies', __( 'Run composer install first' ) ) );
+	} else {
+		init();
+	}
 }
 
-function add_rest_nonce() {
-	add_action( 'wp_enqueue_scripts', function() {
-		// Add the nonce under the /create path and
-		// if the user is admin, add it also on /specialops
-		if ( 'create' === get_page_uri()
-			|| ( current_user_can( 'manage_options' ) && 'specialops' === get_page_uri() ) ) {
-
-			wp_localize_script( 'jurassicninja.js', 'restApiSettings', array(
-				'root' => esc_url_raw( rest_url() ),
-				'nonce' => wp_create_nonce( 'wp_rest' ),
-			) );
-		}
-	} );
-}
-
+/**
+ * Adds a Topbar link to the Jurassic Ninja sites page.
+ */
 function add_admin_bar_node() {
 	add_action( 'wp_before_admin_bar_render', function () {
 		global $wp_admin_bar;
@@ -100,4 +80,40 @@ function add_admin_bar_node() {
 	} );
 }
 
+/**
+ * Adds nonce for cookie-based authentication against the REST API extensions
+ * that this plugin creates.
+ */
+function add_rest_nonce() {
+	add_action( 'wp_enqueue_scripts', function() {
+		// Add the nonce under the /create path and
+		// if the user is admin, add it also on /specialops
+		if ( page_is_launching_page() ) {
+			wp_localize_script( 'jurassicninja.js', 'restApiSettings', array(
+				'root' => esc_url_raw( rest_url() ),
+				'nonce' => wp_create_nonce( 'wp_rest' ),
+			) );
+		}
+	} );
+}
+
+/**
+ * Adds javascript needed by this plugin
+ */
+function add_scripts() {
+	add_action( 'wp_enqueue_scripts', function () {
+		if ( page_is_launching_page() ) {
+			wp_enqueue_script( 'jurassicninja.js', plugins_url( '', __FILE__ ) . '/jurassicninja.js', false, false, true );
+		}
+	} );
+}
+
+/**
+ * Returns true if currently on a /create or /specialops page
+ * @return boolean [description]
+ */
+function page_is_launching_page() {
+	return ( 'create' === get_page_uri()
+		|| ( current_user_can( 'manage_options' ) && 'specialops' === get_page_uri() ) );
+}
 

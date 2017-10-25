@@ -18,7 +18,7 @@ function add_cron_job() {
 		wp_schedule_event( time(), 'hourly', 'jurassic_ninja_purge' );
 	}
 
-	add_action( 'jurassic_ninja_purge', 'jn\jurassic_ninja_purge' );
+	add_action( 'jurassic_ninja_purge', 'jn\jurassic_ninja_purge_cron_task' );
 
 }
 
@@ -26,7 +26,7 @@ function add_cron_job() {
  * Attempts to purge sites calculated as ready to be purged
  * @return [type] [description]
  */
-function jurassic_ninja_purge() {
+function jurassic_ninja_purge_cron_task() {
 	if ( settings( 'purge_sites_when_cron_runs', true ) ) {
 		purge_sites();
 	}

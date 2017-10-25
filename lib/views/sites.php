@@ -18,7 +18,7 @@ if ( settings_problems() ) {
 	</p>
 	<?php
 }
-$db_sites = db()->get_results( 'select * from sites', \ARRAY_A );
+$db_sites = managed_sites();
 
 $just_site_domains = array_column( $db_sites, 'domain' );
 

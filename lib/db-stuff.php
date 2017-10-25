@@ -20,11 +20,11 @@ function db() {
  * @return [type]              [description]
  */
 function create_tables( $plugin_file ) {
-	register_activation_hook( $plugin_file, 'jn\prefix_create_table' );
+	register_activation_hook( $plugin_file, 'jn\jurassic_ninja_create_table' );
 }
 
 
-function prefix_create_table() {
+function jurassic_ninja_create_table() {
 	global $wpdb;
 
 	$charset_collate = $wpdb->get_charset_collate();
