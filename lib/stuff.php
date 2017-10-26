@@ -35,7 +35,7 @@ function add_auto_login( $password ) {
 }
 
 /**
- * Install and activates the Debug plugin on the site.
+ * Installs and activates the Debug plugin on the site.
  */
 function add_debug_plugin() {
 	$cmd = 'wp plugin install debug --activate';
@@ -45,7 +45,17 @@ function add_debug_plugin() {
 }
 
 /**
- * Install and activates Jetpack on the site.
+ * Installs and activates Gutenberg Plugin on the site.
+ */
+function add_gutenberg_plugin() {
+	$cmd = 'wp plugin install gutenberg --activate';
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
+}
+
+/**
+ * Installs and activates Jetpack on the site.
  */
 function add_jetpack() {
 	$cmd = 'wp plugin install jetpack --activate';
@@ -78,18 +88,20 @@ function add_wordpress_beta_tester_plugin() {
  * Launches a new WordPress instance on the managed server
  * @param  String  $runtime              The PHP runtime versino to run the app on.
  * @param  Array  $features              Array of features to enable
+ *         boolean debug                 Should we add the Debug plugin to the site?
  *         boolean ssl                   Should we add SSL for the site?
+ *         boolean gutenberg             Should we add Gutenberg to the site?
  *         boolean jetpack               Should we add Jetpack to the site?
  *         boolean jetpack-beta          Should we add Jetpack Beta Tester plugin to the site?
  *         boolean subdir_multisite      Should we enable subdir-based multisite on the site?
  *         boolean subdir_multisite      Should we enable subdomain-based multisite on the site?
  *         boolean wordpress-beta-tester Should we add Jetpack Beta Tester plugin to the site?
- *         boolean debug                 Should we add the Debug plugin to the site?
  * @return Array|Null                    null or the app data as returned by ServerPilot's API on creation.
  */
 function launch_wordpress( $runtime = 'php5.6', $requested_features ) {
 	$default_features = [
 		'ssl' => false,
+		'gutenberg' => false,
 		'jetpack' => false,
 		'jetpack-beta' => false,
 		'subdir_multisite' => false,
@@ -130,8 +142,13 @@ function launch_wordpress( $runtime = 'php5.6', $requested_features ) {
 		if ( $features['wordpress-beta-tester'] ) {
 			add_wordpress_beta_tester_plugin();
 		}
+
 		if ( $features['debug'] ) {
 			add_debug_plugin();
+		}
+
+		if ( $features['gutenberg'] ) {
+			add_gutenberg_plugin();
 		}
 
 		add_auto_login( $password );
