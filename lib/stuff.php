@@ -74,6 +74,17 @@ function add_jetpack_beta_plugin() {
 		return "$s && $cmd";
 	} );
 }
+
+/**
+ * Installs and activates WooCommerce on the site.
+ */
+function add_woocommerce_plugin() {
+	$cmd = 'wp plugin install woocommerce --activate' ;
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
+}
+
 /**
  * Installs and activates WordPress Beta Tester plugin on the site.
  */
@@ -95,6 +106,7 @@ function add_wordpress_beta_tester_plugin() {
  *         boolean jetpack-beta          Should we add Jetpack Beta Tester plugin to the site?
  *         boolean subdir_multisite      Should we enable subdir-based multisite on the site?
  *         boolean subdir_multisite      Should we enable subdomain-based multisite on the site?
+ *         boolean woocommerce           Should we add WooCommerce plugin to the site?
  *         boolean wordpress-beta-tester Should we add Jetpack Beta Tester plugin to the site?
  * @return Array|Null                    null or the app data as returned by ServerPilot's API on creation.
  */
@@ -106,6 +118,7 @@ function launch_wordpress( $runtime = 'php5.6', $requested_features ) {
 		'jetpack-beta' => false,
 		'subdir_multisite' => false,
 		'subdomain_multisite' => false,
+		'woocommerce' => false,
 		'wordpress-beta-tester' => false,
 		'debug' => false,
 	];
@@ -149,6 +162,10 @@ function launch_wordpress( $runtime = 'php5.6', $requested_features ) {
 
 		if ( $features['gutenberg'] ) {
 			add_gutenberg_plugin();
+		}
+
+		if ( $features['woocommerce'] ) {
+			add_woocommerce_plugin();
 		}
 
 		add_auto_login( $password );
