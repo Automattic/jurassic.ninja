@@ -6,7 +6,7 @@ if ( ! defined( '\\ABSPATH' ) ) {
 	exit;
 }
 
-$errors = [];
+$jurassic_ninja_errors = [];
 
 /**
  * Registers a hook to admin_notices
@@ -71,8 +71,8 @@ function list_in_words( $list = [] ) {
  * @return [Array] array of WP_Error
  */
 function errors() {
-	global $errors;
-	return $errors;
+	global $jurassic_ninja_errors;
+	return $jurassic_ninja_errors;
 }
 
 /**
@@ -80,7 +80,7 @@ function errors() {
  * @param  WP_Error  $err An error to be shown in the admin notice.
  */
 function push_error( $err ) {
-	global $errors;
-	$errors[] = $err;
+	global $jurassic_ninja_errors;
+	$jurassic_ninja_errors[] = $err;
 }
 
