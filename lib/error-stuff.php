@@ -32,7 +32,6 @@ function admin_noticies() {
 		<ul>
 			<?php
 			foreach ( errors() as $error ) {
-			    error_log( print_r( $error, true ) ) ;
 			?>
 				<li>
 				<?php echo esc_html( $error->get_error_message() ); ?>
