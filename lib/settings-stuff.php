@@ -136,6 +136,13 @@ function add_settings_page() {
 							'placeholder' => 'INTERVAL 2 HOUR',
 							'value' => 'INTERVAL 2 HOUR',
 						),
+						'use_subdomain_based_wordpress_title' => array(
+							'id' => 'use_subdomain_based_wordpress_title',
+							'title' => __( 'Base the site titles on their subdomain', 'jurassic-ninja' ),
+							'text' => __( 'Example: http://ugly-unicorn.domain will be titled "Ugly Unicorn".', 'jurassic-ninja' ),
+							'type' => 'checkbox',
+							'checked' => false,
+						),
 						'add_jetpack_by_default' => array(
 							'id' => 'add_jetpack_by_default',
 							'title' => __( 'Add Jetpack to every launched WordPress', 'jurassic-ninja' ),
