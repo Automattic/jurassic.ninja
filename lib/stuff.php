@@ -131,13 +131,19 @@ function launch_wordpress( $runtime = 'php5.6', $requested_features ) {
 	try {
 		$password = generate_random_password();
 		$user = generate_new_user( $password );
+		$subdomain = generate_random_subdomain();
+			// title-case the subdomain
+			// or default to the classic My WordPress Site
+		$site_title = settings( 'use_subdomain_based_wordpress_title', false ) ?
+			ucwords( str_replace( '-', ' ', $subdomain ) ) :
+			'My WordPress Site';
 		$wordpress_options = array(
-			'site_title' => 'My WordPress Site',
+			'site_title' => $site_title,
 			'admin_user' => 'demo',
 			'admin_password' => $password,
 			'admin_email' => settings( 'default_admin_email_address' ),
 		);
-		$domain = generate_random_subdomain() . '.' . settings( 'domain' );
+		$domain = sprintf( '%s.%s', $subdomain, settings( 'domain' ) );
 		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
 		$domain_arg = $features['subdomain_multisite'] ? array( $domain, '*.' . $domain ) : array( $domain );
 		$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg, $wordpress_options );
