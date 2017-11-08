@@ -22,6 +22,10 @@ function add_rest_api_endpoints() {
 		},
 	];
 	add_post_endpoint( 'create', function ( $request ) {
+		$json_params = $request->get_json_params();
+		$shortlived = is_array( $json_params ) && isset( $json_params['shortlived'] ) ?
+			(bool) $json_params[ 'shortlived' ] :
+			false;
 		if ( ! settings( 'enable_launching', true ) ) {
 			return new \WP_Error( 'site_launching_disabled', __( 'Site launching is disabled right now' ), [
 				'status' => 503,
@@ -31,6 +35,7 @@ function add_rest_api_endpoints() {
 		$features = [
 			'jetpack' => settings( 'add_jetpack_by_default', true ),
 			'jetpack-beta' => settings( 'add_jetpack_beta_by_default', false ),
+			'shortlife' => $shortlived,
 		];
 
 		$data = launch_wordpress( 'php5.6', $features );

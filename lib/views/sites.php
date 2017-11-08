@@ -41,6 +41,7 @@ $serverpilot_apps = apply_filters( 'jurassic_ninja_serverpilot_apps_list', get_s
 			<th class="manage-column column-columnname"><?php echo esc_html__( 'Site' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html__( 'System user' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html__( 'Managed by this Jurassic Ninja instance' ); ?> </th>
+			<th class="manage-column column-columnname"><?php echo esc_html__( 'Is shortlived site' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html__( 'Created on' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html__( 'Checked in on' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html__( 'Last logged in on' ); ?> </th>
@@ -56,6 +57,7 @@ foreach ( $serverpilot_apps as $site ) {
 	$sysusername = $in_logs ? $db_sites_indexed[ $domain ]['username'] : '';
 	$last_logged_in = $in_logs ? $db_sites_indexed[ $domain ]['last_logged_in'] : '';
 	$checked_in = $in_logs ? $db_sites_indexed[ $domain ]['checked_in'] : '';
+	$is_shortlived_site = $in_logs ? $db_sites_indexed[ $domain ]['shortlived'] : false ;
 	?>
 	<tr class="active">
 		<td class="column-columnname"><?php echo esc_html( $db_id ); ?></td>
@@ -64,6 +66,7 @@ foreach ( $serverpilot_apps as $site ) {
 		</td>
 		<td class="column-columnname"><a rel="noreferrer noopener" target="_blank" href="<?php echo esc_attr( "https://manage.serverpilot.io/#sysusers/$sysusername" );?>"><?php esc_html_e( $sysusername ); ?></a></td>
 		<td class="column-columnname"><?php echo $in_logs ? esc_html__( 'Yes' ) : esc_html__( 'No' ); ?></td>
+		<td class="column-columnname"><?php echo $in_logs && $is_shortlived_site ? esc_html__( 'Yes' ) : esc_html__( 'No' ); ?></td>
 		<td class="column-columnname"><?php echo $in_logs ? esc_html( mysql2date( 'l, F j - g:i a', get_date_from_gmt( $created ) ) ) : ''; ?></td>
 		<td class="column-columnname"><?php echo $in_logs && $checked_in ? esc_html( mysql2date( 'l, F j - g:i a', get_date_from_gmt( $checked_in ) ) ) : ''; ?></td>
 		<td class="column-columnname"><?php echo $in_logs && $last_logged_in ? esc_html( mysql2date( 'l, F j - g:i a', get_date_from_gmt( $last_logged_in ) ) ) : ''; ?></td>

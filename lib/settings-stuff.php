@@ -129,6 +129,13 @@ function add_settings_page() {
 							'placeholder' => 'INTERVAL 7 DAY',
 							'value' => 'INTERVAL 7 DAY',
 						),
+						'shortlived_sites_expiration' => array(
+							'id' => 'shortlived_sites_expiration',
+							'title' => __( 'Shortlived sites lifespan', 'jurassic-ninja' ),
+							'text' => __( 'Default interval for considering a site to be expired if it has been created a shortlived site. Expressed in MySQL interval format.', 'jurassic-ninja' ),
+							'placeholder' => 'INTERVAL 1 HOUR',
+							'value' => 'INTERVAL 1 HOUR',
+						),
 						'sites_never_checked_in_expiration' => array(
 							'id' => 'sites_never_checked_in_expiration',
 							'title' => __( 'Unvisited sites lifespan', 'jurassic-ninja' ),
