@@ -36,6 +36,7 @@ function jurassic_ninja_create_table() {
 		created datetime ,
 		last_logged_in datetime ,
 		checked_in datetime,
+		shortlived boolean not null DEFAULT 0,
 		PRIMARY KEY  (id)
 	) $charset_collate;";
 
@@ -46,6 +47,7 @@ function jurassic_ninja_create_table() {
 		created datetime ,
 		last_logged_in datetime ,
 		checked_in datetime,
+		shortlived boolean not null DEFAULT 0,
 		PRIMARY KEY  (id)
 	) $charset_collate;";
 

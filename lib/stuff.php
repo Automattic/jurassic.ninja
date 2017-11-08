@@ -121,6 +121,7 @@ function launch_wordpress( $runtime = 'php5.6', $requested_features ) {
 		'woocommerce' => false,
 		'wordpress-beta-tester' => false,
 		'debug' => false,
+		'shortlife' => false,
 	];
 	$features = array_merge( $default_features, $requested_features );
 
@@ -147,7 +148,7 @@ function launch_wordpress( $runtime = 'php5.6', $requested_features ) {
 		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
 		$domain_arg = $features['subdomain_multisite'] ? array( $domain, '*.' . $domain ) : array( $domain );
 		$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg, $wordpress_options );
-		log_new_site( $app->data );
+		log_new_site( $app->data, $features['shortlife'] );
 		if ( $features['ssl'] ) {
 			enable_ssl( $app->data->id );
 		}
@@ -247,9 +248,11 @@ function enable_subdomain_multisite( $domain ) {
  */
 function expired_sites() {
 	$interval = settings( 'sites_expiration', 'INTERVAL 7 DAY' );
+	$interval_shortlived = settings( 'shortlived_sites_expiration', 'INTERVAL 1 HOUR' );
 	return db()->get_results(
 		"select * from sites where ( last_logged_in IS NOT NULL AND last_logged_in < DATE_SUB( NOW(), $interval ) )
-		OR ( last_logged_in is NULL and created < DATE_SUB( NOW(), $interval ) )",
+		OR ( last_logged_in is NULL and created < DATE_SUB( NOW(), $interval ) )
+		OR ( shortlived and created < DATE_SUB( NOW(), $interval_shortlived ) )",
 		\ARRAY_A
 	);
 }
@@ -381,12 +384,13 @@ function l( $stuff ) {
  * @param  Array $data Site data as returned by ServerPilot's API on creation
  * @return [type]       [description]
  */
-function log_new_site( $data ) {
+function log_new_site( $data, $shortlived = false ) {
 	db()->insert( 'sites',
 		[
 			'username' => $data->name,
 			'domain' => figure_out_main_domain( $data->domains ),
 			'created' => current_time( 'mysql', 1 ),
+			'shortlived' => $shortlived,
 		]
 	);
 	if ( db()->last_error ) {
@@ -406,6 +410,7 @@ function log_purged_site( $data ) {
 		'created' => $data['created'],
 		'last_logged_in' => $data['last_logged_in'],
 		'checked_in' => $data['checked_in'],
+		'shortlived' => $data['shortlived'],
 	] );
 	db()->delete( 'sites', [
 		'username' => $data['username'],
