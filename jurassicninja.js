@@ -15,6 +15,8 @@ const defaultFeatures = {
 	'woocommerce': false,
 };
 
+const originalProgressText = jQuery( '#progress' ).text();
+
 function doIt( $, shortlived ) {
 	$( function() {
 		$( '#img1').show();
@@ -132,9 +134,12 @@ if ( isCreatePage() ) {
 
 if ( isSpecialOpsPage() ) {
 	jQuery( '[data-is-create-button]').click( function () {
+		jQuery( '#img1').show();
+		jQuery( '#img2').hide();
+		jQuery( '#progress' ).text( originalProgressText );
 		const $this = jQuery( this );
 		const features = collectFeatures();
-		// Buttons can have a feature too
+		// Buttons can declare a feature too
 		if ( $this.data( 'feature' )  ) {
 			features[ $this.data( 'feature' ) ] = true;
 		}
