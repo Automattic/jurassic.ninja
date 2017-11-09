@@ -136,6 +136,10 @@ function launch_wordpress( $runtime = 'php5.6', $requested_features ) {
 		$collision_attempts = 10;
 		do {
 			$subdomain = generate_random_subdomain();
+			// Add moar randomness to shortlived sites
+			if ( $features['shortlife'] ) {
+				$subdomain = sprintf( "%s-%s", $subdomain, rand( 2, 100) );
+			}
 		} while ( subdomain_is_used( $subdomain ) && $collision_attempts-- > 0 );
 			// title-case the subdomain
 			// or default to the classic My WordPress Site
