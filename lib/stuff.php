@@ -132,7 +132,11 @@ function launch_wordpress( $runtime = 'php5.6', $requested_features ) {
 	try {
 		$password = generate_random_password();
 		$user = generate_new_user( $password );
-		$subdomain = generate_random_subdomain();
+		$subdomain = '';
+		$collision_attempts = 10;
+		do {
+			$subdomain = generate_random_subdomain();
+		} while ( subdomain_is_used( $subdomain ) && $collision_attempts-- > 0 );
 			// title-case the subdomain
 			// or default to the classic My WordPress Site
 		$site_title = settings( 'use_subdomain_based_wordpress_title', false ) ?
@@ -563,3 +567,14 @@ function sites_to_be_purged() {
 	return array_merge( $expired, $unused );
 }
 
+/**
+ * Checks if a subdomain is already user by a running site.
+ *
+ * @param $subdomain	The subdomain to check for collision with an already launched site.
+ * @return bool			Return true if the domain is used by a running site.
+ */
+function subdomain_is_used( $subdomain ) {
+	$domain = sprintf( "%s.%s", $subdomain, settings( 'domain' ) );
+	$results = db()->get_results( "select * from sites where domain='$domain' limit 1", \ARRAY_A );
+	return count( $results ) !== 0;
+}
