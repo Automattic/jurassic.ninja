@@ -387,6 +387,15 @@ function generate_random_password() {
  * @return string A slugified subdomain.
  */
 function generate_random_subdomain() {
+	class CustomGenerator extends \Nubs\RandomNameGenerator\Alliteration {
+		public function getName()
+		{
+			$adjective = $this->_getRandomWord($this->_adjectives);
+			$noun = $this->_getRandomWord($this->_nouns);
+			return ucwords("{$adjective} {$noun}");
+		}
+	}
+
 	$blacklisted_words = [
 		'african',
 		'american',
@@ -419,8 +428,9 @@ function generate_random_subdomain() {
 	$regexp = implode( '|', $blacklisted_words );
 	$name = 'First try';
 	$i = 0;
+
 	do {
-		$generator = new \Nubs\RandomNameGenerator\Alliteration();
+		$generator = new CustomGenerator();
 		$name = $generator->getName();
 	} while( $i++ < $MAX_ATTEMPTS && preg_match("($regexp)", $name ) === 1 );
 
