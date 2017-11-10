@@ -2,5 +2,8 @@
 	"require": {
 		"daverogers/serverpilot-php": "1.*",
 		"nubs/random-name-generator": "1.*"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^6.4"
 	}
 }
