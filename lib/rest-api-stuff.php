@@ -22,21 +22,25 @@ function add_rest_api_endpoints() {
 		},
 	];
 	add_post_endpoint( 'create', function ( $request ) {
+		$defaults = [
+			'jetpack' => (bool)settings( 'add_jetpack_by_default', true ),
+			'jetpack-beta' => (bool) settings( 'add_jetpack_beta_by_default', false ),
+			'shortlife' => false,
+		];
 		$json_params = $request->get_json_params();
-		$shortlived = is_array( $json_params ) && isset( $json_params['shortlived'] ) ?
-			(bool) $json_params[ 'shortlived' ] :
-			false;
+		$features = $json_params && is_array( $json_params ) ? $json_params : [];
 		if ( ! settings( 'enable_launching', true ) ) {
 			return new \WP_Error( 'site_launching_disabled', __( 'Site launching is disabled right now' ), [
 				'status' => 503,
 			] );
 		}
 
-		$features = [
-			'jetpack' => settings( 'add_jetpack_by_default', true ),
-			'jetpack-beta' => settings( 'add_jetpack_beta_by_default', false ),
-			'shortlife' => $shortlived,
-		];
+		$features = array_merge( $defaults, [
+			'shortlife' => isset( $features['shortlived'] ) && (bool) $features['shortlived'],
+		] );
+		if ( isset( $json_params['jetpack'] ) ) {
+			$features['jetpack'] = $json_params['jetpack'];
+		}
 
 		$data = launch_wordpress( 'php5.6', $features );
 		$url = 'http://' . figure_out_main_domain( $data->domains );

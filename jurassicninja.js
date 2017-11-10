@@ -17,12 +17,12 @@ const defaultFeatures = {
 
 const originalProgressText = jQuery( '#progress' ).text();
 
-function doIt( $, shortlived ) {
+function doIt( $, features ) {
 	$( function() {
 		$( '#img1').show();
 		$( '#img2').hide();
 
-		createSite( shortlived )
+		createSite( features )
 			.then( response => {
 				$('#progress').html( `<a href="${ response.data.url }">The new WP is ready to go, visit it!</a>` );
 				$('#img1').hide();
@@ -55,13 +55,13 @@ function doItWithFeatures( $, features ) {
 	} );
 }
 
-function createSite( shortlived ) {
+function createSite( features ) {
 	const url = restApiSettings.root;
 	const nonce = restApiSettings.nonce;
 	return fetch( url + 'jurassic.ninja/create', {
 		method: 'post',
 		credentials: 'same-origin',
-		body: shortlived ? JSON.stringify( { shortlived: true } ) : null,
+		body: Object.keys( features ).length ? JSON.stringify( features ) : null,
 		headers: {
 			'X-WP-Nonce': nonce,
 			'content-type': 'application/json',
@@ -126,9 +126,17 @@ function isCreatePage() {
 }
 
 if ( isCreatePage() ) {
-	const shortlived = null !==  param( 'shortlived' );
+	const shortlived = param( 'shortlived' );
+	const jetpack = param( 'jetpack' );
+	const features = {};
+	if ( shortlived !== null ) {
+		features.shortlived = shortlived;
+	}
+	if ( jetpack !== null ) {
+		features.jetpack = jetpack;
+	}
 	setTimeout( () => {
-		doIt( jQuery, shortlived );
+		doIt( jQuery, features );
 	}, 1000 );
 }
 
@@ -152,8 +160,13 @@ function param(name) {
 	let params;
 	if ( location.search ) {
 		let params = location.search.split('?')[1].split('&');
-		let ret = params.includes( name ) ? params[ params.indexOf( name ) ] : null;
-		return ret;
+		if ( params.includes( name ) ) {
+			return true;
+		}
+		if ( params.includes( 'no' + name ) ) {
+			return false;
+		}
+		return null;
 	}
 	return null;
 }
