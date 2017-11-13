@@ -25,7 +25,7 @@ function add_rest_api_endpoints() {
 		$defaults = [
 			'jetpack' => (bool)settings( 'add_jetpack_by_default', true ),
 			'jetpack-beta' => (bool) settings( 'add_jetpack_beta_by_default', false ),
-			'woocommerce' => (bool)settings( 'add_woocommerce_by_default', true ),
+			'woocommerce' => (bool) settings( 'add_woocommerce_by_default', true ),
 			'shortlife' => false,
 		];
 		$json_params = $request->get_json_params();
