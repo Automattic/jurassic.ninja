@@ -164,6 +164,13 @@ function add_settings_page() {
 							'type' => 'checkbox',
 							'checked' => false,
 						),
+						'add_woocommerce_by_default' => array(
+							'id' => 'add_woocommerce_by_default',
+							'title' => __( 'Add WooCommerce to every launched WordPress', 'jurassic-ninja' ),
+							'text' => __( 'Install and activate WooCommerce on launch', 'jurassic-ninja' ),
+							'type' => 'checkbox',
+							'checked' => false,
+						),
 						'purge_sites_when_cron_runs' => array(
 							'id' => 'purge_sites_when_cron_runs',
 							'title' => __( 'Run the cron task that purges sites when they expire  (Hourly)', 'jurassic-ninja' ),
