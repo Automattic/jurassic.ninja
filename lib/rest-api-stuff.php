@@ -37,7 +37,7 @@ function add_rest_api_endpoints() {
 		}
 
 		$features = array_merge( $defaults, [
-			'shortlife' => isset( $features['shortlived'] ) && (bool) $features['shortlived'],
+			'shortlife' => isset( $json_params['shortlived'] ) && (bool) $json_params['shortlived'],
 		] );
 		if ( isset( $json_params['jetpack'] ) ) {
 			$features['jetpack'] = $json_params['jetpack'];
