@@ -128,12 +128,16 @@ function isCreatePage() {
 if ( isCreatePage() ) {
 	const shortlived = param( 'shortlived' );
 	const jetpack = param( 'jetpack' );
+	const woocommerce = param( 'woocommerce' );
 	const features = {};
 	if ( shortlived !== null ) {
 		features.shortlived = shortlived;
 	}
 	if ( jetpack !== null ) {
 		features.jetpack = jetpack;
+	}
+	if ( woocommerce !== null ) {
+		features.woocommerce = woocommerce;
 	}
 	setTimeout( () => {
 		doIt( jQuery, features );
