@@ -29,7 +29,7 @@ function add_rest_api_endpoints() {
 			'shortlife' => false,
 		];
 		$json_params = $request->get_json_params();
-		$features = $json_params && is_array( $json_params ) ? $json_params : [];
+
 		if ( ! settings( 'enable_launching', true ) ) {
 			return new \WP_Error( 'site_launching_disabled', __( 'Site launching is disabled right now' ), [
 				'status' => 503,
