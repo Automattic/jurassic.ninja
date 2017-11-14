@@ -10,7 +10,8 @@ const defaultFeatures = {
 	'subdir_multisite': false,
 	'subdomain_multisite': false,
 	'wordpress_beta_tester': false,
-	'debug': false,
+	'config-constants': false,
+	'wp-log-viewer': false,
 	'gutenberg': false,
 	'woocommerce': false,
 };
