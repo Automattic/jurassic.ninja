@@ -35,10 +35,10 @@ function add_auto_login( $password ) {
 }
 
 /**
- * Installs and activates the Debug plugin on the site.
+ * Installs and activates the Config Constants plugin on the site.
  */
-function add_debug_plugin() {
-	$cmd = 'wp plugin install debug --activate';
+function add_config_constants_plugin() {
+	$cmd = 'wp plugin install config-constants --activate';
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );
@@ -96,10 +96,20 @@ function add_wordpress_beta_tester_plugin() {
 }
 
 /**
+ * Installs and activates the WP Log Viewer plugin on the site.
+ */
+function add_wp_log_viewer_plugin() {
+	$cmd = 'wp plugin install wp-log-viewer --activate';
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
+}
+
+/**
  * Launches a new WordPress instance on the managed server
  * @param  String  $runtime              The PHP runtime versino to run the app on.
  * @param  Array  $features              Array of features to enable
- *         boolean debug                 Should we add the Debug plugin to the site?
+ *         boolean config-constants      Should we add the Config Constants plugin to the site?
  *         boolean ssl                   Should we add SSL for the site?
  *         boolean gutenberg             Should we add Gutenberg to the site?
  *         boolean jetpack               Should we add Jetpack to the site?
@@ -108,11 +118,13 @@ function add_wordpress_beta_tester_plugin() {
  *         boolean subdir_multisite      Should we enable subdomain-based multisite on the site?
  *         boolean woocommerce           Should we add WooCommerce plugin to the site?
  *         boolean wordpress-beta-tester Should we add Jetpack Beta Tester plugin to the site?
+ *         boolean wp-log-viewer         Should we add WP Log Viewer plugin to the site?
  * @return Array|Null                    null or the app data as returned by ServerPilot's API on creation.
  */
 function launch_wordpress( $runtime = 'php5.6', $requested_features ) {
 	$default_features = [
 		'ssl' => false,
+		'config-constants' => false,
 		'gutenberg' => false,
 		'jetpack' => false,
 		'jetpack-beta' => false,
@@ -120,7 +132,7 @@ function launch_wordpress( $runtime = 'php5.6', $requested_features ) {
 		'subdomain_multisite' => false,
 		'woocommerce' => false,
 		'wordpress-beta-tester' => false,
-		'debug' => false,
+		'wp-log-viewer' => false,
 		'shortlife' => false,
 	];
 	$features = array_merge( $default_features, $requested_features );
@@ -171,9 +183,13 @@ function launch_wordpress( $runtime = 'php5.6', $requested_features ) {
 			add_wordpress_beta_tester_plugin();
 		}
 
-		if ( $features['debug'] ) {
-			add_debug_plugin();
+		if ( $features['config-constants'] ) {
+			add_config_constants_plugin();
 		}
+		
+		if ( $features['wp-log-viewer'] ) {
+			add_wp_log_viewer_plugin();
+		}		
 
 		if ( $features['gutenberg'] ) {
 			add_gutenberg_plugin();
