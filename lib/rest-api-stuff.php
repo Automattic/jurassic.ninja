@@ -64,7 +64,7 @@ function add_rest_api_endpoints() {
 			] );
 		}
 
-		$data = launch_wordpress( 'php5.6', $features );
+		$data = launch_wordpress( $features['runtime'], $features );
 
 		$url = 'http://' . figure_out_main_domain( $data->domains );
 

@@ -3,7 +3,7 @@ const CREATE_PAGE_SLUG = '/create';
 const SPECIALOPS_CREATE_PAGE_SLUG = '/specialops';
 
 const defaultFeatures = {
-	'runtime': 'php5.6',
+	'runtime': 'php7.1',
 	'ssl': false,
 	'jetpack': false,
 	'jetpack-beta': false,
@@ -115,7 +115,11 @@ function collectFeatures() {
 	const features = reduce.call( els, function( acc, el ) {
 		return Object.assign( {}, acc, { [ jQuery( el ).data( 'feature' ) ] : jQuery( el ).is( ':checked' ) } );
 	}, {} );
-	return features;
+	const selects = jQuery( 'select[data-feature]' );
+	const features_in_selects = reduce.call( selects, function( acc, el ) {
+		return Object.assign( {}, acc, { [ jQuery( el ).data( 'feature' ) ] : jQuery( el ).val() } );
+	}, {} );
+	return Object.assign( features, features_in_selects );
 }
 
 function isSpecialOpsPage() {
