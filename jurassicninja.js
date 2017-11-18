@@ -9,7 +9,7 @@ const defaultFeatures = {
 	'jetpack-beta': false,
 	'subdir_multisite': false,
 	'subdomain_multisite': false,
-	'wordpress_beta_tester': false,
+	'wordpress-beta-tester': false,
 	'config-constants': false,
 	'wp-log-viewer': false,
 	'gutenberg': false,

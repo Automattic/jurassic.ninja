@@ -58,7 +58,9 @@ function create_sp_app( $name, $sysuserid, $runtime, $domains, $wordpress ) {
  */
 function create_sp_sysuser( $username, $password ) {
 	try {
-		return sp()->sysuser_create( settings( 'serverpilot_server_id' ), $username, $password );
+		$user = sp()->sysuser_create( settings( 'serverpilot_server_id' ), $username, $password );
+		wait_for_serverpilot_action( $user->actionid );
+		return $user;
 	} catch ( \ServerPilotException $e ) {
 		return new \WP_Error( $e->getCode(), $e->getMessage() );
 	}
