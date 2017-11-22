@@ -3,7 +3,7 @@ const CREATE_PAGE_SLUG = '/create';
 const SPECIALOPS_CREATE_PAGE_SLUG = '/specialops';
 
 const defaultFeatures = {
-	'runtime': 'php7.1',
+	'runtime': 'php7.0',
 	'ssl': false,
 	'jetpack': false,
 	'jetpack-beta': false,

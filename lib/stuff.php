@@ -121,7 +121,7 @@ function add_wp_log_viewer_plugin() {
  *         boolean wp-log-viewer         Should we add WP Log Viewer plugin to the site?
  * @return Array|Null                    null or the app data as returned by ServerPilot's API on creation.
  */
-function launch_wordpress( $runtime = 'php5.6', $requested_features ) {
+function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 	$default_features = [
 		'ssl' => false,
 		'config-constants' => false,
@@ -186,10 +186,10 @@ function launch_wordpress( $runtime = 'php5.6', $requested_features ) {
 		if ( $features['config-constants'] ) {
 			add_config_constants_plugin();
 		}
-		
+
 		if ( $features['wp-log-viewer'] ) {
 			add_wp_log_viewer_plugin();
-		}		
+		}
 
 		if ( $features['gutenberg'] ) {
 			add_gutenberg_plugin();
