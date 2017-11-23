@@ -192,6 +192,13 @@ function add_settings_page() {
 							'type' => 'checkbox',
 							'checked' => false,
 						),
+						'log_debug_messages' => array(
+							'id' => 'log_debug_messages',
+							'title' => __( 'Log debug messages if WP_DEBUG is on', 'jurassic-ninja' ),
+							'text' => __( 'Log debug messages', 'jurassic-ninja' ),
+							'type' => 'checkbox',
+							'checked' => false,
+						),
 					),
 				),
 				'serverpilot' => array(

@@ -616,8 +616,11 @@ function subdomain_is_used( $subdomain ) {
 	return count( $results ) !== 0;
 }
 
+/**
+ * Attempts to log debug messages if WP_DEBUG is on and the setting for log_debug_messages is on too.
+ */
 function debug() {
-	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+	if ( defined( 'WP_DEBUG' ) && WP_DEBUG && settings( 'log_debug_messages', false ) ) {
 		error_log( call_user_func_array( 'sprintf', func_get_args() ) );
 	}
 }
