@@ -167,56 +167,71 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		$domain = sprintf( '%s.%s', $subdomain, settings( 'domain' ) );
 		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
 		$domain_arg = $features['subdomain_multisite'] ? array( $domain, '*.' . $domain ) : array( $domain );
+
+		debug( 'Launching %s with features: %s', $domain, implode( ', ' , array_keys( array_filter( $features ) ) ) );
+
 		$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg, $wordpress_options );
+
 		log_new_site( $app->data, $features['shortlife'] );
+
 		if ( $features['ssl'] ) {
 			enable_ssl( $app->data->id );
 		}
 		if ( $features['jetpack'] ) {
+			debug( '%s: Adding Jetpack', $domain );
 			add_jetpack();
 		}
 		if ( $features['jetpack-beta'] ) {
+			debug( '%s: Adding Jetpack Beta Tester Plugin', $domain );
 			add_jetpack_beta_plugin();
 		}
 
 		if ( $features['wordpress-beta-tester'] ) {
+			debug( '%s: Adding WordPress Beta Tester Plugin', $domain );
 			add_wordpress_beta_tester_plugin();
 		}
 
 		if ( $features['config-constants'] ) {
+			debug( '%s: Adding Config Constants Plugin', $domain );
 			add_config_constants_plugin();
 		}
 
 		if ( $features['wp-log-viewer'] ) {
+			debug( '%s: Adding WP Log Viewer Plugin', $domain );
 			add_wp_log_viewer_plugin();
 		}
 
 		if ( $features['gutenberg'] ) {
+			debug( '%s: Adding Gutenberg', $domain );
 			add_gutenberg_plugin();
 		}
 
 		if ( $features['woocommerce'] ) {
+			debug( '%s: Adding WooCommerce', $domain );
 			add_woocommerce_plugin();
 		}
-
+		debug( '%s: Adding Companion Plugin for Auto Login', $domain );
 		add_auto_login( $password );
 
 		if ( $features['subdir_multisite'] ) {
+			debug( '%s: Enabling subdir based multisite', $domain );
 			enable_subdir_multisite( $domain );
 		}
 
 		if ( $features['subdomain_multisite'] ) {
+			debug( '%s: Enabling subdomain based multisite', $domain );
 			enable_subdomain_multisite( $domain );
 		}
 
 		// Runs the command via SSH
 		// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
-		run_commands_for_features( $user->data->name, $password );
-
+		debug( '%s: Adding features', $domain );
+		run_commands_for_features( $user->data->name, $password, $domain );
 		update_sp_sysuser( $user->data->id, null );
+		debug( 'Finished launching %s', $domain );
 		return $app->data;
-	} catch ( \ServerPilotException $e ) {
-		// echo $e->getCode() . ': ' .$e->getMessage();
+	} catch ( \Exception $e ) {
+		debug( '%s: Error [%s]: %s', $domain, $e->getCode(), $e->getMessage() );
 		return null;
 	}
 
@@ -539,11 +554,12 @@ function run_command_on_behalf( $user, $password, $cmd ) {
 /**
  * Runs a set of commands via ssh.
  * The command string is a result of applying filter `jurassic_ninja_feature_command`
- * @param  [type] $user     [description]
- * @param  [type] $password [description]
+ * @param  string $user     [description]
+ * @param  string $password [description]
+ * @param  string $domain   [description]
  * @return [type]           [description]
  */
-function run_commands_for_features( $user, $password ) {
+function run_commands_for_features( $user, $password, $domain ) {
 	$wp_home = "~/apps/$user/public";
 	$cmd = "cd $wp_home";
 	/**
@@ -558,8 +574,9 @@ function run_commands_for_features( $user, $password ) {
 	 * @param string $cmd commands chained for running
 	 */
 	$filter_output = apply_filters( 'jurassic_ninja_feature_command', $cmd );
-	error_log( "Running $filter_output");
+	debug( '%s: Running commands %s', $domain, $filter_output );
 	run_command_on_behalf( $user, $password, $filter_output );
+	debug( '%s: Commands run OK', $domain );
 }
 
 /**
@@ -598,3 +615,13 @@ function subdomain_is_used( $subdomain ) {
 	$results = db()->get_results( "select * from sites where domain='$domain' limit 1", \ARRAY_A );
 	return count( $results ) !== 0;
 }
+
+/**
+ * Attempts to log debug messages if WP_DEBUG is on and the setting for log_debug_messages is on too.
+ */
+function debug() {
+	if ( defined( 'WP_DEBUG' ) && WP_DEBUG && settings( 'log_debug_messages', false ) ) {
+		error_log( call_user_func_array( 'sprintf', func_get_args() ) );
+	}
+}
+
