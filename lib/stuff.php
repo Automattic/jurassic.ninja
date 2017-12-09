@@ -143,7 +143,6 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 
 	try {
 		$password = generate_random_password();
-		$user = generate_new_user( $password );
 		$subdomain = '';
 		$collision_attempts = 10;
 		do {
@@ -169,6 +168,12 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		$domain_arg = $features['subdomain_multisite'] ? array( $domain, '*.' . $domain ) : array( $domain );
 
 		debug( 'Launching %s with features: %s', $domain, implode( ', ' , array_keys( array_filter( $features ) ) ) );
+
+		debug( 'Creating sysuser for %s', $domain );
+
+		$user = generate_new_user( $password );
+
+		debug( 'Creating app for %s under sysuser %s', $domain, $user->data->name );
 
 		$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg, $wordpress_options );
 
