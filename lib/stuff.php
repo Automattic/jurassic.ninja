@@ -76,6 +76,26 @@ function add_jetpack_beta_plugin() {
 }
 
 /**
+ * Activates jetpack branch in Beta plugin
+ */
+function activate_jetpack_branch( $branch_name ) {
+	switch ($branch_name) {
+    case 'master':
+			$section = 'master';
+			break;
+    case 'stable':
+			$section = 'stable';
+			break;
+    default:
+			$section = 'pr';
+}	
+	$cmd = "wp jetpack-beta branch activate $section $branch_name";
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
+}
+
+/**
  * Installs and activates WooCommerce on the site.
  */
 function add_woocommerce_plugin() {
@@ -170,8 +190,8 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		debug( 'Launching %s with features: %s', $domain, implode( ', ' , array_keys( array_filter( $features ) ) ) );
 
 		debug( 'Creating sysuser for %s', $domain );
-
-		$user = generate_new_user( $password );
+		
+		$user = generate_new_user( $password );		
 
 		debug( 'Creating app for %s under sysuser %s', $domain, $user->data->name );
 
@@ -189,6 +209,11 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		if ( $features['jetpack-beta'] ) {
 			debug( '%s: Adding Jetpack Beta Tester Plugin', $domain );
 			add_jetpack_beta_plugin();
+		}
+
+		if ( $features['branch'] ) {
+			debug( '%s: Activating Jetpack %s branch in Beta plugin', $domain, $features["branch"]);
+			activate_jetpack_branch($features['branch']);
 		}
 
 		if ( $features['wordpress-beta-tester'] ) {

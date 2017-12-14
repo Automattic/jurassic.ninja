@@ -134,7 +134,9 @@ if ( isCreatePage() ) {
 	const shortlived = param( 'shortlived' );
 	const jetpack = param( 'jetpack' );
 	const woocommerce = param( 'woocommerce' );
-	const features = {};
+	const jetpack_beta = param( 'jetpack-beta' );
+	const branch = param('branch')
+	const features = {};	
 	if ( shortlived !== null ) {
 		features.shortlived = shortlived;
 	}
@@ -144,6 +146,13 @@ if ( isCreatePage() ) {
 	if ( woocommerce !== null ) {
 		features.woocommerce = woocommerce;
 	}
+	if ( jetpack_beta !== null ) {
+		features['jetpack-beta'] = jetpack_beta;
+		if ( branch !== null ) {
+			features.branch = branch;
+		}
+	}
+
 	setTimeout( () => {
 		doIt( jQuery, features );
 	}, 1000 );
@@ -169,6 +178,11 @@ function param(name) {
 	let params;
 	if ( location.search ) {
 		let params = location.search.split('?')[1].split('&');
+		// branch option is only valid when jetpack-beta is used.
+		if (name == 'branch' && params.includes( 'jetpack-beta' ) ) {
+			let branch = params.filter(param => param.startsWith('branch'))
+			return branch.length ? branch[0].split('=')[1] : 'master'
+		}
 		if ( params.includes( name ) ) {
 			return true;
 		}
