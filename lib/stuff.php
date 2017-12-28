@@ -340,8 +340,11 @@ function figure_out_main_domain( $domains ) {
  */
 function generate_new_user( $password ) {
 	$username = generate_random_username();
-	$user = create_sp_sysuser( $username, $password );
-	return $user;
+	$return = create_sp_sysuser( $username, $password );
+	if ( is_wp_error( $return ) ) {
+		throw new \Exception( $return->get_error_message(), $return->get_error_code() );
+	}
+	return $return;
 }
 
 /**
@@ -357,8 +360,8 @@ function generate_random_password() {
  * Generates a random subdomain based on an adjective and sustantive.
  * Tries to filter out some potentially offensive combinations
  * The words come from:
- * 		https://animalcorner.co.uk/animals/dung-beetle/
- * 		http://grammar.yourdictionary.com/parts-of-speech/adjectives/list-of-adjective-words.html
+ *      https://animalcorner.co.uk/animals/dung-beetle/
+ *      http://grammar.yourdictionary.com/parts-of-speech/adjectives/list-of-adjective-words.html
  * Tne name is slugified.
  *
  * @return string A slugified subdomain.
