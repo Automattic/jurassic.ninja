@@ -504,6 +504,13 @@ function mark_site_as_checked_in( $domain ) {
 function purge_sites() {
 	$sites = sites_to_be_purged();
 	$system_users  = get_sp_sysuser_list();
+	if ( is_wp_error( $system_users ) ) {
+		debug( 'There was an error fetching users list for purging: (%s) - %s',
+			$system_users->get_error_code(),
+			$system_users->get_error_message()
+		);
+		return $system_users;
+	}
 	$site_users = array_map(
 		function ( $site ) {
 			return $site['username'];
@@ -514,7 +521,14 @@ function purge_sites() {
 			return in_array( $user->name, $site_users, true );
 	} );
 	foreach ( $purge as $user ) {
-		delete_sp_sysuser( $user->id );
+		$return = delete_sp_sysuser( $user->id );
+		if ( is_wp_error( $return ) ) {
+			debug( 'There was an error purging site for user %s: (%s) - %s',
+				$user->id,
+				$return->get_error_code(),
+				$return->get_error_message()
+			);
+		}
 	}
 	foreach ( $sites as $site ) {
 		log_purged_site( $site );
