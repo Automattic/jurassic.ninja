@@ -569,8 +569,23 @@ function random_string( $length = 32 ) {
  */
 function run_command_on_behalf( $user, $password, $cmd ) {
 	$domain = settings( 'domain' );
-	$run = "SSHPASS=$password sshpass -e ssh -oStrictHostKeyChecking=no $user@$domain '$cmd'";
-	return shell_exec( $run );
+	// Redirect all errors to stdout so exec shows them in the $output parameters
+	$run = "SSHPASS=$password sshpass -e ssh -oStrictHostKeyChecking=no $user@$domain '$cmd' 2>&1";
+	$output = null;
+	$return_value = null;
+	// Use exec instead of shell_exect so we can know if the commands failed or not
+	exec( $run, $output, $return_value );
+	if ( 0 !== $return_value ) {
+		debug( 'Commands run finished with code %s and output: %s',
+			$return_value,
+			implode( "\n", $output )
+		);
+		return new \WP_Error(
+			'commands_did_not_run_successfully',
+			"Commands didn't run OK"
+		);
+	}
+	return null;
 }
 
 /**
@@ -597,7 +612,10 @@ function run_commands_for_features( $user, $password, $domain ) {
 	 */
 	$filter_output = apply_filters( 'jurassic_ninja_feature_command', $cmd );
 	debug( '%s: Running commands %s', $domain, $filter_output );
-	run_command_on_behalf( $user, $password, $filter_output );
+	$return = run_command_on_behalf( $user, $password, $filter_output );
+	if ( is_wp_error( $return ) ) {
+		throw new \Exception( "Commands didn't run OK" );
+	}
 	debug( '%s: Commands run OK', $domain );
 }
 
