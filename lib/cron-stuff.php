@@ -28,6 +28,12 @@ function add_cron_job() {
  */
 function jurassic_ninja_purge_cron_task() {
 	if ( settings( 'purge_sites_when_cron_runs', true ) ) {
-		purge_sites();
+		$return = purge_sites();
+		if ( is_wp_error( $return ) ) {
+			debug( 'There was an error purging sites: (%s) - %s',
+				$return->get_error_code(),
+				$return->get_error_message()
+			);
+		}
 	}
 }

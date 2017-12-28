@@ -176,7 +176,9 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		debug( 'Creating app for %s under sysuser %s', $domain, $user->data->name );
 
 		$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg, $wordpress_options );
-
+		if ( is_wp_error( $app ) ) {
+			throw new \Exception( 'Error creating app: ' . $app->get_error_message(), $app->get_error_code() );
+		}
 		log_new_site( $app->data, $features['shortlife'] );
 
 		if ( $features['ssl'] ) {
@@ -232,7 +234,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
 		debug( '%s: Adding features', $domain );
 		run_commands_for_features( $user->data->name, $password, $domain );
-		update_sp_sysuser( $user->data->id, null );
+		//update_sp_sysuser( $user->data->id, null );
 		debug( 'Finished launching %s', $domain );
 		return $app->data;
 	} catch ( \Exception $e ) {
@@ -340,8 +342,11 @@ function figure_out_main_domain( $domains ) {
  */
 function generate_new_user( $password ) {
 	$username = generate_random_username();
-	$user = create_sp_sysuser( $username, $password );
-	return $user;
+	$return = create_sp_sysuser( $username, $password );
+	if ( is_wp_error( $return ) ) {
+		throw new \Exception( 'Error creating sysuser: ' . $return->get_error_message(), $return->get_error_code() );
+	}
+	return $return;
 }
 
 /**
@@ -357,8 +362,8 @@ function generate_random_password() {
  * Generates a random subdomain based on an adjective and sustantive.
  * Tries to filter out some potentially offensive combinations
  * The words come from:
- * 		https://animalcorner.co.uk/animals/dung-beetle/
- * 		http://grammar.yourdictionary.com/parts-of-speech/adjectives/list-of-adjective-words.html
+ *      https://animalcorner.co.uk/animals/dung-beetle/
+ *      http://grammar.yourdictionary.com/parts-of-speech/adjectives/list-of-adjective-words.html
  * Tne name is slugified.
  *
  * @return string A slugified subdomain.
@@ -501,6 +506,13 @@ function mark_site_as_checked_in( $domain ) {
 function purge_sites() {
 	$sites = sites_to_be_purged();
 	$system_users  = get_sp_sysuser_list();
+	if ( is_wp_error( $system_users ) ) {
+		debug( 'There was an error fetching users list for purging: (%s) - %s',
+			$system_users->get_error_code(),
+			$system_users->get_error_message()
+		);
+		return $system_users;
+	}
 	$site_users = array_map(
 		function ( $site ) {
 			return $site['username'];
@@ -511,7 +523,14 @@ function purge_sites() {
 			return in_array( $user->name, $site_users, true );
 	} );
 	foreach ( $purge as $user ) {
-		delete_sp_sysuser( $user->id );
+		$return = delete_sp_sysuser( $user->id );
+		if ( is_wp_error( $return ) ) {
+			debug( 'There was an error purging site for user %s: (%s) - %s',
+				$user->id,
+				$return->get_error_code(),
+				$return->get_error_message()
+			);
+		}
 	}
 	foreach ( $sites as $site ) {
 		log_purged_site( $site );
@@ -552,8 +571,23 @@ function random_string( $length = 32 ) {
  */
 function run_command_on_behalf( $user, $password, $cmd ) {
 	$domain = settings( 'domain' );
-	$run = "SSHPASS=$password sshpass -e ssh -oStrictHostKeyChecking=no $user@$domain '$cmd'";
-	return shell_exec( $run );
+	// Redirect all errors to stdout so exec shows them in the $output parameters
+	$run = "SSHPASS=$password sshpass -e ssh -oStrictHostKeyChecking=no $user@$domain '$cmd' 2>&1";
+	$output = null;
+	$return_value = null;
+	// Use exec instead of shell_exect so we can know if the commands failed or not
+	exec( $run, $output, $return_value );
+	if ( 0 !== $return_value ) {
+		debug( 'Commands run finished with code %s and output: %s',
+			$return_value,
+			implode( "\n", $output )
+		);
+		return new \WP_Error(
+			'commands_did_not_run_successfully',
+			"Commands didn't run OK"
+		);
+	}
+	return null;
 }
 
 /**
@@ -580,7 +614,10 @@ function run_commands_for_features( $user, $password, $domain ) {
 	 */
 	$filter_output = apply_filters( 'jurassic_ninja_feature_command', $cmd );
 	debug( '%s: Running commands %s', $domain, $filter_output );
-	run_command_on_behalf( $user, $password, $filter_output );
+	$return = run_command_on_behalf( $user, $password, $filter_output );
+	if ( is_wp_error( $return ) ) {
+		throw new \Exception( "Commands didn't run OK" );
+	}
 	debug( '%s: Commands run OK', $domain );
 }
 

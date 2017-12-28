@@ -47,6 +47,15 @@ function add_rest_api_endpoints() {
 		}
 
 		$data = launch_wordpress( 'php7.0', $features );
+		if ( null === $data ) {
+			return new \WP_Error(
+				'failed_to_launch_site',
+				esc_html__( 'There was an error launching the site.' ),
+				[
+					'status' => 500,
+				]
+			);
+		}
 		$url = 'http://' . figure_out_main_domain( $data->domains );
 
 		$output = [
@@ -65,7 +74,15 @@ function add_rest_api_endpoints() {
 		}
 
 		$data = launch_wordpress( $features['runtime'], $features );
-
+		if ( null === $data ) {
+			return new \WP_Error(
+				'failed_to_launch_site',
+				esc_html__( 'There was an error launching the site.' ),
+				[
+					'status' => 500,
+				]
+			);
+		}
 		$url = 'http://' . figure_out_main_domain( $data->domains );
 
 		$output = [
