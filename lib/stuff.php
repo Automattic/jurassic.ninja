@@ -176,7 +176,9 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		debug( 'Creating app for %s under sysuser %s', $domain, $user->data->name );
 
 		$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg, $wordpress_options );
-
+		if ( is_wp_error( $app ) ) {
+			throw new \Exception( 'Error creating app: ' . $app->get_error_message(), $app->get_error_code() );
+		}
 		log_new_site( $app->data, $features['shortlife'] );
 
 		if ( $features['ssl'] ) {
@@ -342,7 +344,7 @@ function generate_new_user( $password ) {
 	$username = generate_random_username();
 	$return = create_sp_sysuser( $username, $password );
 	if ( is_wp_error( $return ) ) {
-		throw new \Exception( $return->get_error_message(), $return->get_error_code() );
+		throw new \Exception( 'Error creating sysuser: ' . $return->get_error_message(), $return->get_error_code() );
 	}
 	return $return;
 }
