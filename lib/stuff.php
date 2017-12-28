@@ -177,7 +177,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 
 		$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg, $wordpress_options );
 		if ( is_wp_error( $app ) ) {
-			throw new \Exception( 'Error creating app: ' . $app->get_error_message(), $app->get_error_code() );
+			throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
 		}
 		log_new_site( $app->data, $features['shortlife'] );
 
