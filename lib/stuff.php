@@ -232,7 +232,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
 		debug( '%s: Adding features', $domain );
 		run_commands_for_features( $user->data->name, $password, $domain );
-		update_sp_sysuser( $user->data->id, null );
+		//update_sp_sysuser( $user->data->id, null );
 		debug( 'Finished launching %s', $domain );
 		return $app->data;
 	} catch ( \Exception $e ) {
