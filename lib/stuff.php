@@ -344,7 +344,7 @@ function generate_new_user( $password ) {
 	$username = generate_random_username();
 	$return = create_sp_sysuser( $username, $password );
 	if ( is_wp_error( $return ) ) {
-		throw new \Exception( 'Error creating sysuser: ' . $return->get_error_message(), $return->get_error_code() );
+		throw new \Exception( 'Error creating sysuser: ' . $return->get_error_message() );
 	}
 	return $return;
 }
