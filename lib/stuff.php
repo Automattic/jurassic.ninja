@@ -23,10 +23,12 @@ define( 'SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubuserconten
  * Installs and activates the Jurassic Ninja companion plugin on the site.
  * @param string $password System password for ssh.
  */
-function add_auto_login( $password ) {
+function add_auto_login( $password, $sysuser ) {
 	$companion_api_base_url = rest_url( REST_API_NAMESPACE );
 	$companion_plugin_url = COMPANION_PLUGIN_URL;
-	$cmd = "wp option add auto_login 1 && wp option add jurassic_ninja_admin_password '$password'"
+	$cmd = "wp option add auto_login 1"
+		. " && wp option add jurassic_ninja_sysuser '$sysuser'"
+		. " && wp option add jurassic_ninja_admin_password '$password'"
 		. " && wp option add companion_api_base_url '$companion_api_base_url'"
 		. " && wp plugin install --force $companion_plugin_url --activate";
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
@@ -218,7 +220,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 			add_woocommerce_plugin();
 		}
 		debug( '%s: Adding Companion Plugin for Auto Login', $domain );
-		add_auto_login( $password );
+		add_auto_login( $password, $user->data->name );
 
 		if ( $features['subdir_multisite'] ) {
 			debug( '%s: Enabling subdir based multisite', $domain );
