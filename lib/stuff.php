@@ -357,7 +357,7 @@ function generate_new_user( $password ) {
  */
 function generate_random_password() {
 	$length = 12;
-	return random_string( $length );
+	return wp_generate_password( $length, false, false );
 }
 
 /**
@@ -543,24 +543,6 @@ function purge_sites() {
 		},
 		$sites
 	);
-}
-
-/**
- * function to generate random strings
- * @param       int     $length number of characters in the generated string
- * @return      string          a new string is created with random characters of the desired length
- */
-function random_string( $length = 32 ) {
-	$randstr = null;
-	srand( (double) microtime( true ) * 1000000 );
-	//our array add all letters and numbers if you wish
-	$chars = array_merge( range( 'a', 'z' ), range( 0, 9 ), range( 'A', 'Z' ) );
-
-	for ( $rand = 0; $rand <= $length; $rand++ ) {
-		$random = rand( 0, count( $chars ) - 1 );
-		$randstr .= $chars[ $random ];
-	}
-	return $randstr;
 }
 
 /**
