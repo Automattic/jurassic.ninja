@@ -46,6 +46,11 @@ function add_rest_api_endpoints() {
 			$features['woocommerce'] = $json_params['woocommerce'];
 		}
 
+		if ( isset( $json_params['jetpack-beta'] ) ) {
+			$features['jetpack-beta'] = $json_params['jetpack-beta'];
+			$features['branch'] = $json_params['branch'];
+		}
+
 		$data = launch_wordpress( 'php7.0', $features );
 		$url = 'http://' . figure_out_main_domain( $data->domains );
 
@@ -63,7 +68,7 @@ function add_rest_api_endpoints() {
 				'status' => 503,
 			] );
 		}
-
+		
 		$data = launch_wordpress( $features['runtime'], $features );
 
 		$url = 'http://' . figure_out_main_domain( $data->domains );
