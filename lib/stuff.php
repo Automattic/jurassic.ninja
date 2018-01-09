@@ -79,17 +79,7 @@ function add_jetpack_beta_plugin() {
  * Activates jetpack branch in Beta plugin
  */
 function activate_jetpack_branch( $branch_name ) {
-	switch ($branch_name) {
-    case 'master':
-			$section = 'master';
-			break;
-    case 'stable':
-			$section = 'stable';
-			break;
-    default:
-			$section = 'pr';
-}	
-	$cmd = "wp jetpack-beta branch activate $section $branch_name";
+	$cmd = "wp jetpack-beta branch activate $branch_name";
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );
@@ -577,14 +567,8 @@ function random_string( $length = 32 ) {
  */
 function run_command_on_behalf( $user, $password, $cmd ) {
 	$domain = settings( 'domain' );
-	$cmd_with_done = $cmd . '&& echo "done"';
-	$run = "SSHPASS=$password sshpass -e ssh -oStrictHostKeyChecking=no $user@$domain '$cmd_with_done'";
-	$output = shell_exec( $run );
-	debug( 'OUTPUT: %s', $output );	
-	if ( $output != 'done' ) {
-		throw new Error( 'The API responded in a weird way' );
-	}
-	return true;
+	$run = "SSHPASS=$password sshpass -e ssh -oStrictHostKeyChecking=no $user@$domain '$cmd'";
+	return shell_exec( $run );
 }
 
 /**
