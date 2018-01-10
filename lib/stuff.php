@@ -183,8 +183,8 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		debug( 'Launching %s with features: %s', $domain, implode( ', ' , array_keys( array_filter( $features ) ) ) );
 
 		debug( 'Creating sysuser for %s', $domain );
-		
-		$user = generate_new_user( $password );		
+
+		$user = generate_new_user( $password );
 
 		debug( 'Creating app for %s under sysuser %s', $domain, $user->data->name );
 
@@ -580,7 +580,7 @@ function run_command_on_behalf( $user, $password, $cmd ) {
 	if ( 0 !== $return_value ) {
 		debug( 'Commands run finished with code %s and output: %s',
 			$return_value,
-			implode( "\n", $output )
+			implode( " -> ", $output )
 		);
 		return new \WP_Error(
 			'commands_did_not_run_successfully',

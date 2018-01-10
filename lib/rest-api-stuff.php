@@ -47,6 +47,17 @@ function add_rest_api_endpoints() {
 		}
 
 		if ( isset( $json_params['jetpack-beta'] ) ) {
+			$url = get_jetpack_beta_url( $json_params['branch'] );
+			
+			if ( $url === null ) {
+				return new \WP_Error(
+					'failed_to_launch_site',
+					esc_html__( 'Invalid branch name: ' . $json_params['branch'] ),
+					[
+						'status' => 500,
+					]
+				);
+			}
 			$features['jetpack-beta'] = $json_params['jetpack-beta'];
 			$features['branch'] = $json_params['branch'];
 		}
@@ -204,4 +215,18 @@ function add_endpoint( $namespace, $path, $callback, $register_rest_route_option
 	add_action( 'rest_api_init', function () use ( $namespace, $path, $options ) {
 		register_rest_route( $namespace, $path, $options );
 	} );
+}
+
+function get_jetpack_beta_url( $branch_name ) {
+	$branch_name = str_replace( '/', '_', $branch_name );
+	$manifest_url = "https://betadownload.jetpack.me/jetpack-branches.json";
+	$manifest = json_decode( wp_remote_retrieve_body( wp_remote_get( $manifest_url ) ) );
+
+	if ( ( 'rc' === $branch_name || 'master' === $branch_name ) && isset( $manifest->{$branch_name}->download_url ) ) {
+		return $manifest->{$branch_name}->download_url;
+	}
+
+	if ( isset( $manifest->pr->{$branch_name}->download_url ) ) {
+		return $manifest->pr->{$branch_name}->download_url;
+	}
 }
