@@ -147,10 +147,9 @@ if ( isCreatePage() ) {
 		features.woocommerce = woocommerce;
 	}
 	if ( jetpack_beta !== null ) {
-		features['jetpack-beta'] = jetpack_beta;
-		if ( branch !== null ) {
-			features.branch = branch;
-		}
+		features[ 'jetpack-beta' ] = jetpack_beta;
+		features.branch = ( branch !== null ? 'stable' : branch );
+
 	}
 
 	setTimeout( () => {

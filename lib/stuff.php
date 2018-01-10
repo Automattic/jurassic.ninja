@@ -144,6 +144,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		'wordpress-beta-tester' => false,
 		'wp-log-viewer' => false,
 		'shortlife' => false,
+		'branch' => false,
 	];
 	$features = array_merge( $default_features, $requested_features );
 
