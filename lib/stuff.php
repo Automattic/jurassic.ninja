@@ -23,10 +23,12 @@ define( 'SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubuserconten
  * Installs and activates the Jurassic Ninja companion plugin on the site.
  * @param string $password System password for ssh.
  */
-function add_auto_login( $password ) {
+function add_auto_login( $password, $sysuser ) {
 	$companion_api_base_url = rest_url( REST_API_NAMESPACE );
 	$companion_plugin_url = COMPANION_PLUGIN_URL;
-	$cmd = "wp option add auto_login 1 && wp option add jurassic_ninja_admin_password '$password'"
+	$cmd = "wp option add auto_login 1"
+		. " && wp option add jurassic_ninja_sysuser '$sysuser'"
+		. " && wp option add jurassic_ninja_admin_password '$password'"
 		. " && wp option add companion_api_base_url '$companion_api_base_url'"
 		. " && wp plugin install --force $companion_plugin_url --activate";
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
@@ -187,7 +189,9 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		debug( 'Creating app for %s under sysuser %s', $domain, $user->data->name );
 
 		$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg, $wordpress_options );
-
+		if ( is_wp_error( $app ) ) {
+			throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
+		}
 		log_new_site( $app->data, $features['shortlife'] );
 
 		if ( $features['ssl'] ) {
@@ -232,7 +236,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 			add_woocommerce_plugin();
 		}
 		debug( '%s: Adding Companion Plugin for Auto Login', $domain );
-		add_auto_login( $password );
+		add_auto_login( $password, $user->data->name );
 
 		if ( $features['subdir_multisite'] ) {
 			debug( '%s: Enabling subdir based multisite', $domain );
@@ -248,7 +252,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
 		debug( '%s: Adding features', $domain );
 		run_commands_for_features( $user->data->name, $password, $domain );
-		update_sp_sysuser( $user->data->id, null );
+		//update_sp_sysuser( $user->data->id, null );
 		debug( 'Finished launching %s', $domain );
 		return $app->data;
 	} catch ( \Exception $e ) {
@@ -356,8 +360,11 @@ function figure_out_main_domain( $domains ) {
  */
 function generate_new_user( $password ) {
 	$username = generate_random_username();
-	$user = create_sp_sysuser( $username, $password );
-	return $user;
+	$return = create_sp_sysuser( $username, $password );
+	if ( is_wp_error( $return ) ) {
+		throw new \Exception( 'Error creating sysuser: ' . $return->get_error_message() );
+	}
+	return $return;
 }
 
 /**
@@ -366,15 +373,15 @@ function generate_new_user( $password ) {
  */
 function generate_random_password() {
 	$length = 12;
-	return random_string( $length );
+	return wp_generate_password( $length, false, false );
 }
 
 /**
  * Generates a random subdomain based on an adjective and sustantive.
  * Tries to filter out some potentially offensive combinations
  * The words come from:
- * 		https://animalcorner.co.uk/animals/dung-beetle/
- * 		http://grammar.yourdictionary.com/parts-of-speech/adjectives/list-of-adjective-words.html
+ *      https://animalcorner.co.uk/animals/dung-beetle/
+ *      http://grammar.yourdictionary.com/parts-of-speech/adjectives/list-of-adjective-words.html
  * Tne name is slugified.
  *
  * @return string A slugified subdomain.
@@ -517,6 +524,13 @@ function mark_site_as_checked_in( $domain ) {
 function purge_sites() {
 	$sites = sites_to_be_purged();
 	$system_users  = get_sp_sysuser_list();
+	if ( is_wp_error( $system_users ) ) {
+		debug( 'There was an error fetching users list for purging: (%s) - %s',
+			$system_users->get_error_code(),
+			$system_users->get_error_message()
+		);
+		return $system_users;
+	}
 	$site_users = array_map(
 		function ( $site ) {
 			return $site['username'];
@@ -527,7 +541,14 @@ function purge_sites() {
 			return in_array( $user->name, $site_users, true );
 	} );
 	foreach ( $purge as $user ) {
-		delete_sp_sysuser( $user->id );
+		$return = delete_sp_sysuser( $user->id );
+		if ( is_wp_error( $return ) ) {
+			debug( 'There was an error purging site for user %s: (%s) - %s',
+				$user->id,
+				$return->get_error_code(),
+				$return->get_error_message()
+			);
+		}
 	}
 	foreach ( $sites as $site ) {
 		log_purged_site( $site );
@@ -541,24 +562,6 @@ function purge_sites() {
 }
 
 /**
- * function to generate random strings
- * @param       int     $length number of characters in the generated string
- * @return      string          a new string is created with random characters of the desired length
- */
-function random_string( $length = 32 ) {
-	$randstr = null;
-	srand( (double) microtime( true ) * 1000000 );
-	//our array add all letters and numbers if you wish
-	$chars = array_merge( range( 'a', 'z' ), range( 0, 9 ), range( 'A', 'Z' ) );
-
-	for ( $rand = 0; $rand <= $length; $rand++ ) {
-		$random = rand( 0, count( $chars ) - 1 );
-		$randstr .= $chars[ $random ];
-	}
-	return $randstr;
-}
-
-/**
  * Runs a command on the manager server using the username and password for
  * a freshly created system user.
  * @param string $user     System user for ssh.
@@ -568,8 +571,23 @@ function random_string( $length = 32 ) {
  */
 function run_command_on_behalf( $user, $password, $cmd ) {
 	$domain = settings( 'domain' );
-	$run = "SSHPASS=$password sshpass -e ssh -oStrictHostKeyChecking=no $user@$domain '$cmd'";
-	return shell_exec( $run );
+	// Redirect all errors to stdout so exec shows them in the $output parameters
+	$run = "SSHPASS=$password sshpass -e ssh -oStrictHostKeyChecking=no $user@$domain '$cmd' 2>&1";
+	$output = null;
+	$return_value = null;
+	// Use exec instead of shell_exect so we can know if the commands failed or not
+	exec( $run, $output, $return_value );
+	if ( 0 !== $return_value ) {
+		debug( 'Commands run finished with code %s and output: %s',
+			$return_value,
+			implode( "\n", $output )
+		);
+		return new \WP_Error(
+			'commands_did_not_run_successfully',
+			"Commands didn't run OK"
+		);
+	}
+	return null;
 }
 
 /**
@@ -596,7 +614,10 @@ function run_commands_for_features( $user, $password, $domain ) {
 	 */
 	$filter_output = apply_filters( 'jurassic_ninja_feature_command', $cmd );
 	debug( '%s: Running commands %s', $domain, $filter_output );
-	run_command_on_behalf( $user, $password, $filter_output );
+	$return = run_command_on_behalf( $user, $password, $filter_output );
+	if ( is_wp_error( $return ) ) {
+		throw new \Exception( "Commands didn't run OK" );
+	}
 	debug( '%s: Commands run OK', $domain );
 }
 
