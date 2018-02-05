@@ -80,6 +80,16 @@ function add_rest_api_endpoints() {
 			$features['branch'] = $json_params['branch'];
 		}
 
+		if ( isset( $json_params['autologin'] ) ) {
+			$features['autologin'] = $json_params['autologin'];
+		}
+		if ( isset( $json_params['username'] ) ) {
+			$features['username'] = $json_params['username'];
+		}
+		if ( isset( $json_params['password'] ) ) {
+			$features['password'] = $json_params['password'];
+		}
+
 		$data = launch_wordpress( 'php7.0', $features );
 		if ( null === $data ) {
 			return new \WP_Error(
