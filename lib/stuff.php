@@ -78,6 +78,16 @@ function add_jetpack_beta_plugin() {
 }
 
 /**
+ * Activates jetpack branch in Beta plugin
+ */
+function activate_jetpack_branch( $branch_name ) {
+	$cmd = "wp jetpack-beta branch activate $branch_name";
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
+}
+
+/**
  * Installs and activates WooCommerce on the site.
  */
 function add_woocommerce_plugin() {
@@ -136,6 +146,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		'wordpress-beta-tester' => false,
 		'wp-log-viewer' => false,
 		'shortlife' => false,
+		'branch' => false,
 	];
 	$features = array_merge( $default_features, $requested_features );
 
@@ -193,6 +204,11 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		if ( $features['jetpack-beta'] ) {
 			debug( '%s: Adding Jetpack Beta Tester Plugin', $domain );
 			add_jetpack_beta_plugin();
+		}
+
+		if ( $features['branch'] ) {
+			debug( '%s: Activating Jetpack %s branch in Beta plugin', $domain, $features["branch"]);
+			activate_jetpack_branch($features['branch']);
 		}
 
 		if ( $features['wordpress-beta-tester'] ) {
@@ -564,7 +580,7 @@ function run_command_on_behalf( $user, $password, $cmd ) {
 	if ( 0 !== $return_value ) {
 		debug( 'Commands run finished with code %s and output: %s',
 			$return_value,
-			implode( "\n", $output )
+			implode( " -> ", $output )
 		);
 		return new \WP_Error(
 			'commands_did_not_run_successfully',

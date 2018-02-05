@@ -20,38 +20,38 @@ const originalProgressText = jQuery( '#progress' ).text();
 
 function doIt( $, features ) {
 	$( function() {
-		$( '#img1').show();
-		$( '#img2').hide();
+		$( '#img1' ).show();
+		$( '#img2' ).hide();
 
 		createSite( features )
 			.then( response => {
-				$('#progress').html( `<a href="${ response.data.url }">The new WP is ready to go, visit it!</a>` );
-				$('#img1').hide();
-				$('#img2').show();
+				$( '#progress' ).html( `<a href="${ response.data.url }">The new WP is ready to go, visit it!</a>` );
+				$( '#img1' ).hide();
+				$( '#img2' ).show();
 			} )
 			.catch( err => {
-				$('#progress').text( `Oh No! There was a problem launching the new WP. (${ err.message }).` );
-				$('#img2').hide();
-				$('#img1').attr( 'src', 'https://i.imgur.com/vdyaxmx.gif');
+				$( '#progress' ).text( `Oh No! There was a problem launching the new WP. (${ err.message }).` );
+				$( '#img2' ).hide();
+				$( '#img1' ).attr( 'src', 'https://i.imgur.com/vdyaxmx.gif' );
 			} );
 	} );
 }
 
 function doItWithFeatures( $, features ) {
 	$( function() {
-		$( '#progress').show();
-		$( '#img1').show();
+		$( '#progress' ).show();
+		$( '#img1' ).show();
 		$( '#img2').hide();
 		launchSiteWithFeatures( features )
 			.then( response => {
-				$('#progress').html( `<a href="${ response.data.url }">The new WP is ready to go, visit it!</a>` );
-				$('#img1').hide();
-				$('#img2').show();
+				$( '#progress' ).html( `<a href="${ response.data.url }">The new WP is ready to go, visit it!</a>` );
+				$( '#img1' ).hide();
+				$( '#img2' ).show();
 			} )
 			.catch( err => {
-				$('#progress').text( `Oh No! There was a problem launching the new WP. (${ err.message }).` );
-				$('#img2').hide();
-				$('#img1').attr( 'src', 'https://i.imgur.com/vdyaxmx.gif');
+				$( '#progress' ).text( `Oh No! There was a problem launching the new WP. (${ err.message }).` );
+				$( '#img2' ).hide();
+				$( '#img1' ).attr( 'src', 'https://i.imgur.com/vdyaxmx.gif' );
 			} );
 	} );
 }
@@ -134,7 +134,9 @@ if ( isCreatePage() ) {
 	const shortlived = param( 'shortlived' );
 	const jetpack = param( 'jetpack' );
 	const woocommerce = param( 'woocommerce' );
-	const features = {};
+	const jetpack_beta = param( 'jetpack-beta' );
+	const branch = param( 'branch' )
+	const features = {};	
 	if ( shortlived !== null ) {
 		features.shortlived = shortlived;
 	}
@@ -144,15 +146,20 @@ if ( isCreatePage() ) {
 	if ( woocommerce !== null ) {
 		features.woocommerce = woocommerce;
 	}
+	if ( jetpack_beta !== null ) {
+		features[ 'jetpack-beta' ] = jetpack_beta;
+		features.branch = ( branch !== null ? branch : 'stable' );
+	}
+
 	setTimeout( () => {
 		doIt( jQuery, features );
 	}, 1000 );
 }
 
 if ( isSpecialOpsPage() ) {
-	jQuery( '[data-is-create-button]').click( function () {
-		jQuery( '#img1').show();
-		jQuery( '#img2').hide();
+	jQuery( '[data-is-create-button]' ).click( function () {
+		jQuery( '#img1' ).show();
+		jQuery( '#img2' ).hide();
 		jQuery( '#progress' ).text( originalProgressText );
 		const $this = jQuery( this );
 		const features = collectFeatures();
@@ -165,10 +172,15 @@ if ( isSpecialOpsPage() ) {
 	} )
 }
 
-function param(name) {
+function param( name ) {
 	let params;
 	if ( location.search ) {
-		let params = location.search.split('?')[1].split('&');
+		let params = location.search.split( '?' )[1].split( '&' );
+		// branch option is only valid when jetpack-beta is used.
+		if ( name == 'branch' && params.includes( 'jetpack-beta' ) ) {
+			let branch = params.filter( param => param.startsWith( 'branch' ) )
+			return branch.length ? branch[0].split( '=' )[1] : 'master'
+		}
 		if ( params.includes( name ) ) {
 			return true;
 		}
