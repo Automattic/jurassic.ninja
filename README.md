@@ -1,4 +1,5 @@
 # jurassic.ninja
+
 A frontend to launching ephemeral WordPress instances that auto-destroy after some time
 
 ## Usage
@@ -10,7 +11,7 @@ A frontend to launching ephemeral WordPress instances that auto-destroy after so
 * `sshpass` installed on the box.
 * `wp cli` and `composer` (which is already installed by ServerPilot).
 * **Have a domain name you fully control**.
-	* Add wildcard A record for every subdomain under that domain, pointing to the box's IP addresss.
+* Add wildcard A record for every subdomain under that domain, pointing to the box's IP addresss.
 
 ### Installation
 
@@ -19,11 +20,10 @@ A frontend to launching ephemeral WordPress instances that auto-destroy after so
 Basically the steps are
 
 1. Install the plugin and activate it.
-2. Create the needed pages (home and `/create`).
-3. 1. Configure ServerPilot credentials.
+1. Create the needed pages (home and `/create`).
+1. 1. Configure ServerPilot credentials.
 
 #### Install the Plugin
-
 
 Install it
 
@@ -32,15 +32,18 @@ wp plugin install https://github.com/oskosk/jurassic.ninja/archive/master.zip
 ```
 
 Install composer dependencies
+
 ```sh
 cd wp-content/plugins/jurassic.ninja
 composer install
 ```
 
-**Activate the plugin**
-```
+#### Activate the plugin
+
+```sh
 wp plugin activate jurassic.ninja
 ```
+
 #### Create needed pages
 
 All of the frontend magic is done by a little piece of Javascript that detects if current page is
@@ -53,13 +56,13 @@ Create a page titled **Create**. Make sure its slug is `/create`.
 
 And add this using the Text version of the editor:
 
-```
+```html
 <img id="img1" src="https://media.giphy.com/media/uIRyMKFfmoHyo/giphy.gif" style="display:none" />
 <img id="img2" src="https://i1.wp.com/media.giphy.com/media/KF3r4Q6YCtfOM/giphy.gif?ssl=1" style="display:none" />
 <p class="lead" id="progress">Launching a fresh WP with a Jetpack ...</p>
 ```
 
-#### Create a home page with a link to `/create`.
+#### Create a home page with a link to `/create`
 
 1. Create a new page and configure it a static front page with a link to `/create`.
 
@@ -68,3 +71,24 @@ And add this using the Text version of the editor:
 1. Visit the Jurassic Ninja Settings page in wp-admin.
 2. Configure your Server pilot client id, client key and server id.
 3. Configure the top-domain on which this is going to create sites.
+
+#### Using docker image for testing
+
+It is convenient to test the application using a docker image. Make sure that docker is installed and running before proceed.
+
+1. In project directory create `jndb` folder where WordPress DB will be stored:
+
+```sh
+mkdir ./jndb
+```
+
+1. create and run docker containers:
+
+```sh
+docker-compose up
+```
+
+1. navigate to <http://localhost> to create WordPress site, Activate Jurassic Ninja plugin. Other plugins are optional
+
+1. Setup Jurassic Ninja plugin as menitioned above
+
