@@ -10,6 +10,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
 if ( ! class_exists( 'RationalOptionPages' ) ) {
 	require_once __DIR__ . '/RationalOptionPages.php';
 }
+if ( ! class_exists( 'CustomNameGenerator' ) ) {
+	require_once __DIR__ . '/class-customnamegenerator.php';
+}
 require_once __DIR__ . '/rest-api-stuff.php';
 
 define( 'REST_API_NAMESPACE', 'jurassic.ninja' );
@@ -387,15 +390,6 @@ function generate_random_password() {
  * @return string A slugified subdomain.
  */
 function generate_random_subdomain() {
-	class CustomGenerator extends \Nubs\RandomNameGenerator\Alliteration {
-		public function getName()
-		{
-			$adjective = $this->_getRandomWord($this->_adjectives);
-			$noun = $this->_getRandomWord($this->_nouns);
-			return ucwords("{$adjective} {$noun}");
-		}
-	}
-
 	$blacklisted_words = [
 		'african',
 		'american',
@@ -433,10 +427,10 @@ function generate_random_subdomain() {
 		if ( settings( 'use_alliterations_for_subdomain', true ) ) {
 			$generator = new \Nubs\RandomNameGenerator\Alliteration();
 		} else {
-			$generator = new CustomGenerator();
+			$generator = new CustomNameGenerator();
 		}
 		$name = $generator->getName();
-	} while ( $i++ < $max_attempts && preg_match("($regexp)", $name ) === 1 );
+	} while ( $i++ < $max_attempts && preg_match( "($regexp)", $name ) === 1 );
 
 	$slug = create_slug( $name );
 	return $slug;
