@@ -424,15 +424,19 @@ function generate_random_subdomain() {
 		'syrian',
 	];
 	// Filter out some words that could lead to offensive combinations
-	$MAX_ATTEMPTS = 10;
+	$max_attempts = 10;
 	$regexp = implode( '|', $blacklisted_words );
 	$name = 'First try';
 	$i = 0;
 
 	do {
-		$generator = new CustomGenerator();
+		if ( settings( 'use_alliterations_for_subdomain', true ) ) {
+			$generator = new \Nubs\RandomNameGenerator\Alliteration();
+		} else {
+			$generator = new CustomGenerator();
+		}
 		$name = $generator->getName();
-	} while( $i++ < $MAX_ATTEMPTS && preg_match("($regexp)", $name ) === 1 );
+	} while ( $i++ < $max_attempts && preg_match("($regexp)", $name ) === 1 );
 
 	$slug = create_slug( $name );
 	return $slug;

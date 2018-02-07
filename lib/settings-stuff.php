@@ -146,6 +146,13 @@ function add_settings_page() {
 							'type' => 'checkbox',
 							'checked' => false,
 						),
+						'use_alliterations_for_subdomain' => array(
+							'id' => 'use_alliterations_for_subdomain',
+							'title' => __( 'Base the site domain just on alliterations', 'jurassic-ninja' ),
+							'text' => __( 'Example: ugly-unicorn.domain and not fancy-unicorn.domain.', 'jurassic-ninja' ),
+							'type' => 'checkbox',
+							'checked' => true,
+						),
 						'add_jetpack_by_default' => array(
 							'id' => 'add_jetpack_by_default',
 							'title' => __( 'Add Jetpack to every launched WordPress', 'jurassic-ninja' ),
