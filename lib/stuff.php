@@ -10,6 +10,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
 if ( ! class_exists( 'RationalOptionPages' ) ) {
 	require_once __DIR__ . '/RationalOptionPages.php';
 }
+if ( ! class_exists( 'CustomNameGenerator' ) ) {
+	require_once __DIR__ . '/class-customnamegenerator.php';
+}
 require_once __DIR__ . '/rest-api-stuff.php';
 
 define( 'REST_API_NAMESPACE', 'jurassic.ninja' );
@@ -415,14 +418,15 @@ function generate_random_subdomain() {
 		'syrian',
 	];
 	// Filter out some words that could lead to offensive combinations
-	$MAX_ATTEMPTS = 10;
+	$max_attempts = 10;
 	$regexp = implode( '|', $blacklisted_words );
 	$name = 'First try';
 	$i = 0;
+
 	do {
-		$generator = new \Nubs\RandomNameGenerator\Alliteration();
-		$name = $generator->getName();
-	} while( $i++ < $MAX_ATTEMPTS && preg_match("($regexp)", $name ) === 1 );
+		$generator = new CustomNameGenerator();
+		$name = $generator->getName( settings( 'use_alliterations_for_subdomain', true ) );
+	} while ( $i++ < $max_attempts && preg_match( "($regexp)", $name ) === 1 );
 
 	$slug = create_slug( $name );
 	return $slug;
