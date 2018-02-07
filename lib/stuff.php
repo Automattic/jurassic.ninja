@@ -424,12 +424,8 @@ function generate_random_subdomain() {
 	$i = 0;
 
 	do {
-		if ( settings( 'use_alliterations_for_subdomain', true ) ) {
-			$generator = new \Nubs\RandomNameGenerator\Alliteration();
-		} else {
-			$generator = new CustomNameGenerator();
-		}
-		$name = $generator->getName();
+		$generator = new CustomNameGenerator();
+		$name = $generator->getName( settings( 'use_alliterations_for_subdomain', true ) );
 	} while ( $i++ < $max_attempts && preg_match( "($regexp)", $name ) === 1 );
 
 	$slug = create_slug( $name );

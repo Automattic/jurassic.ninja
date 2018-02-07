@@ -14,9 +14,11 @@ class CustomNameGenerator extends \Nubs\RandomNameGenerator\Alliteration {
 		$this->_nouns = file( __DIR__ . '/words/nouns.txt', FILE_IGNORE_NEW_LINES );
 	}
 	// Based on \Nubs\RandomNameGenerator\Alliteration::getName
-	public function getName() {
+	public function getName( $alliteration = true ) {
 		$adjective = $this->_getRandomWord( $this->_adjectives );
-		$noun = $this->_getRandomWord( $this->_nouns );
+		$noun = $alliteration ?
+			$this->_getRandomWord( $this->_nouns, $adjective[0] ) :
+			$this->_getRandomWord( $this->_nouns );
 		return ucwords( "{$adjective} {$noun}" );
 	}
 }
