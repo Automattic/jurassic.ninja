@@ -409,7 +409,6 @@ friendly
 frightened
 front
 frozen
-fucking
 full
 fun
 functional
