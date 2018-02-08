@@ -223,7 +223,6 @@ great
 greater
 grebe
 green
-grevy’s
 grey
 grivet
 grizzly
@@ -466,7 +465,6 @@ possum
 potter
 prawn
 praying
-preuss’s
 primate
 ptarmigan
 puffin
@@ -501,7 +499,6 @@ rhino
 rhinoceros
 rice
 right
-risso’s
 roadrunner
 roborovski
 rock
@@ -574,7 +571,6 @@ song
 southern
 sparrow
 spectacled
-spectacled/common
 sperm
 spider
 spiders
@@ -585,7 +581,6 @@ spotted
 spurred
 squid
 squirrel
-st.
 stag
 starfish
 stilt
@@ -620,7 +615,6 @@ tawny
 teira
 termite
 tern
-thomson’s
 thrush
 tick
 tiger
