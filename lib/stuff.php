@@ -123,7 +123,7 @@ function add_wp_log_viewer_plugin() {
 /**
  * Launches a new WordPress instance on the managed server
  * @param  String  $runtime              The PHP runtime versino to run the app on.
- * @param  Array  $features              Array of features to enable
+ * @param  Array   $features             Array of features to enable
  *         boolean config-constants      Should we add the Config Constants plugin to the site?
  *         boolean ssl                   Should we add SSL for the site?
  *         boolean gutenberg             Should we add Gutenberg to the site?
@@ -133,6 +133,7 @@ function add_wp_log_viewer_plugin() {
  *         boolean subdir_multisite      Should we enable subdomain-based multisite on the site?
  *         boolean woocommerce           Should we add WooCommerce plugin to the site?
  *         boolean wordpress-beta-tester Should we add Jetpack Beta Tester plugin to the site?
+ *         boolean wp-debug-log          Should we set WP_DEBUG and WP_DEBUG log to true ?
  *         boolean wp-log-viewer         Should we add WP Log Viewer plugin to the site?
  * @return Array|Null                    null or the app data as returned by ServerPilot's API on creation.
  */
@@ -147,6 +148,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		'subdomain_multisite' => false,
 		'woocommerce' => false,
 		'wordpress-beta-tester' => false,
+		'wp-debug-log' => false,
 		'wp-log-viewer' => false,
 		'shortlife' => false,
 		'branch' => false,
@@ -217,6 +219,11 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		if ( $features['wordpress-beta-tester'] ) {
 			debug( '%s: Adding WordPress Beta Tester Plugin', $domain );
 			add_wordpress_beta_tester_plugin();
+		}
+
+		if ( $features['wp-debug-log'] ) {
+			debug( '%s: Setting WP_DEBUG_LOG and WP_DEBUG_LOG to true', $domain );
+			set_wp_debug_log();
 		}
 
 		if ( $features['config-constants'] ) {
@@ -623,6 +630,15 @@ function run_commands_for_features( $user, $password, $domain ) {
 		throw new \Exception( "Commands didn't run OK" );
 	}
 	debug( '%s: Commands run OK', $domain );
+}
+
+function set_wp_debug_log() {
+	$cmd = 'wp config --type=constant set WP_DEBUG true'
+		. ' && wp config --type=constant set WP_DEBUG_LOG true'
+		. ' && touch wp-content/debug.log';
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
 }
 
 /**
