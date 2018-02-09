@@ -136,6 +136,7 @@ if ( isCreatePage() ) {
 	const jetpack = param( 'jetpack' );
 	const woocommerce = param( 'woocommerce' );
 	const jetpack_beta = param( 'jetpack-beta' );
+	const wp_debug_log = param( 'wp-debug-log' )
 	const branch = param( 'branch' )
 	const features = {};
 	if ( shortlived !== null ) {
@@ -146,6 +147,9 @@ if ( isCreatePage() ) {
 	}
 	if ( woocommerce !== null ) {
 		features.woocommerce = woocommerce;
+	}
+	if ( wp_debug_log !== null ) {
+		features[ 'wp-debug-log' ] = wp_debug_log;
 	}
 	if ( jetpack_beta !== null ) {
 		features[ 'jetpack-beta' ] = jetpack_beta;

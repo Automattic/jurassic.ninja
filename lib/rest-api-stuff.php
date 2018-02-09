@@ -26,6 +26,7 @@ function add_rest_api_endpoints() {
 			'jetpack' => (bool)settings( 'add_jetpack_by_default', true ),
 			'jetpack-beta' => (bool) settings( 'add_jetpack_beta_by_default', false ),
 			'woocommerce' => (bool) settings( 'add_woocommerce_by_default', false ),
+			'wp-debug-log' => (bool) settings( 'set_wp_debug_log_by_default', false ),
 			'shortlife' => false,
 		];
 		$json_params = $request->get_json_params();
@@ -45,10 +46,13 @@ function add_rest_api_endpoints() {
 		if ( isset( $json_params['woocommerce'] ) ) {
 			$features['woocommerce'] = $json_params['woocommerce'];
 		}
+		if ( isset( $json_params['wp-debug-log'] ) ) {
+			$features['wp-debug-log'] = $json_params['wp-debug-log'];
+		}
 
 		if ( isset( $json_params['jetpack-beta'] ) ) {
 			$url = get_jetpack_beta_url( $json_params['branch'] );
-			
+
 			if ( $url === null ) {
 				return new \WP_Error(
 					'failed_to_launch_site',
@@ -88,7 +92,7 @@ function add_rest_api_endpoints() {
 				'status' => 503,
 			] );
 		}
-		
+
 		$data = launch_wordpress( $features['runtime'], $features );
 		if ( null === $data ) {
 			return new \WP_Error(

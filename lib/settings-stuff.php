@@ -174,6 +174,13 @@ function add_settings_page() {
 							'type' => 'checkbox',
 							'checked' => false,
 						),
+						'set_wp_debug_log_by_default' => array(
+							'id' => 'set_wp_debug_log_by_default',
+							'title' => __( 'Set WP_DEBUG and WP_DEBUG_LOG to true on every launched WordPress', 'jurassic-ninja' ),
+							'text' => __( 'Enabling debugging log on launch', 'jurassic-ninja' ),
+							'type' => 'checkbox',
+							'checked' => false,
+						),
 						'purge_sites_when_cron_runs' => array(
 							'id' => 'purge_sites_when_cron_runs',
 							'title' => __( 'Run the cron task that purges sites when they expire  (Hourly)', 'jurassic-ninja' ),
