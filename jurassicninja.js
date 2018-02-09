@@ -11,6 +11,7 @@ const defaultFeatures = {
 	'subdomain_multisite': false,
 	'wordpress-beta-tester': false,
 	'config-constants': false,
+	'wp-debug-log': false,
 	'wp-log-viewer': false,
 	'gutenberg': false,
 	'woocommerce': false,
@@ -136,7 +137,7 @@ if ( isCreatePage() ) {
 	const woocommerce = param( 'woocommerce' );
 	const jetpack_beta = param( 'jetpack-beta' );
 	const branch = param( 'branch' )
-	const features = {};	
+	const features = {};
 	if ( shortlived !== null ) {
 		features.shortlived = shortlived;
 	}
