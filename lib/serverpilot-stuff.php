@@ -40,7 +40,7 @@ function sp() {
  * @param  Array  $wordpress An array containing the following keys: site_title , admin_user , admin_password , and admin_email
  * @return Object            An object with the new app data.
  */
-function create_sp_app( $name, $sysuserid, $runtime, $domains, $wordpress ) {
+function create_sp_app( $name, $sysuserid, $runtime, $domains, $wordpress = null ) {
 	try {
 		$app = sp()->app_create( $name, $sysuserid, $runtime, $domains, $wordpress );
 		wait_for_serverpilot_action( $app->actionid );

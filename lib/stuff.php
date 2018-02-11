@@ -119,7 +119,33 @@ function add_wp_log_viewer_plugin() {
 		return "$s && $cmd";
 	} );
 }
-
+/**
+ * Downloads WordPress, creates a wp-config.php file and installs WordPress admin user.
+ *
+ * @param  [type] $domain            The domain name that will be configured for the site.
+ * @param  [type] $wordpress_options WordPress options for the admin user and site. Resembling ServerPilot's parameter for creating an app
+ * @param  [type] $dbname            The database name this WordPress will connect to.
+ * @param  [type] $dbusername        The database username this WordPress will use.
+ * @param  [type] $dbpassword        The database password this WordPress will use.
+ */
+function install_wordpress_with_cli( $domain, $wordpress_options, $dbname, $dbusername, $dbpassword ) {
+	$cmd = sprintf(
+		'wp core download'
+		. ' && wp config create --dbname="%s" --dbuser="%s" --dbpass="%s"'
+		. ' && wp core install --url="%s" --title="%s" --admin_user="%s" --admin_password="%s" --admin_email="%s"',
+		$dbname,
+		$dbusername,
+		$dbpassword,
+		$domain,
+		$wordpress_options['site_title'],
+		$wordpress_options['admin_user'],
+		$wordpress_options['admin_password'],
+		$wordpress_options['admin_email']
+	);
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
+}
 /**
  * Launches a new WordPress instance on the managed server
  * @param  String  $runtime              The PHP runtime versino to run the app on.
@@ -135,9 +161,10 @@ function add_wp_log_viewer_plugin() {
  *         boolean wordpress-beta-tester Should we add Jetpack Beta Tester plugin to the site?
  *         boolean wp-debug-log          Should we set WP_DEBUG and WP_DEBUG log to true ?
  *         boolean wp-log-viewer         Should we add WP Log Viewer plugin to the site?
+ * @param  Boolean $use_custom_launcher  Use a custom way to launch WP instead of using ServerPilot's method.
  * @return Array|Null                    null or the app data as returned by ServerPilot's API on creation.
  */
-function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
+function launch_wordpress( $runtime = 'php7.0', $requested_features = [], $use_custom_launcher = false ) {
 	/**
 	 * Filters the array of default values for feature flags
 	 *    add_filter( 'jurassic_ninja_features_default_values', function ( $features ) {
@@ -202,9 +229,22 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 
 		debug( 'Creating app for %s under sysuser %s', $domain, $user->data->name );
 
-		$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg, $wordpress_options );
-		if ( is_wp_error( $app ) ) {
-			throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
+		if ( $use_custom_launcher ) {
+			$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg );
+			if ( is_wp_error( $app ) ) {
+				throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
+			}
+			// Reuse these credentials for the database, for now...
+			$dbname = $user->data->name . '-wp-blah';
+			$dbusername = $user->data->name;
+			$dbpassword = $password;
+			$db = create_sp_database( $app->data->id, $dbname, $dbusername, $dbpassword );
+			if ( is_wp_error( $db ) ) {
+				throw new \Exception( 'Error creating database for app: ' . $app->get_error_message() );
+			}
+			install_wordpress_with_cli( $domain_arg[0], $wordpress_options, $dbname, $dbusername, $dbpassword );
+		} else {
+			$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg, $wordpress_options );
 		}
 		log_new_site( $app->data, $features['shortlife'] );
 
