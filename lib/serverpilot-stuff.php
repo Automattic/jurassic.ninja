@@ -51,6 +51,24 @@ function create_sp_app( $name, $sysuserid, $runtime, $domains, $wordpress ) {
 }
 
 /**
+ * Creates a mysql database using ServerPilot's API
+ * @param  String $apid      The id of the app to attach this database.
+ * @param  String $name      The name of the Database.
+ * @param  String $username  The username that will be allowed to connect to this database
+ * @param  String $password  The password for $username.
+ * @return Object            An object with the new app data.
+ */
+function create_sp_database( $appid, $name, $username, $password ) {
+	try {
+		$app = sp()->database_create( $appid, $name, $username, $password );
+		wait_for_serverpilot_action( $app->actionid );
+		return $app;
+	} catch ( \ServerPilotException $e ) {
+		return new \WP_Error( $e->getCode(), $e->getMessage() );
+	}
+}
+
+/**
  * Creates a system user using ServerPilot's API
  * @param  String $username The username
  * @param  String $password The password
