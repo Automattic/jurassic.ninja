@@ -230,19 +230,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [], $use_c
 		debug( 'Creating app for %s under sysuser %s', $domain, $user->data->name );
 
 		if ( $use_custom_launcher ) {
-			$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg );
-			if ( is_wp_error( $app ) ) {
-				throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
-			}
-			// Reuse these credentials for the database, for now...
-			$dbname = $user->data->name . '-wp-blah';
-			$dbusername = $user->data->name;
-			$dbpassword = $password;
-			$db = create_sp_database( $app->data->id, $dbname, $dbusername, $dbpassword );
-			if ( is_wp_error( $db ) ) {
-				throw new \Exception( 'Error creating database for app: ' . $app->get_error_message() );
-			}
-			install_wordpress_with_cli( $domain_arg[0], $wordpress_options, $dbname, $dbusername, $dbpassword );
+			$app = custom_launcher( $user->data->name, $user->data->id, $runtime, $domain_arg, $wordpress_options );
 		} else {
 			$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg, $wordpress_options );
 		}
@@ -324,6 +312,34 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [], $use_c
 		return null;
 	}
 
+}
+
+/**
+ * Creates a PHP app using ServerPilot's API and enqueues commands for installing
+ * WordPress via the WordPress Command Line Interface
+ *
+ * @param  String $name      The nickname of the App
+ * @param  String $sysuserid The System User that will "own" this App
+ * @param  String $runtime   The PHP runtime for an App. Choose from php5.4, php5.5, php5.6, php7.0, or php7.1.
+ * @param  Array  $domains   An array of domains that will be used in the webserver's configuration
+ * @param  Array  $wordpress An array containing the following keys: site_title , admin_user , admin_password , and admin_email
+ * @return Object            An object with the new app data.
+ */
+function custom_launcher( $appname, $sysuser, $runtime, $domain_arg, $wordpress_options ) {
+	$app = create_sp_app( $appname, $sysuser, $runtime, $domain_arg );
+	if ( is_wp_error( $app ) ) {
+		throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
+	}
+	// Reuse these credentials for the database, for now...
+	$dbname = $appname . '-wp-blah';
+	$dbusername = $appname;
+	$dbpassword = $wordpress_options['admin_password'];
+	$db = create_sp_database( $app->data->id, $dbname, $dbusername, $dbpassword );
+	if ( is_wp_error( $db ) ) {
+		throw new \Exception( 'Error creating database for app: ' . $app->get_error_message() );
+	}
+	install_wordpress_with_cli( $domain_arg[0], $wordpress_options, $dbname, $dbusername, $dbpassword );
+	return $app;
 }
 
 /**
