@@ -39,9 +39,6 @@ function init() {
 
 	if ( isSpecialOpsPage() ) {
 		jQuery( '[data-is-create-button]' ).click( function () {
-			jQuery( '#img1' ).show();
-			jQuery( '#img2' ).hide();
-			jQuery( '#progress' ).text( originalProgressText );
 			const $this = jQuery( this );
 			const features = collectFeaturesFromFormInputs();
 			// Buttons can declare a feature too
@@ -56,38 +53,33 @@ function init() {
 
 function launchSite( $, features ) {
 	$( function() {
-		$( '#img1' ).show();
-		$( '#img2' ).hide();
+		startSpinner();
 
 		jurassicNinjaApi().create( features )
 			.then( response => {
 				$( '#progress' ).html( `<a href="${ response.data.url }">The new WP is ready to go, visit it!</a>` );
-				$( '#img1' ).hide();
-				$( '#img2' ).show();
+				stopSpinner();
 			} )
 			.catch( err => {
 				$( '#progress' ).text( `Oh No! There was a problem launching the new WP. (${ err.message }).` );
-				$( '#img2' ).hide();
-				$( '#img1' ).attr( 'src', 'https://i.imgur.com/vdyaxmx.gif' );
+				stopSpinner( true );
 			} );
 	} );
 }
 
 function launchSiteWithFeatures( $, features ) {
 	$( function() {
+		$( '#progress' ).text( originalProgressText );
 		$( '#progress' ).show();
-		$( '#img1' ).show();
-		$( '#img2').hide();
+		startSpinner();
 		jurassicNinjaApi().specialops( features )
 			.then( response => {
 				$( '#progress' ).html( `<a href="${ response.data.url }">The new WP is ready to go, visit it!</a>` );
-				$( '#img1' ).hide();
-				$( '#img2' ).show();
+				stopSpinner();
 			} )
 			.catch( err => {
 				$( '#progress' ).text( `Oh No! There was a problem launching the new WP. (${ err.message }).` );
-				$( '#img2' ).hide();
-				$( '#img1' ).attr( 'src', 'https://i.imgur.com/vdyaxmx.gif' );
+				stopSpinner( true );
 			} );
 	} );
 }
@@ -111,6 +103,20 @@ function isSpecialOpsPage() {
 
 function isCreatePage() {
 	return window.location.pathname.startsWith( CREATE_PAGE_SLUG )
+}
+
+function startSpinner() {
+	jQuery( '#img1' ).show();
+	jQuery( '#img2' ).hide();
+}
+function stopSpinner( error = false ) {
+	if ( error ) {
+		jQuery( '#img2' ).hide();
+		jQuery( '#img1' ).attr( 'src', 'https://i.imgur.com/vdyaxmx.gif' );
+	} else {
+		jQuery( '#img1' ).hide();
+		jQuery( '#img2' ).show();
+	}
 }
 
 function param( name ) {
