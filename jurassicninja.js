@@ -43,7 +43,7 @@ function init() {
 			jQuery( '#img2' ).hide();
 			jQuery( '#progress' ).text( originalProgressText );
 			const $this = jQuery( this );
-			const features = collectFeatures();
+			const features = collectFeaturesFromFormInputs();
 			// Buttons can declare a feature too
 			if ( $this.data( 'feature' )  ) {
 				features[ $this.data( 'feature' ) ] = true;
@@ -92,7 +92,7 @@ function launchSiteWithFeatures( $, features ) {
 	} );
 }
 
-function collectFeatures() {
+function collectFeaturesFromFormInputs() {
 	const reduce = Array.prototype.reduce;
 	const els = jQuery( 'input[type=checkbox][data-feature]' );
 	const features = reduce.call( els, function( acc, el ) {
