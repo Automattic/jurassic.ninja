@@ -92,6 +92,47 @@ function launchSiteWithFeatures( $, features ) {
 	} );
 }
 
+function collectFeatures() {
+	const reduce = Array.prototype.reduce;
+	const els = jQuery( 'input[type=checkbox][data-feature]' );
+	const features = reduce.call( els, function( acc, el ) {
+		return Object.assign( {}, acc, { [ jQuery( el ).data( 'feature' ) ] : jQuery( el ).is( ':checked' ) } );
+	}, {} );
+	const selects = jQuery( 'select[data-feature]' );
+	const features_in_selects = reduce.call( selects, function( acc, el ) {
+		return Object.assign( {}, acc, { [ jQuery( el ).data( 'feature' ) ] : jQuery( el ).val() } );
+	}, {} );
+	return Object.assign( features, features_in_selects );
+}
+
+function isSpecialOpsPage() {
+	return window.location.pathname.startsWith( SPECIALOPS_CREATE_PAGE_SLUG );
+}
+
+function isCreatePage() {
+	return window.location.pathname.startsWith( CREATE_PAGE_SLUG )
+}
+
+function param( name ) {
+	let params;
+	if ( location.search ) {
+		let params = location.search.split( '?' )[1].split( '&' );
+		// branch option is only valid when jetpack-beta is used.
+		if ( name == 'branch' && params.includes( 'jetpack-beta' ) ) {
+			let branch = params.filter( param => param.startsWith( 'branch' ) )
+			return branch.length ? branch[0].split( '=' )[1] : 'master'
+		}
+		if ( params.includes( name ) ) {
+			return true;
+		}
+		if ( params.includes( 'no' + name ) ) {
+			return false;
+		}
+		return null;
+	}
+	return null;
+}
+
 function jurassicNinjaApi() {
 	if ( ! ( this instanceof jurassicNinjaApi ) ) {
 		return new jurassicNinjaApi();
@@ -151,48 +192,4 @@ function jurassicNinjaApi() {
 
 	this.create = create;
 	this.specialops = specialops;
-}
-
-
-
-
-function collectFeatures() {
-	const reduce = Array.prototype.reduce;
-	const els = jQuery( 'input[type=checkbox][data-feature]' );
-	const features = reduce.call( els, function( acc, el ) {
-		return Object.assign( {}, acc, { [ jQuery( el ).data( 'feature' ) ] : jQuery( el ).is( ':checked' ) } );
-	}, {} );
-	const selects = jQuery( 'select[data-feature]' );
-	const features_in_selects = reduce.call( selects, function( acc, el ) {
-		return Object.assign( {}, acc, { [ jQuery( el ).data( 'feature' ) ] : jQuery( el ).val() } );
-	}, {} );
-	return Object.assign( features, features_in_selects );
-}
-
-function isSpecialOpsPage() {
-	return window.location.pathname.startsWith( SPECIALOPS_CREATE_PAGE_SLUG );
-}
-
-function isCreatePage() {
-	return window.location.pathname.startsWith( CREATE_PAGE_SLUG )
-}
-
-function param( name ) {
-	let params;
-	if ( location.search ) {
-		let params = location.search.split( '?' )[1].split( '&' );
-		// branch option is only valid when jetpack-beta is used.
-		if ( name == 'branch' && params.includes( 'jetpack-beta' ) ) {
-			let branch = params.filter( param => param.startsWith( 'branch' ) )
-			return branch.length ? branch[0].split( '=' )[1] : 'master'
-		}
-		if ( params.includes( name ) ) {
-			return true;
-		}
-		if ( params.includes( 'no' + name ) ) {
-			return false;
-		}
-		return null;
-	}
-	return null;
 }
