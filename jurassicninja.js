@@ -4,6 +4,56 @@ const SPECIALOPS_CREATE_PAGE_SLUG = '/specialops';
 
 const originalProgressText = jQuery( '#progress' ).text();
 
+init();
+
+function init() {
+	if ( isCreatePage() ) {
+		const shortlived = param( 'shortlived' );
+		const jetpack = param( 'jetpack' );
+		const woocommerce = param( 'woocommerce' );
+		const jetpack_beta = param( 'jetpack-beta' );
+		const wp_debug_log = param( 'wp-debug-log' )
+		const branch = param( 'branch' )
+		const features = {};
+		if ( shortlived !== null ) {
+			features.shortlived = shortlived;
+		}
+		if ( jetpack !== null ) {
+			features.jetpack = jetpack;
+		}
+		if ( woocommerce !== null ) {
+			features.woocommerce = woocommerce;
+		}
+		if ( wp_debug_log !== null ) {
+			features[ 'wp-debug-log' ] = wp_debug_log;
+		}
+		if ( jetpack_beta !== null ) {
+			features[ 'jetpack-beta' ] = jetpack_beta;
+			features.branch = ( branch !== null ? branch : 'stable' );
+		}
+
+		setTimeout( () => {
+			doIt( jQuery, features );
+		}, 1000 );
+	}
+
+	if ( isSpecialOpsPage() ) {
+		jQuery( '[data-is-create-button]' ).click( function () {
+			jQuery( '#img1' ).show();
+			jQuery( '#img2' ).hide();
+			jQuery( '#progress' ).text( originalProgressText );
+			const $this = jQuery( this );
+			const features = collectFeatures();
+			// Buttons can declare a feature too
+			if ( $this.data( 'feature' )  ) {
+				features[ $this.data( 'feature' ) ] = true;
+			}
+			doItWithFeatures( jQuery, features );
+			return false;
+		} )
+	}
+}
+
 function doIt( $, features ) {
 	$( function() {
 		$( '#img1' ).show();
@@ -125,52 +175,6 @@ function isSpecialOpsPage() {
 
 function isCreatePage() {
 	return window.location.pathname.startsWith( CREATE_PAGE_SLUG )
-}
-
-if ( isCreatePage() ) {
-	const shortlived = param( 'shortlived' );
-	const jetpack = param( 'jetpack' );
-	const woocommerce = param( 'woocommerce' );
-	const jetpack_beta = param( 'jetpack-beta' );
-	const wp_debug_log = param( 'wp-debug-log' )
-	const branch = param( 'branch' )
-	const features = {};
-	if ( shortlived !== null ) {
-		features.shortlived = shortlived;
-	}
-	if ( jetpack !== null ) {
-		features.jetpack = jetpack;
-	}
-	if ( woocommerce !== null ) {
-		features.woocommerce = woocommerce;
-	}
-	if ( wp_debug_log !== null ) {
-		features[ 'wp-debug-log' ] = wp_debug_log;
-	}
-	if ( jetpack_beta !== null ) {
-		features[ 'jetpack-beta' ] = jetpack_beta;
-		features.branch = ( branch !== null ? branch : 'stable' );
-	}
-
-	setTimeout( () => {
-		doIt( jQuery, features );
-	}, 1000 );
-}
-
-if ( isSpecialOpsPage() ) {
-	jQuery( '[data-is-create-button]' ).click( function () {
-		jQuery( '#img1' ).show();
-		jQuery( '#img2' ).hide();
-		jQuery( '#progress' ).text( originalProgressText );
-		const $this = jQuery( this );
-		const features = collectFeatures();
-		// Buttons can declare a feature too
-		if ( $this.data( 'feature' )  ) {
-			features[ $this.data( 'feature' ) ] = true;
-		}
-		doItWithFeatures( jQuery, features );
-		return false;
-	} )
 }
 
 function param( name ) {
