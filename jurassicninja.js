@@ -2,21 +2,6 @@
 const CREATE_PAGE_SLUG = '/create';
 const SPECIALOPS_CREATE_PAGE_SLUG = '/specialops';
 
-const defaultFeatures = {
-	'runtime': 'php7.0',
-	'ssl': false,
-	'jetpack': false,
-	'jetpack-beta': false,
-	'subdir_multisite': false,
-	'subdomain_multisite': false,
-	'wordpress-beta-tester': false,
-	'config-constants': false,
-	'wp-debug-log': false,
-	'wp-log-viewer': false,
-	'gutenberg': false,
-	'woocommerce': false,
-};
-
 const originalProgressText = jQuery( '#progress' ).text();
 
 function doIt( $, features ) {
@@ -73,7 +58,6 @@ function createSite( features ) {
 }
 
 function launchSiteWithFeatures( features ) {
-	features = Object.assign( {}, defaultFeatures, features );
 	const url = restApiSettings.root;
 	const nonce = restApiSettings.nonce;
 	return fetch( url + 'jurassic.ninja/specialops/create', {
