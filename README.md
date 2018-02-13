@@ -7,7 +7,7 @@ A frontend to launching ephemeral WordPress instances that auto-destroy after so
 
 * An ubuntu box managed by ServerPilot
 * A ServerPilot plan. One of the paid plans. Coach plan is OK. This is to take advantage of multiple sysusers management
-* `sshpasss` installed on the box.
+* `sshpass` installed on the box.
 * `wp cli` and `composer` (which is already installed by ServerPilot).
 * **Have a domain name you fully control**.
 	* Add wildcard A record for every subdomain under that domain, pointing to the box's IP addresss.
