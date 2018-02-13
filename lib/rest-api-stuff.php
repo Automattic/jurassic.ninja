@@ -53,10 +53,16 @@ function add_rest_api_endpoints() {
 		/**
 		 * Filters the features requested through the /create REST API endpoint
 		 *
+		 * If any filter returns a WP_Error, then the request is finished with status 500
+		 *
 		 * @param array $features    The current feature flags.
 		 * @param array $json_params The body of the json request.
 		 */
 		$features = apply_filters( 'jurassic_ninja_rest_create_request_features', $features, $json_params );
+
+		if ( is_wp_error( $features ) ) {
+			return $features;
+		}
 
 		if ( isset( $json_params['jetpack-beta'] ) ) {
 			$url = get_jetpack_beta_url( $json_params['branch'] );
