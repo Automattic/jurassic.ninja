@@ -33,7 +33,7 @@ function init() {
 		}
 
 		setTimeout( () => {
-			doIt( jQuery, features );
+			launchSite( jQuery, features );
 		}, 1000 );
 	}
 
@@ -48,18 +48,18 @@ function init() {
 			if ( $this.data( 'feature' )  ) {
 				features[ $this.data( 'feature' ) ] = true;
 			}
-			doItWithFeatures( jQuery, features );
+			launchSiteWithFeatures( jQuery, features );
 			return false;
 		} )
 	}
 }
 
-function doIt( $, features ) {
+function launchSite( $, features ) {
 	$( function() {
 		$( '#img1' ).show();
 		$( '#img2' ).hide();
 
-		jurassicNinjaApi().launchSite( features )
+		jurassicNinjaApi().create( features )
 			.then( response => {
 				$( '#progress' ).html( `<a href="${ response.data.url }">The new WP is ready to go, visit it!</a>` );
 				$( '#img1' ).hide();
@@ -73,12 +73,12 @@ function doIt( $, features ) {
 	} );
 }
 
-function doItWithFeatures( $, features ) {
+function launchSiteWithFeatures( $, features ) {
 	$( function() {
 		$( '#progress' ).show();
 		$( '#img1' ).show();
 		$( '#img2').hide();
-		jurassicNinjaApi().launchSiteWithFeatures( features )
+		jurassicNinjaApi().specialops( features )
 			.then( response => {
 				$( '#progress' ).html( `<a href="${ response.data.url }">The new WP is ready to go, visit it!</a>` );
 				$( '#img1' ).hide();
@@ -97,7 +97,7 @@ function jurassicNinjaApi() {
 		return new jurassicNinjaApi();
 	}
 
-	function launchSite( features ) {
+	function create( features ) {
 		const url = restApiSettings.root;
 		const nonce = restApiSettings.nonce;
 		return fetch( url + 'jurassic.ninja/create', {
@@ -112,7 +112,7 @@ function jurassicNinjaApi() {
 		.then( checkStatusAndErrors ).then( parseJson )
 	}
 
-	function launchSiteWithFeatures( features ) {
+	function specialops( features ) {
 		const url = restApiSettings.root;
 		const nonce = restApiSettings.nonce;
 		return fetch( url + 'jurassic.ninja/specialops/create', {
@@ -149,8 +149,8 @@ function jurassicNinjaApi() {
 		} );
 	}
 
-	this.launchSite = launchSite;
-	this.launchSiteWithFeatures = launchSiteWithFeatures;
+	this.create = create;
+	this.specialops = specialops;
 }
 
 
