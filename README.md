@@ -21,7 +21,7 @@ Basically the steps are
 
 1. Install the plugin and activate it.
 1. Create the needed pages (home and `/create`).
-1. 1. Configure ServerPilot credentials.
+1. Configure ServerPilot credentials.
 
 #### Install the Plugin
 
