@@ -88,7 +88,7 @@ mkdir ./jndb
 docker-compose up
 ```
 
-1. navigate to <http://localhost> to create WordPress site, Activate Jurassic Ninja plugin. Other plugins are optional
+1. Navigate to <http://localhost> to create WordPress site, Activate Jurassic Ninja plugin. Other plugins are optional
 
 1. Setup Jurassic Ninja plugin as menitioned above
 
