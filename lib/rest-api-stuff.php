@@ -50,6 +50,14 @@ function add_rest_api_endpoints() {
 			$features['wp-debug-log'] = $json_params['wp-debug-log'];
 		}
 
+		/**
+		 * Filters the features requested through the /create REST API endpoint
+		 *
+		 * @param array $features    The current feature flags.
+		 * @param array $json_params The body of the json request.
+		 */
+		$features = apply_filters( 'jurassic_ninja_rest_create_request_features', $features, $json_params );
+
 		if ( isset( $json_params['jetpack-beta'] ) ) {
 			$url = get_jetpack_beta_url( $json_params['branch'] );
 

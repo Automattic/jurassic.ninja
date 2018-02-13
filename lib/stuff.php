@@ -138,7 +138,16 @@ function add_wp_log_viewer_plugin() {
  * @return Array|Null                    null or the app data as returned by ServerPilot's API on creation.
  */
 function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
-	$default_features = [
+	/**
+	 * Filters the array of default values for feature flags
+	 *    add_filter( 'jurassic_ninja_features_default_values', function ( $features ) {
+	 *       $features['myfeatures'] = false;
+	 *       return $features;
+	 *    } );
+	 *
+	 * @param array $features array of default values for feature flags
+	*/
+	$default_features = apply_filters( 'jurassic_ninja_features_default_values', [
 		'ssl' => false,
 		'config-constants' => false,
 		'gutenberg' => false,
@@ -152,7 +161,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		'wp-log-viewer' => false,
 		'shortlife' => false,
 		'branch' => false,
-	];
+	] );
 	$features = array_merge( $default_features, $requested_features );
 
 	if ( $features['subdir_multisite'] && $features['subdomain_multisite'] ) {
@@ -257,6 +266,11 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 			debug( '%s: Enabling subdomain based multisite', $domain );
 			enable_subdomain_multisite( $domain );
 		}
+		/**
+		 * Allow the enqueue of commands for features with each launched site.
+		 * @param array $features The current feature flags
+		 */
+		do_action( 'jurassic_ninja_add_features', $features );
 
 		// Runs the command via SSH
 		// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
