@@ -183,16 +183,24 @@ function jurassicNinjaApi() {
 		if ( response.status === 403 ) {
 			throw new Error( 'Launching sites is currently restricted to authenticated users' );
 		}
-		if ( response.status !== 200 ) {
+		if ( response.status !== 200 && response.status !== 400 ) {
 			throw new Error( 'The API responded in a weird way' );
 		}
 		return response;
 	}
 
 	function parseJson( response ) {
+		let message = 'There was en error with the response from the API';
 		return response.json()
+		.then( data => {
+			if ( response.status === 400 ) {
+				message = data.message;
+				throw new Error();
+			}
+			return data;
+		} )
 		.catch( () => {
-			throw new Error ( 'There was en error with the response from the API' )
+			throw new Error ( message )
 		} );
 	}
 
