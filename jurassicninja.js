@@ -183,6 +183,8 @@ function jurassicNinjaApi() {
 		if ( response.status === 403 ) {
 			throw new Error( 'Launching sites is currently restricted to authenticated users' );
 		}
+		// 400 status are custom WP_Error when features are requested in a bad way
+		// so we still parse the json there.
 		if ( response.status !== 200 && response.status !== 400 ) {
 			throw new Error( 'The API responded in a weird way' );
 		}
@@ -193,6 +195,7 @@ function jurassicNinjaApi() {
 		let message = 'There was en error with the response from the API';
 		return response.json()
 		.then( data => {
+			// 400 status are custom WP_Error when features are requested in a bad way
 			if ( response.status === 400 ) {
 				message = data.message;
 				throw new Error();
