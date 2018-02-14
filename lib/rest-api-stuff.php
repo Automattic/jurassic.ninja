@@ -69,10 +69,10 @@ function add_rest_api_endpoints() {
 
 			if ( $url === null ) {
 				return new \WP_Error(
-					'failed_to_launch_site',
-					esc_html__( 'Invalid branch name: ' . $json_params['branch'] ),
+					'failed_to_launch_site_with_branch',
+					esc_html__( 'Invalid branch name or not ready yet: ' . $json_params['branch'] ),
 					[
-						'status' => 500,
+						'status' => 400,
 					]
 				);
 			}
