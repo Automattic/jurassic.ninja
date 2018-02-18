@@ -126,6 +126,7 @@ function add_wp_log_viewer_plugin() {
  * @param  Array   $features             Array of features to enable
  *         boolean config-constants      Should we add the Config Constants plugin to the site?
  *         boolean auto_ssl              Should we add Let's Encrypt-based SSL for the site?
+ *         boolean ssl                   Should we add the configured SSL certificate for the site?
  *         boolean gutenberg             Should we add Gutenberg to the site?
  *         boolean jetpack               Should we add Jetpack to the site?
  *         boolean jetpack-beta          Should we add Jetpack Beta Tester plugin to the site?
@@ -149,6 +150,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 	*/
 	$default_features = apply_filters( 'jurassic_ninja_features_default_values', [
 		'auto_ssl' => false,
+		'ssl' => false,
 		'config-constants' => false,
 		'gutenberg' => false,
 		'jetpack' => false,
@@ -208,13 +210,33 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		}
 		log_new_site( $app->data, $features['shortlife'] );
 
+		// Currently not used but the code works.
 		if ( $features['auto_ssl'] ) {
 			enable_auto_ssl( $app->data->id );
 		}
+		// We can't easily enable SSL for subodmains because
+		// wildcard certificates don't support multiple levels of subdomains
+		// and this can result in awful experience.
+		// Need to explorer a little bit better
+		if ( $features['ssl'] && ! $features['subdomain_multisite'] ) {
+			if ( $features['auto_ssl'] ) {
+				debug( 'Both ssl and auto_ssl features were requested. Ignoring ssl and launching with auto_ssl' );
+			} else {
+				debug( '%s: Enabling custom SSL', $domain );
+				$response = enable_ssl( $app->data->id );
+				if ( is_wp_error( $response ) ) {
+					debug( 'Error enabling SSL for %s. Check the next log line for a dump of the WP_Error', $domain );
+					debug( print_r( $response, true ) );
+					throw new \Exception( 'Error creating sysuser: ' . $return->get_error_message() );
+				}
+			}
+		}
+
 		if ( $features['jetpack'] ) {
 			debug( '%s: Adding Jetpack', $domain );
 			add_jetpack();
 		}
+
 		if ( $features['jetpack-beta'] ) {
 			debug( '%s: Adding Jetpack Beta Tester Plugin', $domain );
 			add_jetpack_beta_plugin();

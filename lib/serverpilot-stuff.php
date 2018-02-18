@@ -100,6 +100,47 @@ function enable_auto_ssl( $app_id ) {
 }
 
 /**
+ * Enable  SSL on a ServerPilot app according to the configured certificate
+ * in Jurassic Ninja settings.
+ *
+ * @param  string $app_id The ServerPilot id for the app
+ * @return [type]         [description]
+ */
+function enable_ssl( $app_id ) {
+	$private_key = settings( 'ssl_private_key' );
+	$certificate = settings( 'ssl_certificate' );
+	$ca_certificates = settings( 'ssl_ca_certificates', null );
+
+	if ( ! $private_key || ! $certificate ) {
+		return new \WP_Error( 'ssl_settings_not_present', __( 'Certificate or Private key are not configured' ) );
+	}
+
+	if ( ! $ca_certificates ) {
+		debug( 'No CA certificates configured in settings. This may take a little bit longer to launch' );
+	}
+
+	try {
+		// Add certificate
+		$data = sp()->ssl_add( $app_id, $private_key, $certificate, $ca_certificates );
+		/**
+		 * NOTE: Here it would make sense to wait for this action to finish.
+		 * IRL: It talkes tooooo long before the action is in a success state AND
+		 * without the wait, the SSL provisioning still works fine.
+		 * Tested a few sites and nothing broke.
+		 * Leaving it commented in case something breaks eventually.
+		 */
+		// wait_for_serverpilot_action( $data->actionid );
+		
+		// Enable redirection from https to http
+		$data = sp()->ssl_force( $app_id, true );
+		wait_for_serverpilot_action( $data->actionid );
+		return $data;
+	} catch ( \ServerPilotException $e ) {
+		return new \WP_Error( $e->getCode(), $e->getMessage() );
+	}
+}
+
+/**
  * Returns an array of apps as reported by ServerPilot's API
  * @return Array The PHP apps that ServerPilot knows about.
  */

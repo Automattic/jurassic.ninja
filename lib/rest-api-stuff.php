@@ -28,6 +28,7 @@ function add_rest_api_endpoints() {
 			'woocommerce' => (bool) settings( 'add_woocommerce_by_default', false ),
 			'wp-debug-log' => (bool) settings( 'set_wp_debug_log_by_default', false ),
 			'shortlife' => false,
+			'ssl' => (bool) settings( 'ssl_use_custom_certificate', false ),
 		];
 		$json_params = $request->get_json_params();
 
@@ -90,7 +91,9 @@ function add_rest_api_endpoints() {
 				]
 			);
 		}
-		$url = 'http://' . figure_out_main_domain( $data->domains );
+		// See note in launch_wordpress() about why we can't launch subdomain_multisite with ssl.
+		$schema = $features['ssl'] && ! $features['subdomain_multisite'] ? 'https' : 'http';
+		$url = "$schema://" . figure_out_main_domain( $data->domains );
 
 		$output = [
 			'url' => $url,
@@ -100,7 +103,11 @@ function add_rest_api_endpoints() {
 
 	add_post_endpoint( 'specialops/create', function ( $request ) {
 		$json_params = $request->get_json_params();
+		$defaults = [
+			'ssl' => (bool) settings( 'ssl_use_custom_certificate', false ),
+		];
 		$features = $json_params && is_array( $json_params ) ? $json_params : [];
+		$features = array_merge( $defaults, $features );
 		if ( ! settings( 'enable_launching', true ) ) {
 			return new \WP_Error( 'site_launching_disabled', __( 'Site launching is disabled right now' ), [
 				'status' => 503,
@@ -117,7 +124,9 @@ function add_rest_api_endpoints() {
 				]
 			);
 		}
-		$url = 'http://' . figure_out_main_domain( $data->domains );
+		// See note in launch_wordpress() about why we can't launch subdomain_multisite with ssl.
+		$schema = $features['ssl'] && ! $features['subdomain_multisite'] ? 'https' : 'http';
+		$url = "$schema://" . figure_out_main_domain( $data->domains );
 
 		$output = [
 			'url' => $url,
