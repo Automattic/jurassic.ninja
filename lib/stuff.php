@@ -125,7 +125,7 @@ function add_wp_log_viewer_plugin() {
  * @param  String  $runtime              The PHP runtime versino to run the app on.
  * @param  Array   $features             Array of features to enable
  *         boolean config-constants      Should we add the Config Constants plugin to the site?
- *         boolean ssl                   Should we add SSL for the site?
+ *         boolean auto_ssl              Should we add Let's Encrypt-based SSL for the site?
  *         boolean gutenberg             Should we add Gutenberg to the site?
  *         boolean jetpack               Should we add Jetpack to the site?
  *         boolean jetpack-beta          Should we add Jetpack Beta Tester plugin to the site?
@@ -148,7 +148,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 	 * @param array $features array of default values for feature flags
 	*/
 	$default_features = apply_filters( 'jurassic_ninja_features_default_values', [
-		'ssl' => false,
+		'auto_ssl' => false,
 		'config-constants' => false,
 		'gutenberg' => false,
 		'jetpack' => false,
@@ -208,8 +208,8 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		}
 		log_new_site( $app->data, $features['shortlife'] );
 
-		if ( $features['ssl'] ) {
-			enable_ssl( $app->data->id );
+		if ( $features['auto_ssl'] ) {
+			enable_auto_ssl( $app->data->id );
 		}
 		if ( $features['jetpack'] ) {
 			debug( '%s: Adding Jetpack', $domain );

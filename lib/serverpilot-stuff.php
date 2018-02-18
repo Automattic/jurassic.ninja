@@ -81,7 +81,7 @@ function delete_sp_sysuser( $id ) {
 }
 
 /**
- * Tries to enable SSL on a ServerPilot app
+ * Tries to enable auto SSL on a ServerPilot app
  * This is currently not working so well due to the amount
  * of instances created by ServerPilot and the throttling mechanism
  * enforced by Let's Encrypt.
@@ -89,7 +89,7 @@ function delete_sp_sysuser( $id ) {
  * @param  string $app_id The ServerPilot id for the app
  * @return [type]         [description]
  */
-function enable_ssl( $app_id ) {
+function enable_auto_ssl( $app_id ) {
 	try {
 		$data = sp()->ssl_auto( $app_id );
 		wait_for_serverpilot_action( $data->actionid );
