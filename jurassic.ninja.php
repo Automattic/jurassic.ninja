@@ -3,7 +3,7 @@
 /*
  * Plugin Name: Jurassic Ninja
  * Description: Launch ephemeral instances of WordPress + Jetpack using ServerPilot and an Ubuntu Box.
- * Version: 2.0
+ * Version: 2.1
  * Author: Osk
  **/
 
