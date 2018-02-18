@@ -232,6 +232,36 @@ function add_settings_page() {
 						),
 					),
 				),
+				'ssl' => array(
+					'title' => __( 'SSL Configuration', 'jurassic-ninja' ),
+					'text' => '<p>' . __( 'Pase a wildcard SSL certificate and the private key used to generate it.' ) . '</p>',
+					'fields' => array(
+						'ssl_use_custom_certificate' => array(
+							'id' => 'ssl_use_custom_certificate',
+							'title' => __( 'Use custom SSL certificate', 'jurassic-ninja' ),
+							'type' => 'checkbox',
+							'checked' => false,
+						),
+						'ssl_certificate' => array(
+							'id' => 'ssl_certificate',
+							'title' => __( 'SSL certificate', 'jurassic-ninja' ),
+							'text' => __( 'Paste the text here.' ),
+							'type' => 'textarea',
+						),
+						'ssl_private_key' => array(
+							'id' => 'ssl_private_key',
+							'title' => __( 'The private key used to create the certificate', 'jurassic-ninja' ),
+							'text' => __( 'Paste the text here.' ),
+							'type' => 'textarea',
+						),
+						'ssl_ca_certificates' => array(
+							'id' => 'ssl_ca_certificates',
+							'title' => __( 'CA certificates', 'jurassic-ninja' ),
+							'text' => __( 'Paste the text here.' ),
+							'type' => 'textarea',
+						),
+					),
+				),
 			),
 		),
 	] );
