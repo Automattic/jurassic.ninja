@@ -34,4 +34,42 @@ add_action( 'jurassic_ninja_init', function() {
 			}
 		}
 	}, 10, 3 );
+
+} );
+
+add_action( 'jurassic_ninja_admin_init', function() {
+	add_filter( 'jurassic_ninja_settings_options_page', function( $options_page ) {
+		$settings = [
+			'title' => __( 'SSL Configuration', 'jurassic-ninja' ),
+			'text' => '<p>' . __( 'Paste a wildcard SSL certificate and the private key used to generate it.' ) . '</p>',
+			'fields' => array(
+				'ssl_use_custom_certificate' => array(
+					'id' => 'ssl_use_custom_certificate',
+					'title' => __( 'Use custom SSL certificate', 'jurassic-ninja' ),
+					'type' => 'checkbox',
+					'checked' => false,
+				),
+				'ssl_certificate' => array(
+					'id' => 'ssl_certificate',
+					'title' => __( 'SSL certificate', 'jurassic-ninja' ),
+					'text' => __( 'Paste the text here.' ),
+					'type' => 'textarea',
+				),
+				'ssl_private_key' => array(
+					'id' => 'ssl_private_key',
+					'title' => __( 'The private key used to create the certificate', 'jurassic-ninja' ),
+					'text' => __( 'Paste the text here.' ),
+					'type' => 'textarea',
+				),
+				'ssl_ca_certificates' => array(
+					'id' => 'ssl_ca_certificates',
+					'title' => __( 'CA certificates', 'jurassic-ninja' ),
+					'text' => __( 'Paste the text here.' ),
+					'type' => 'textarea',
+				),
+			),
+		];
+		$options_page[ SETTINGS_KEY ]['sections']['ssl'] = $settings;
+		return $options_page;
+	} );
 } );

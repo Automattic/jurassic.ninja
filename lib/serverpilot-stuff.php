@@ -37,6 +37,34 @@ add_action( 'jurassic_ninja_init', function() {
 	}, 10, 2 );
 } );
 
+add_action( 'jurassic_ninja_admin_init', function() {
+	add_filter( 'jurassic_ninja_settings_options_page', function( $options_page ) {
+		$settings = [
+			'title' => __( 'ServerPilot Configuration', 'jurassic-ninja' ),
+			'text' => '<p>' . __( 'Configure ServerPilot client Id and Key. This need to be one of the paid plans. At least a Coach Plan', 'jurassic-ninja' ) . '</p>',
+			'fields' => array(
+				'serverpilot_server_id' => array(
+					'id' => 'serverpilot_server_id',
+					'title' => __( 'ServerPilot Server Id', 'jurassic-ninja' ),
+					'text' => __( 'A ServerPilot Server Id.' ),
+				),
+				'serverpilot_client_id' => array(
+					'id' => 'serverpilot_client_id',
+					'title' => __( 'ServerPilot Client Id', 'jurassic-ninja' ),
+					'text' => __( 'A ServerPilot Client id.' ),
+				),
+				'serverpilot_client_key' => array(
+					'id' => 'serverpilot_client_key',
+					'title' => __( 'ServerPilot Key', 'jurassic-ninja' ),
+					'text' => __( 'A ServerPilot Client key.' ),
+				),
+			),
+		];
+		$options_page[ SETTINGS_KEY ]['sections']['serverpilot'] = $settings;
+		return $options_page;
+	}, 5 );
+} );
+
 /**
  * Returns a ServerPilot instance
  * @return [type] [description]

@@ -59,6 +59,40 @@ add_action( 'jurassic_ninja_init', function() {
 	}, 10, 3 );
 } );
 
+add_action( 'jurassic_ninja_admin_init', function() {
+	add_filter( 'jurassic_ninja_settings_options_page', function( $options_page ) {
+		$settings = [
+			'title' => __( 'Default plugins', 'jurassic-ninja' ),
+			'text' => '<p>' . __( 'Choose plugins you want installed on launch by default.' ) . '</p>',
+			'fields' => array(
+				'add_jetpack_by_default' => array(
+					'id' => 'add_jetpack_by_default',
+					'title' => __( 'Add Jetpack to every launched WordPress', 'jurassic-ninja' ),
+					'text' => __( 'Install and activate Jetpack on launch', 'jurassic-ninja' ),
+					'type' => 'checkbox',
+					'checked' => true,
+				),
+				'add_jetpack_beta_by_default' => array(
+					'id' => 'add_jetpack_beta_by_default',
+					'title' => __( 'Add Jetpack Beta Tester plugin to every launched WordPress', 'jurassic-ninja' ),
+					'text' => __( 'Install and activate Jetpack Beta Tester on launch', 'jurassic-ninja' ),
+					'type' => 'checkbox',
+					'checked' => false,
+				),
+				'add_woocommerce_by_default' => array(
+					'id' => 'add_woocommerce_by_default',
+					'title' => __( 'Add WooCommerce to every launched WordPress', 'jurassic-ninja' ),
+					'text' => __( 'Install and activate WooCommerce on launch', 'jurassic-ninja' ),
+					'type' => 'checkbox',
+					'checked' => false,
+				),
+			),
+		];
+		$options_page[ SETTINGS_KEY ]['sections']['plugins'] = $settings;
+		return $options_page;
+	}, 1);
+} );
+
 /**
  * Installs and activates the Config Constants plugin on the site.
  */

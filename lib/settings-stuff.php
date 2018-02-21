@@ -153,27 +153,6 @@ function add_settings_page() {
 							'type' => 'checkbox',
 							'checked' => true,
 						),
-						'add_jetpack_by_default' => array(
-							'id' => 'add_jetpack_by_default',
-							'title' => __( 'Add Jetpack to every launched WordPress', 'jurassic-ninja' ),
-							'text' => __( 'Install and activate Jetpack on launch', 'jurassic-ninja' ),
-							'type' => 'checkbox',
-							'checked' => true,
-						),
-						'add_jetpack_beta_by_default' => array(
-							'id' => 'add_jetpack_beta_by_default',
-							'title' => __( 'Add Jetpack Beta Tester plugin to every launched WordPress', 'jurassic-ninja' ),
-							'text' => __( 'Install and activate Jetpack Beta Tester on launch', 'jurassic-ninja' ),
-							'type' => 'checkbox',
-							'checked' => false,
-						),
-						'add_woocommerce_by_default' => array(
-							'id' => 'add_woocommerce_by_default',
-							'title' => __( 'Add WooCommerce to every launched WordPress', 'jurassic-ninja' ),
-							'text' => __( 'Install and activate WooCommerce on launch', 'jurassic-ninja' ),
-							'type' => 'checkbox',
-							'checked' => false,
-						),
 						'set_wp_debug_log_by_default' => array(
 							'id' => 'set_wp_debug_log_by_default',
 							'title' => __( 'Set WP_DEBUG and WP_DEBUG_LOG to true on every launched WordPress', 'jurassic-ninja' ),
@@ -211,59 +190,8 @@ function add_settings_page() {
 						),
 					),
 				),
-				'serverpilot' => array(
-					'title' => __( 'ServerPilot Configuration', 'jurassic-ninja' ),
-					'text' => '<p>' . __( 'Configure ServerPilot client Id and Key. This need to be one of the paid plans. At least a Coach Plan', 'jurassic-ninja' ) . '</p>',
-					'fields' => array(
-						'serverpilot_server_id' => array(
-							'id' => 'serverpilot_server_id',
-							'title' => __( 'ServerPilot Server Id', 'jurassic-ninja' ),
-							'text' => __( 'A ServerPilot Server Id.' ),
-						),
-						'serverpilot_client_id' => array(
-							'id' => 'serverpilot_client_id',
-							'title' => __( 'ServerPilot Client Id', 'jurassic-ninja' ),
-							'text' => __( 'A ServerPilot Client id.' ),
-						),
-						'serverpilot_client_key' => array(
-							'id' => 'serverpilot_client_key',
-							'title' => __( 'ServerPilot Key', 'jurassic-ninja' ),
-							'text' => __( 'A ServerPilot Client key.' ),
-						),
-					),
-				),
-				'ssl' => array(
-					'title' => __( 'SSL Configuration', 'jurassic-ninja' ),
-					'text' => '<p>' . __( 'Pase a wildcard SSL certificate and the private key used to generate it.' ) . '</p>',
-					'fields' => array(
-						'ssl_use_custom_certificate' => array(
-							'id' => 'ssl_use_custom_certificate',
-							'title' => __( 'Use custom SSL certificate', 'jurassic-ninja' ),
-							'type' => 'checkbox',
-							'checked' => false,
-						),
-						'ssl_certificate' => array(
-							'id' => 'ssl_certificate',
-							'title' => __( 'SSL certificate', 'jurassic-ninja' ),
-							'text' => __( 'Paste the text here.' ),
-							'type' => 'textarea',
-						),
-						'ssl_private_key' => array(
-							'id' => 'ssl_private_key',
-							'title' => __( 'The private key used to create the certificate', 'jurassic-ninja' ),
-							'text' => __( 'Paste the text here.' ),
-							'type' => 'textarea',
-						),
-						'ssl_ca_certificates' => array(
-							'id' => 'ssl_ca_certificates',
-							'title' => __( 'CA certificates', 'jurassic-ninja' ),
-							'text' => __( 'Paste the text here.' ),
-							'type' => 'textarea',
-						),
-					),
-				),
 			),
 		),
 	];
-	new \RationalOptionPages( apply_filters( 'jurassic_ninja_settings_page_options' , $options_page ) );
+	new \RationalOptionPages( apply_filters( 'jurassic_ninja_settings_options_page' , $options_page ) );
 }
