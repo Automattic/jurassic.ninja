@@ -81,7 +81,7 @@ function settings_problems() {
  *     - The Site Admin page
  */
 function add_settings_page() {
-	$options_page = new \RationalOptionPages( [
+	$options_page = [
 		'jurassic-ninja' => array(
 			'page_title' => __( 'Jurassic Ninja Sites Admin', 'jurassic-ninja' ),
 			'menu_title' => __( 'Jurassic Ninja' ),
@@ -264,5 +264,6 @@ function add_settings_page() {
 				),
 			),
 		),
-	] );
+	];
+	new \RationalOptionPages( apply_filters( 'jurassic_ninja_settings_page_options' , $options_page ) );
 }

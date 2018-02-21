@@ -103,6 +103,7 @@ function add_scripts() {
 	add_action( 'wp_enqueue_scripts', function () {
 		if ( page_is_launching_page() ) {
 			wp_enqueue_script( 'jurassicninja.js', plugins_url( '', __FILE__ ) . '/jurassicninja.js', false, false, true );
+			do_action( 'jurassic_ninja_enqueue_scripts' );
 		}
 	} );
 }
