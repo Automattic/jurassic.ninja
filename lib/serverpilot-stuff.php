@@ -15,6 +15,28 @@ if ( ! defined( '\\ABSPATH' ) ) {
 
 $serverpilot_instance = null;
 
+add_action( 'jurassic_ninja_init', function() {
+	add_action( 'jurassic_ninja_create_app', function( &$app, $user, $runtime, $domain_arg, $wordpress_options ) {
+		$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg, $wordpress_options );
+	}, 10, 5 );
+	add_action( 'jurassic_ninja_create_sysuser', function( &$return, $username, $password ) {
+		try {
+			$return = create_sp_sysuser( $username, $password );
+		} catch ( \Exception $e ) {
+			$return = new \WP_Error( $e->getCode(), $e->getMessage() );
+		}
+	}, 10, 3 );
+
+	add_filter( 'jurassic_ninja_sysuser_list', function( $users ) {
+		$return = array_merge( $users,  get_sp_sysuser_list() );
+		return $return;
+	} );
+	add_filter( 'jurassic_ninja_delete_site', function( &$return, $user ) {
+		$return = delete_sp_sysuser( $user->id );
+		return $return;
+	}, 10, 2 );
+} );
+
 /**
  * Returns a ServerPilot instance
  * @return [type] [description]
@@ -89,7 +111,7 @@ function delete_sp_sysuser( $id ) {
  * @param  string $app_id The ServerPilot id for the app
  * @return [type]         [description]
  */
-function enable_auto_ssl( $app_id ) {
+function enable_sp_auto_ssl( $app_id ) {
 	try {
 		$data = sp()->ssl_auto( $app_id );
 		wait_for_serverpilot_action( $data->actionid );
@@ -106,7 +128,7 @@ function enable_auto_ssl( $app_id ) {
  * @param  string $app_id The ServerPilot id for the app
  * @return [type]         [description]
  */
-function enable_ssl( $app_id ) {
+function enable_sp_ssl( $app_id ) {
 	$private_key = settings( 'ssl_private_key' );
 	$certificate = settings( 'ssl_certificate' );
 	$ca_certificates = settings( 'ssl_ca_certificates', null );
@@ -130,7 +152,7 @@ function enable_ssl( $app_id ) {
 		 * Leaving it commented in case something breaks eventually.
 		 */
 		// wait_for_serverpilot_action( $data->actionid );
-		
+
 		// Enable redirection from https to http
 		$data = sp()->ssl_force( $app_id, true );
 		wait_for_serverpilot_action( $data->actionid );

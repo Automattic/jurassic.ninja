@@ -13,7 +13,21 @@ if ( ! class_exists( 'RationalOptionPages' ) ) {
 if ( ! class_exists( 'CustomNameGenerator' ) ) {
 	require_once __DIR__ . '/class-customnamegenerator.php';
 }
+
+/**
+ * Attempts to log debug messages if WP_DEBUG is on and the setting for log_debug_messages is on too.
+ */
+function debug() {
+	if ( defined( 'WP_DEBUG' ) && WP_DEBUG && settings( 'log_debug_messages', false ) ) {
+		error_log( call_user_func_array( 'sprintf', func_get_args() ) );
+	}
+}
+
 require_once __DIR__ . '/rest-api-stuff.php';
+require_once __DIR__ . '/features/multisite.php';
+require_once __DIR__ . '/features/ssl.php';
+require_once __DIR__ . '/features/plugins.php';
+require_once __DIR__ . '/serverpilot-stuff.php';
 
 define( 'REST_API_NAMESPACE', 'jurassic.ninja' );
 define( 'COMPANION_PLUGIN_URL', 'https://github.com/oskosk/companion/archive/master.zip' );
@@ -29,7 +43,7 @@ define( 'SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubuserconten
 function add_auto_login( $password, $sysuser ) {
 	$companion_api_base_url = rest_url( REST_API_NAMESPACE );
 	$companion_plugin_url = COMPANION_PLUGIN_URL;
-	$cmd = "wp option add auto_login 1"
+	$cmd = 'wp option add auto_login 1'
 		. " && wp option add jurassic_ninja_sysuser '$sysuser'"
 		. " && wp option add jurassic_ninja_admin_password '$password'"
 		. " && wp option add companion_api_base_url '$companion_api_base_url'"
@@ -39,85 +53,20 @@ function add_auto_login( $password, $sysuser ) {
 	} );
 }
 
-/**
- * Installs and activates the Config Constants plugin on the site.
- */
-function add_config_constants_plugin() {
-	$cmd = 'wp plugin install config-constants --activate';
-	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
-		return "$s && $cmd";
-	} );
-}
-
-/**
- * Installs and activates Gutenberg Plugin on the site.
- */
-function add_gutenberg_plugin() {
-	$cmd = 'wp plugin install gutenberg --activate';
-	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
-		return "$s && $cmd";
-	} );
-}
-
-/**
- * Installs and activates Jetpack on the site.
- */
-function add_jetpack() {
-	$cmd = 'wp plugin install jetpack --activate';
-	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
-		return "$s && $cmd";
-	} );
-}
-
-/**
- * Installs and activates Jetpack Beta Tester plugin on the site.
- */
-function add_jetpack_beta_plugin() {
-	$jetpack_beta_plugin_url = JETPACK_BETA_PLUGIN_URL;
-	$cmd = "wp plugin install $jetpack_beta_plugin_url --activate" ;
-	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
-		return "$s && $cmd";
-	} );
-}
-
-/**
- * Activates jetpack branch in Beta plugin
- */
-function activate_jetpack_branch( $branch_name ) {
-	$cmd = "wp jetpack-beta branch activate $branch_name";
-	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
-		return "$s && $cmd";
-	} );
-}
-
-/**
- * Installs and activates WooCommerce on the site.
- */
-function add_woocommerce_plugin() {
-	$cmd = 'wp plugin install woocommerce --activate' ;
-	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
-		return "$s && $cmd";
-	} );
-}
-
-/**
- * Installs and activates WordPress Beta Tester plugin on the site.
- */
-function add_wordpress_beta_tester_plugin() {
-	$cmd = 'wp plugin install wordpress-beta-tester --activate' ;
-	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
-		return "$s && $cmd";
-	} );
-}
-
-/**
- * Installs and activates the WP Log Viewer plugin on the site.
- */
-function add_wp_log_viewer_plugin() {
-	$cmd = 'wp plugin install wp-log-viewer --activate';
-	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
-		return "$s && $cmd";
-	} );
+function features() {
+	/**
+	 * Filters the array of default values for feature flags
+	 *    add_filter( 'jurassic_ninja_features', function ( $features ) {
+	 *       $features['myfeatures'] = false;
+	 *       return $features;
+	 *    } );
+	 *
+	 * @param array $features array of default values for feature flags
+	*/
+	$features = apply_filters( 'jurassic_ninja_features', [
+		'shortlife' => false,
+	] );
+	return $features;
 }
 
 /**
@@ -139,36 +88,10 @@ function add_wp_log_viewer_plugin() {
  * @return Array|Null                    null or the app data as returned by ServerPilot's API on creation.
  */
 function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
-	/**
-	 * Filters the array of default values for feature flags
-	 *    add_filter( 'jurassic_ninja_features_default_values', function ( $features ) {
-	 *       $features['myfeatures'] = false;
-	 *       return $features;
-	 *    } );
-	 *
-	 * @param array $features array of default values for feature flags
-	*/
-	$default_features = apply_filters( 'jurassic_ninja_features_default_values', [
-		'auto_ssl' => false,
-		'ssl' => false,
-		'config-constants' => false,
-		'gutenberg' => false,
-		'jetpack' => false,
-		'jetpack-beta' => false,
-		'subdir_multisite' => false,
-		'subdomain_multisite' => false,
-		'woocommerce' => false,
-		'wordpress-beta-tester' => false,
-		'wp-debug-log' => false,
-		'wp-log-viewer' => false,
-		'shortlife' => false,
-		'branch' => false,
-	] );
+	$default_features = features();
 	$features = array_merge( $default_features, $requested_features );
 
-	if ( $features['subdir_multisite'] && $features['subdomain_multisite'] ) {
-		throw new \Exception( 'not-both-multisite-types', __( "Don't try to enable both types of multiste" ) );
-	}
+	do_action( 'jurassic_ninja_do_feature_conditions', $features );
 
 	try {
 		$password = generate_random_password();
@@ -178,7 +101,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 			$subdomain = generate_random_subdomain();
 			// Add moar randomness to shortlived sites
 			if ( $features['shortlife'] ) {
-				$subdomain = sprintf( "%s-%s", $subdomain, rand( 2, 500) );
+				$subdomain = sprintf( '%s-%s', $subdomain, rand( 2, 500 ) );
 			}
 		} while ( subdomain_is_used( $subdomain ) && $collision_attempts-- > 0 );
 			// title-case the subdomain
@@ -186,12 +109,12 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		$site_title = settings( 'use_subdomain_based_wordpress_title', false ) ?
 			ucwords( str_replace( '-', ' ', $subdomain ) ) :
 			'My WordPress Site';
-		$wordpress_options = array(
+		$wordpress_options = apply_filters( 'jurassic_ninja_wordpress_options', array(
 			'site_title' => $site_title,
 			'admin_user' => 'demo',
 			'admin_password' => $password,
 			'admin_email' => settings( 'default_admin_email_address' ),
-		);
+		) );
 		$domain = sprintf( '%s.%s', $subdomain, settings( 'domain' ) );
 		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
 		$domain_arg = $features['subdomain_multisite'] ? array( $domain, '*.' . $domain ) : array( $domain );
@@ -204,101 +127,31 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 
 		debug( 'Creating app for %s under sysuser %s', $domain, $user->data->name );
 
-		$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg, $wordpress_options );
+		$app = null;
+
+		do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $user, $runtime, $domain_arg, $wordpress_options ] );
+
 		if ( is_wp_error( $app ) ) {
 			throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
 		}
 		log_new_site( $app->data, $features['shortlife'] );
 
-		// Currently not used but the code works.
-		if ( $features['auto_ssl'] ) {
-			enable_auto_ssl( $app->data->id );
-		}
-		// We can't easily enable SSL for subodmains because
-		// wildcard certificates don't support multiple levels of subdomains
-		// and this can result in awful experience.
-		// Need to explorer a little bit better
-		if ( $features['ssl'] && ! $features['subdomain_multisite'] ) {
-			if ( $features['auto_ssl'] ) {
-				debug( 'Both ssl and auto_ssl features were requested. Ignoring ssl and launching with auto_ssl' );
-			} else {
-				debug( '%s: Enabling custom SSL', $domain );
-				$response = enable_ssl( $app->data->id );
-				if ( is_wp_error( $response ) ) {
-					debug( 'Error enabling SSL for %s. Check the next log line for a dump of the WP_Error', $domain );
-					debug( print_r( $response, true ) );
-					throw new \Exception( 'Error creating sysuser: ' . $return->get_error_message() );
-				}
-			}
-		}
-
-		if ( $features['jetpack'] ) {
-			debug( '%s: Adding Jetpack', $domain );
-			add_jetpack();
-		}
-
-		if ( $features['jetpack-beta'] ) {
-			debug( '%s: Adding Jetpack Beta Tester Plugin', $domain );
-			add_jetpack_beta_plugin();
-		}
-
-		if ( $features['branch'] ) {
-			debug( '%s: Activating Jetpack %s branch in Beta plugin', $domain, $features["branch"]);
-			activate_jetpack_branch($features['branch']);
-		}
-
-		if ( $features['wordpress-beta-tester'] ) {
-			debug( '%s: Adding WordPress Beta Tester Plugin', $domain );
-			add_wordpress_beta_tester_plugin();
-		}
-
-		if ( $features['wp-debug-log'] ) {
-			debug( '%s: Setting WP_DEBUG_LOG and WP_DEBUG_LOG to true', $domain );
-			set_wp_debug_log();
-		}
-
-		if ( $features['config-constants'] ) {
-			debug( '%s: Adding Config Constants Plugin', $domain );
-			add_config_constants_plugin();
-		}
-
-		if ( $features['wp-log-viewer'] ) {
-			debug( '%s: Adding WP Log Viewer Plugin', $domain );
-			add_wp_log_viewer_plugin();
-		}
-
-		if ( $features['gutenberg'] ) {
-			debug( '%s: Adding Gutenberg', $domain );
-			add_gutenberg_plugin();
-		}
-
-		if ( $features['woocommerce'] ) {
-			debug( '%s: Adding WooCommerce', $domain );
-			add_woocommerce_plugin();
-		}
-		debug( '%s: Adding Companion Plugin for Auto Login', $domain );
-		add_auto_login( $password, $user->data->name );
-
-		if ( $features['subdir_multisite'] ) {
-			debug( '%s: Enabling subdir based multisite', $domain );
-			enable_subdir_multisite( $domain );
-		}
-
-		if ( $features['subdomain_multisite'] ) {
-			debug( '%s: Enabling subdomain based multisite', $domain );
-			enable_subdomain_multisite( $domain );
-		}
 		/**
 		 * Allow the enqueue of commands for features with each launched site.
 		 * @param array $features The current feature flags
 		 */
-		do_action( 'jurassic_ninja_add_features', $features );
+		do_action_ref_array( 'jurassic_ninja_add_features_before_auto_login', [ &$app, $features, $domain ] );
+
+		debug( '%s: Adding Companion Plugin for Auto Login', $domain );
+		add_auto_login( $password, $user->data->name );
+
+		do_action_ref_array( 'jurassic_ninja_add_features_after_auto_login', [ &$app, $features, $domain ] );
 
 		// Runs the command via SSH
 		// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
 		debug( '%s: Adding features', $domain );
 		run_commands_for_features( $user->data->name, $password, $domain );
-		//update_sp_sysuser( $user->data->id, null );
+
 		debug( 'Finished launching %s', $domain );
 		return $app->data;
 	} catch ( \Exception $e ) {
@@ -317,39 +170,6 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 function create_slug( $str, $delimiter = '-' ) {
 	$slug = strtolower( trim( preg_replace( '/[\s-]+/', $delimiter, preg_replace( '/[^A-Za-z0-9-]+/', $delimiter, preg_replace( '/[&]/', 'and', preg_replace( '/[\']/', '', iconv( 'UTF-8', 'ASCII//TRANSLIT', $str ) ) ) ) ), $delimiter ) );
 	return $slug;
-}
-
-/**
- * Enables subdir-based multisite on a WordPress instance
- * @param string  $domain          The main domain for the site
- * @return [type]                   [description]
- */
-function enable_subdir_multisite( $domain ) {
-	$file_url = SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL;
-	$email = settings( 'default_admin_email_address' );
-	$cmd = "wp core multisite-install --title=\"subdir-based Network\" --url=\"$domain\" --admin_email=\"$email\" --skip-email"
-		. " && cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess";
-	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
-		return "$s && $cmd";
-	} );
-}
-
-/**
- * Enables subdomain-based multisite on a WordPress instance
- * @param string  $domain          The main domain for the site.
- * @return [type]                   [description]
- */
-function enable_subdomain_multisite( $domain ) {
-	$file_url = SUBDOMAIN_MULTISITE_HTACCESS_TEMPLATE_URL;
-	$email = settings( 'default_admin_email_address' );
-	// For some reason, the option auto_login gets set to a 0 after enabling multisite-install,
-	// like if there were a sort of inside login happening magically.
-	$cmd = "wp core multisite-install --title=\"subdomain-based Network\" --url=\"$domain\" --admin_email=\"$email\" --subdomains --skip-email"
-		. " && cp .htaccess .htaccess-not-multisite && wget '$file_url' -O .htaccess"
-		. ' && wp option update auto_login 1';
-	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
-		return "$s && $cmd";
-	} );
 }
 
 /**
@@ -406,7 +226,9 @@ function figure_out_main_domain( $domains ) {
  */
 function generate_new_user( $password ) {
 	$username = generate_random_username();
-	$return = create_sp_sysuser( $username, $password );
+	$return = null;
+	do_action_ref_array( 'jurassic_ninja_create_sysuser', [ &$return, $username, $password ] );
+
 	if ( is_wp_error( $return ) ) {
 		throw new \Exception( 'Error creating sysuser: ' . $return->get_error_message() );
 	}
@@ -570,7 +392,7 @@ function mark_site_as_checked_in( $domain ) {
  */
 function purge_sites() {
 	$sites = sites_to_be_purged();
-	$system_users  = get_sp_sysuser_list();
+	$system_users  = apply_filters( 'jurassic_ninja_sysuser_list', [] );
 	if ( is_wp_error( $system_users ) ) {
 		debug( 'There was an error fetching users list for purging: (%s) - %s',
 			$system_users->get_error_code(),
@@ -588,7 +410,7 @@ function purge_sites() {
 			return in_array( $user->name, $site_users, true );
 	} );
 	foreach ( $purge as $user ) {
-		$return = delete_sp_sysuser( $user->id );
+		do_action_ref_array( 'jurassic_ninja_delete_site', [ &$return, $user ] );
 		if ( is_wp_error( $return ) ) {
 			debug( 'There was an error purging site for user %s: (%s) - %s',
 				$user->id,
@@ -627,7 +449,7 @@ function run_command_on_behalf( $user, $password, $cmd ) {
 	if ( 0 !== $return_value ) {
 		debug( 'Commands run finished with code %s and output: %s',
 			$return_value,
-			implode( " -> ", $output )
+			implode( ' -> ', $output )
 		);
 		return new \WP_Error(
 			'commands_did_not_run_successfully',
@@ -668,15 +490,6 @@ function run_commands_for_features( $user, $password, $domain ) {
 	debug( '%s: Commands run OK', $domain );
 }
 
-function set_wp_debug_log() {
-	$cmd = 'wp config --type=constant set WP_DEBUG true'
-		. ' && wp config --type=constant set WP_DEBUG_LOG true'
-		. ' && touch wp-content/debug.log';
-	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
-		return "$s && $cmd";
-	} );
-}
-
 /**
  * Calculates and returns sites that the creator has never visited.
  * @return [type] [description]
@@ -695,9 +508,6 @@ function sites_never_checked_in() {
  */
 function sites_to_be_purged() {
 	$expired = expired_sites();
-	// TODO BETTER STRATEGY FOR WIPING OUT EARLY THOSE SITES THAT NEVER GOT VISITED AT ALL
-	// CURRENTLY THE last_logged_in datetime is filled if the user logs in with user/password
-	// and not on the first time they reach the site's dashboard.
 	$unused = sites_never_checked_in();
 	return array_merge( $expired, $unused );
 }
@@ -705,21 +515,12 @@ function sites_to_be_purged() {
 /**
  * Checks if a subdomain is already user by a running site.
  *
- * @param $subdomain	The subdomain to check for collision with an already launched site.
- * @return bool			Return true if the domain is used by a running site.
+ * @param $subdomain    The subdomain to check for collision with an already launched site.
+ * @return bool         Return true if the domain is used by a running site.
  */
 function subdomain_is_used( $subdomain ) {
-	$domain = sprintf( "%s.%s", $subdomain, settings( 'domain' ) );
+	$domain = sprintf( '%s.%s', $subdomain, settings( 'domain' ) );
 	$results = db()->get_results( "select * from sites where domain='$domain' limit 1", \ARRAY_A );
 	return count( $results ) !== 0;
-}
-
-/**
- * Attempts to log debug messages if WP_DEBUG is on and the setting for log_debug_messages is on too.
- */
-function debug() {
-	if ( defined( 'WP_DEBUG' ) && WP_DEBUG && settings( 'log_debug_messages', false ) ) {
-		error_log( call_user_func_array( 'sprintf', func_get_args() ) );
-	}
 }
 
