@@ -57,6 +57,14 @@ add_action( 'jurassic_ninja_init', function() {
 			add_woocommerce_plugin();
 		}
 	}, 10, 3 );
+
+	add_filter( 'create_endpoint_feature_defaults', function( $defaults ) {
+		return array_merge( $defaults, [
+			'jetpack' => (bool) settings( 'add_jetpack_by_default', true ),
+			'jetpack-beta' => (bool) settings( 'add_jetpack_beta_by_default', false ),
+			'woocommerce' => (bool) settings( 'add_woocommerce_by_default', false ),
+		] );
+	} );
 } );
 
 add_action( 'jurassic_ninja_admin_init', function() {

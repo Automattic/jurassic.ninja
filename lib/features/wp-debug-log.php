@@ -15,6 +15,12 @@ add_action( 'jurassic_ninja_init', function() {
 			set_wp_debug_log();
 		}
 	}, 1, 3 );
+
+	add_filter( 'create_endpoint_feature_defaults', function( $defaults ) {
+		return array_merge( $defaults, [
+			'wp-debug-log' => (bool) settings( 'set_wp_debug_log_by_default', false ),
+		] );
+	} );
 } );
 
 function set_wp_debug_log() {

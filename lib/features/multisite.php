@@ -29,6 +29,12 @@ add_action( 'jurassic_ninja_init', function() {
 			enable_subdomain_multisite( $domain );
 		}
 	}, 10, 3 );
+
+	add_filter( 'create_endpoint_feature_defaults', function( $defaults ) {
+		return array_merge( $defaults, [
+			'subdomain_multisite' => false,
+		] );
+	} );
 } );
 
 /**

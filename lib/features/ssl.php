@@ -34,7 +34,11 @@ add_action( 'jurassic_ninja_init', function() {
 			}
 		}
 	}, 10, 3 );
-
+	add_filter( 'create_endpoint_feature_defaults', function( $defaults ) {
+		return array_merge( $defaults, [
+			'ssl' => (bool) settings( 'ssl_use_custom_certificate', false ),
+		] );
+	} );
 } );
 
 add_action( 'jurassic_ninja_admin_init', function() {

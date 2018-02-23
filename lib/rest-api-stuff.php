@@ -22,15 +22,7 @@ function add_rest_api_endpoints() {
 		},
 	];
 	add_post_endpoint( 'create', function ( $request ) {
-		$defaults = [
-			'jetpack' => (bool)settings( 'add_jetpack_by_default', true ),
-			'jetpack-beta' => (bool) settings( 'add_jetpack_beta_by_default', false ),
-			'woocommerce' => (bool) settings( 'add_woocommerce_by_default', false ),
-			'wp-debug-log' => (bool) settings( 'set_wp_debug_log_by_default', false ),
-			'shortlife' => false,
-			'subdomain_multisite' => false,
-			'ssl' => (bool) settings( 'ssl_use_custom_certificate', false ),
-		];
+		$defaults = create_endpoint_feature_defaults();
 		$json_params = $request->get_json_params();
 
 		if ( ! settings( 'enable_launching', true ) ) {
@@ -258,4 +250,11 @@ function get_jetpack_beta_url( $branch_name ) {
 	if ( isset( $manifest->pr->{$branch_name}->download_url ) ) {
 		return $manifest->pr->{$branch_name}->download_url;
 	}
+}
+
+function create_endpoint_feature_defaults( $defaults ) {
+	$defaults = [
+		'shortlife' => false,
+	];
+	return apply_filters( 'create_endpoint_feature_defaults', $defaults );
 }
