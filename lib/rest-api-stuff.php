@@ -44,7 +44,6 @@ function add_rest_api_endpoints() {
 		 * @param array $json_params The body of the json request.
 		 */
 		$features = apply_filters( 'jurassic_ninja_rest_create_request_features', $features, $json_params );
-
 		if ( is_wp_error( $features ) ) {
 			return $features;
 		}
@@ -60,7 +59,7 @@ function add_rest_api_endpoints() {
 			);
 		}
 
-		$url = apply_filter( 'jurassic_ninja_created_site_url', $features );
+		$url = apply_filters( 'jurassic_ninja_created_site_url', figure_out_main_domain( $data->domains ), $features );
 
 		$output = [
 			'url' => $url,
@@ -92,7 +91,7 @@ function add_rest_api_endpoints() {
 			);
 		}
 
-		$url = apply_filter( 'jurassic_ninja_created_site_url', $features );
+		$url = apply_filter( 'jurassic_ninja_created_site_url', figure_out_main_domain( $data->domains ), $features );
 
 		$output = [
 			'url' => $url,
@@ -210,7 +209,7 @@ function add_endpoint( $namespace, $path, $callback, $register_rest_route_option
 	} );
 }
 
-function create_endpoint_feature_defaults( $defaults ) {
+function create_endpoint_feature_defaults() {
 	$defaults = [
 		'shortlife' => false,
 	];

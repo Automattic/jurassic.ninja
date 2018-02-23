@@ -27,6 +27,13 @@ require_once __DIR__ . '/rest-api-stuff.php';
 require_once __DIR__ . '/features/multisite.php';
 require_once __DIR__ . '/features/ssl.php';
 require_once __DIR__ . '/features/plugins.php';
+require_once __DIR__ . '/features/config-constants.php';
+require_once __DIR__ . '/features/gutenberg.php';
+require_once __DIR__ . '/features/jetpack-beta.php';
+require_once __DIR__ . '/features/woocommerce.php';
+require_once __DIR__ . '/features/wordpress-beta-tester.php';
+require_once __DIR__ . '/features/wp-debug-log.php';
+require_once __DIR__ . '/features/wp-log-viewer.php';
 require_once __DIR__ . '/serverpilot-stuff.php';
 
 define( 'REST_API_NAMESPACE', 'jurassic.ninja' );
@@ -89,6 +96,7 @@ function features() {
  */
 function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 	$default_features = features();
+
 	$features = array_merge( $default_features, $requested_features );
 
 	do_action( 'jurassic_ninja_do_feature_conditions', $features );

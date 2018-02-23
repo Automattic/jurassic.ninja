@@ -40,12 +40,12 @@ add_action( 'jurassic_ninja_init', function() {
 		] );
 	} );
 
-	add_filter( 'jurassic_ninja_created_site_url', function( $defaults ) {
+	add_filter( 'jurassic_ninja_created_site_url', function( $domain, $features ) {
 		// See note in launch_wordpress() about why we can't launch subdomain_multisite with ssl.
 		$schema = $features['ssl'] && ! $features['subdomain_multisite'] ? 'https' : 'http';
-		$url = "$schema://" . figure_out_main_domain( $data->domains );
+		$url = "$schema://" . $domain;
 		return $url;
-	} );
+	}, 10, 2 );
 } );
 
 add_action( 'jurassic_ninja_admin_init', function() {
