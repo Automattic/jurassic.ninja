@@ -58,13 +58,39 @@ add_action( 'jurassic_ninja_init', function() {
 		}
 	}, 10, 3 );
 
-	add_filter( 'create_endpoint_feature_defaults', function( $defaults ) {
+	add_filter( 'jurassic_ninja_create_endpoint_feature_defaults', function( $defaults ) {
 		return array_merge( $defaults, [
 			'jetpack' => (bool) settings( 'add_jetpack_by_default', true ),
 			'jetpack-beta' => (bool) settings( 'add_jetpack_beta_by_default', false ),
 			'woocommerce' => (bool) settings( 'add_woocommerce_by_default', false ),
 		] );
 	} );
+
+	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) {
+		if ( isset( $json_params['jetpack'] ) ) {
+			$features['jetpack'] = $json_params['jetpack'];
+		}
+		if ( isset( $json_params['woocommerce'] ) ) {
+			$features['woocommerce'] = $json_params['woocommerce'];
+		}
+		if ( isset( $json_params['jetpack-beta'] ) ) {
+			$url = get_jetpack_beta_url( $json_params['branch'] );
+
+			if ( null === $url ) {
+				return new \WP_Error(
+					'failed_to_launch_site_with_branch',
+					esc_html__( 'Invalid branch name or not ready yet: ' . $json_params['branch'] ),
+					[
+						'status' => 400,
+					]
+				);
+			}
+			$features['jetpack-beta'] = $json_params['jetpack-beta'];
+			$features['branch'] = $json_params['branch'];
+		}
+
+		return $features;
+	}, 10, 2 );
 } );
 
 add_action( 'jurassic_ninja_admin_init', function() {
@@ -180,4 +206,19 @@ function add_wp_log_viewer_plugin() {
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );
+}
+
+
+function get_jetpack_beta_url( $branch_name ) {
+	$branch_name = str_replace( '/', '_', $branch_name );
+	$manifest_url = 'https://betadownload.jetpack.me/jetpack-branches.json';
+	$manifest = json_decode( wp_remote_retrieve_body( wp_remote_get( $manifest_url ) ) );
+
+	if ( ( 'rc' === $branch_name || 'master' === $branch_name ) && isset( $manifest->{$branch_name}->download_url ) ) {
+		return $manifest->{$branch_name}->download_url;
+	}
+
+	if ( isset( $manifest->pr->{$branch_name}->download_url ) ) {
+		return $manifest->pr->{$branch_name}->download_url;
+	}
 }

@@ -34,15 +34,6 @@ function add_rest_api_endpoints() {
 		$features = array_merge( $defaults, [
 			'shortlife' => isset( $json_params['shortlived'] ) && (bool) $json_params['shortlived'],
 		] );
-		if ( isset( $json_params['jetpack'] ) ) {
-			$features['jetpack'] = $json_params['jetpack'];
-		}
-		if ( isset( $json_params['woocommerce'] ) ) {
-			$features['woocommerce'] = $json_params['woocommerce'];
-		}
-		if ( isset( $json_params['wp-debug-log'] ) ) {
-			$features['wp-debug-log'] = $json_params['wp-debug-log'];
-		}
 
 		/**
 		 * Filters the features requested through the /create REST API endpoint
@@ -56,22 +47,6 @@ function add_rest_api_endpoints() {
 
 		if ( is_wp_error( $features ) ) {
 			return $features;
-		}
-
-		if ( isset( $json_params['jetpack-beta'] ) ) {
-			$url = get_jetpack_beta_url( $json_params['branch'] );
-
-			if ( $url === null ) {
-				return new \WP_Error(
-					'failed_to_launch_site_with_branch',
-					esc_html__( 'Invalid branch name or not ready yet: ' . $json_params['branch'] ),
-					[
-						'status' => 400,
-					]
-				);
-			}
-			$features['jetpack-beta'] = $json_params['jetpack-beta'];
-			$features['branch'] = $json_params['branch'];
 		}
 
 		$data = launch_wordpress( 'php7.0', $features );
@@ -238,23 +213,9 @@ function add_endpoint( $namespace, $path, $callback, $register_rest_route_option
 	} );
 }
 
-function get_jetpack_beta_url( $branch_name ) {
-	$branch_name = str_replace( '/', '_', $branch_name );
-	$manifest_url = "https://betadownload.jetpack.me/jetpack-branches.json";
-	$manifest = json_decode( wp_remote_retrieve_body( wp_remote_get( $manifest_url ) ) );
-
-	if ( ( 'rc' === $branch_name || 'master' === $branch_name ) && isset( $manifest->{$branch_name}->download_url ) ) {
-		return $manifest->{$branch_name}->download_url;
-	}
-
-	if ( isset( $manifest->pr->{$branch_name}->download_url ) ) {
-		return $manifest->pr->{$branch_name}->download_url;
-	}
-}
-
 function create_endpoint_feature_defaults( $defaults ) {
 	$defaults = [
 		'shortlife' => false,
 	];
-	return apply_filters( 'create_endpoint_feature_defaults', $defaults );
+	return apply_filters( 'jurassic_ninja_create_endpoint_feature_defaults', $defaults );
 }
