@@ -39,6 +39,13 @@ add_action( 'jurassic_ninja_init', function() {
 			'ssl' => (bool) settings( 'ssl_use_custom_certificate', false ),
 		] );
 	} );
+
+	add_filter( 'jurassic_ninja_created_site_url', function( $defaults ) {
+		// See note in launch_wordpress() about why we can't launch subdomain_multisite with ssl.
+		$schema = $features['ssl'] && ! $features['subdomain_multisite'] ? 'https' : 'http';
+		$url = "$schema://" . figure_out_main_domain( $data->domains );
+		return $url;
+	} );
 } );
 
 add_action( 'jurassic_ninja_admin_init', function() {

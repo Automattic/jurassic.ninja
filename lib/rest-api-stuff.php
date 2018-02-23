@@ -59,9 +59,8 @@ function add_rest_api_endpoints() {
 				]
 			);
 		}
-		// See note in launch_wordpress() about why we can't launch subdomain_multisite with ssl.
-		$schema = $features['ssl'] && ! $features['subdomain_multisite'] ? 'https' : 'http';
-		$url = "$schema://" . figure_out_main_domain( $data->domains );
+
+		$url = apply_filter( 'jurassic_ninja_created_site_url', $features );
 
 		$output = [
 			'url' => $url,
@@ -70,11 +69,9 @@ function add_rest_api_endpoints() {
 	}, $permission_callback );
 
 	add_post_endpoint( 'specialops/create', function ( $request ) {
+		$defaults = create_endpoint_feature_defaults();
 		$json_params = $request->get_json_params();
-		$defaults = [
-			'subdomain_multisite' => false,
-			'ssl' => (bool) settings( 'ssl_use_custom_certificate', false ),
-		];
+
 		$features = $json_params && is_array( $json_params ) ? $json_params : [];
 		$features = array_merge( $defaults, $features );
 		if ( ! settings( 'enable_launching', true ) ) {
@@ -84,6 +81,7 @@ function add_rest_api_endpoints() {
 		}
 
 		$data = launch_wordpress( $features['runtime'], $features );
+
 		if ( null === $data ) {
 			return new \WP_Error(
 				'failed_to_launch_site',
@@ -93,9 +91,8 @@ function add_rest_api_endpoints() {
 				]
 			);
 		}
-		// See note in launch_wordpress() about why we can't launch subdomain_multisite with ssl.
-		$schema = $features['ssl'] && ! $features['subdomain_multisite'] ? 'https' : 'http';
-		$url = "$schema://" . figure_out_main_domain( $data->domains );
+
+		$url = apply_filter( 'jurassic_ninja_created_site_url', $features );
 
 		$output = [
 			'url' => $url,
