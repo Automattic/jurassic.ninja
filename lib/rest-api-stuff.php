@@ -213,5 +213,5 @@ function create_endpoint_feature_defaults() {
 	$defaults = [
 		'shortlife' => false,
 	];
-	return apply_filters( 'jurassic_ninja_create_endpoint_feature_defaults', $defaults );
+	return apply_filters( 'jurassic_ninja_rest_feature_defaults', $defaults );
 }
