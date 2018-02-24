@@ -163,7 +163,10 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		'wp-log-viewer' => false,
 		'shortlife' => false,
 		'branch' => false,
-	] );
+		'username' => false,
+		'password' => false,
+		'autologin' => true
+	];
 	$features = array_merge( $default_features, $requested_features );
 
 	if ( $features['subdir_multisite'] && $features['subdomain_multisite'] ) {
@@ -171,7 +174,8 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 	}
 
 	try {
-		$password = generate_random_password();
+		$password = ( $features[ 'password' ] ) ? $features[ 'password' ] : generate_random_password();
+		$username = ( $features[ 'username' ] ) ? $features[ 'username' ] : 'demo';
 		$subdomain = '';
 		$collision_attempts = 10;
 		do {
@@ -188,7 +192,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 			'My WordPress Site';
 		$wordpress_options = array(
 			'site_title' => $site_title,
-			'admin_user' => 'demo',
+			'admin_user' => $username,
 			'admin_password' => $password,
 			'admin_email' => settings( 'default_admin_email_address' ),
 		);
@@ -200,7 +204,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 
 		debug( 'Creating sysuser for %s', $domain );
 
-		$user = generate_new_user( $password );
+		$user = generate_new_user( $password, $username );
 
 		debug( 'Creating app for %s under sysuser %s', $domain, $user->data->name );
 
@@ -276,8 +280,11 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 			debug( '%s: Adding WooCommerce', $domain );
 			add_woocommerce_plugin();
 		}
-		debug( '%s: Adding Companion Plugin for Auto Login', $domain );
-		add_auto_login( $password, $user->data->name );
+		
+		if ( $features['autologin'] ) {
+			debug( '%s: Adding Companion Plugin for Auto Login', $domain );
+			add_auto_login( $password, $user->data->name );
+		}
 
 		if ( $features['subdir_multisite'] ) {
 			debug( '%s: Enabling subdir based multisite', $domain );
@@ -404,8 +411,8 @@ function figure_out_main_domain( $domains ) {
  * @param  string $password The password to be assigned for the user
  * @return [type]           [description]
  */
-function generate_new_user( $password ) {
-	$username = generate_random_username();
+function generate_new_user( $password, $name ) {
+	$username = ($name === 'demo' ) ? generate_random_username() : $name;
 	$return = create_sp_sysuser( $username, $password );
 	if ( is_wp_error( $return ) ) {
 		throw new \Exception( 'Error creating sysuser: ' . $return->get_error_message() );

@@ -8,29 +8,7 @@ init();
 
 function init() {
 	if ( isCreatePage() ) {
-		const shortlived = param( 'shortlived' );
-		const jetpack = param( 'jetpack' );
-		const woocommerce = param( 'woocommerce' );
-		const jetpack_beta = param( 'jetpack-beta' );
-		const wp_debug_log = param( 'wp-debug-log' )
-		const branch = param( 'branch' )
-		const features = {};
-		if ( shortlived !== null ) {
-			features.shortlived = shortlived;
-		}
-		if ( jetpack !== null ) {
-			features.jetpack = jetpack;
-		}
-		if ( woocommerce !== null ) {
-			features.woocommerce = woocommerce;
-		}
-		if ( wp_debug_log !== null ) {
-			features[ 'wp-debug-log' ] = wp_debug_log;
-		}
-		if ( jetpack_beta !== null ) {
-			features[ 'jetpack-beta' ] = jetpack_beta;
-			features.branch = ( branch !== null ? branch : 'stable' );
-		}
+		const features = extractFeatures();
 
 		setTimeout( () => {
 			launchSite( jQuery, features );
@@ -119,24 +97,32 @@ function stopSpinner( error = false ) {
 	}
 }
 
-function param( name ) {
-	let params;
-	if ( location.search ) {
-		let params = location.search.split( '?' )[1].split( '&' );
-		// branch option is only valid when jetpack-beta is used.
-		if ( name == 'branch' && params.includes( 'jetpack-beta' ) ) {
-			let branch = params.filter( param => param.startsWith( 'branch' ) )
-			return branch.length ? branch[0].split( '=' )[1] : 'master'
-		}
-		if ( params.includes( name ) ) {
-			return true;
-		}
-		if ( params.includes( 'no' + name ) ) {
-			return false;
-		}
+function extractFeatures() {
+	if ( !location.search ) {
 		return null;
 	}
-	return null;
+
+	let params = location.search.split('?')[1].split('&');
+	let features = {};
+
+	for (var p of params) {
+		if ( p.includes( '=' ) ) {
+			const splitedParam = p.split( '=' )
+			features[ splitedParam[0] ] = splitedParam[1]
+		} else {
+			if ( p.startsWith( 'no' ) ) {
+				features[ p.slice( 2 ) ] = false
+			} else {
+				features[ p ] = true
+			}
+		}
+	}
+
+	if ( features[ 'jetpack-beta'] ) {
+		features.branch = ( features.branch !== null ? features.branch : 'stable' );
+	}
+
+	return features
 }
 
 function jurassicNinjaApi() {
