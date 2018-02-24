@@ -96,10 +96,6 @@ function collectFeaturesFromQueryString() {
 		}
 	}
 
-	if ( features['jetpack-beta'] ) {
-		features.branch = ( features.branch !== null ? features.branch : 'stable' );
-	}
-
 	return features;
 }
 
