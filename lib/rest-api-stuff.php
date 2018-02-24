@@ -91,7 +91,7 @@ function add_rest_api_endpoints() {
 			);
 		}
 
-		$url = apply_filter( 'jurassic_ninja_created_site_url', figure_out_main_domain( $data->domains ), $features );
+		$url = apply_filters( 'jurassic_ninja_created_site_url', figure_out_main_domain( $data->domains ), $features );
 
 		$output = [
 			'url' => $url,
