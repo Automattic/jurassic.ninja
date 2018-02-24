@@ -3,13 +3,12 @@
 namespace jn;
 
 add_action( 'jurassic_ninja_init', function() {
-	add_filter( 'jurassic_ninja_features', function( $features ) {
-		return array_merge( $features, [
-			'wordpress-beta-tester' => false,
-		] );
-	} );
+	$defaults = [
+		'wordpress-beta-tester' => false,
+	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) {
+	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+		$features = array_merge( $defaults, $features );
 		if ( $features['wordpress-beta-tester'] ) {
 			debug( '%s: Adding WordPress Beta Tester Plugin', $domain );
 			add_wordpress_beta_tester_plugin();

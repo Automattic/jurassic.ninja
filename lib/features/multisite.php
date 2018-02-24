@@ -3,20 +3,20 @@
 namespace jn;
 
 add_action( 'jurassic_ninja_init', function() {
-	add_filter( 'jurassic_ninja_features', function( $features ) {
-		return array_merge( $features, [
-			'subdir_multisite' => false,
-			'subdomain_multisite' => false,
-		] );
-	} );
+	$defaults = [
+		'subdir_multisite' => false,
+		'subdomain_multisite' => false,
+	];
 
-	add_action( 'jurassic_ninja_do_feature_conditions', function( $features ) {
+	add_action( 'jurassic_ninja_do_feature_conditions', function( $features ) use ( $defaults ) {
+		$features = array_merge( $defaults, $features );
 		if ( $features['subdir_multisite'] && $features['subdomain_multisite'] ) {
 			throw new \Exception( 'not-both-multisite-types', __( "Don't try to enable both types of multisite" ) );
 		}
 	} );
 
-	add_action( 'jurassic_ninja_add_features_after_auto_login', function( &$app, $features, $domain ) {
+	add_action( 'jurassic_ninja_add_features_after_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+		$features = array_merge( $defaults, $features );
 		// Enabling multisite is done very late so we can install plugins first without
 		// having to decide if network activate them afterwards.
 		if ( $features['subdir_multisite'] ) {

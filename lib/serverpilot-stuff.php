@@ -16,9 +16,12 @@ if ( ! defined( '\\ABSPATH' ) ) {
 $serverpilot_instance = null;
 
 add_action( 'jurassic_ninja_init', function() {
-	add_action( 'jurassic_ninja_create_app', function( &$app, $user, $runtime, $domain_arg, $wordpress_options ) {
+	add_action( 'jurassic_ninja_create_app', function( &$app, $user, $runtime, $domain, $wordpress_options, $features ) {
+		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
+		$domain_arg = isset( $features['subdomain_multisite'] ) && $features['subdomain_multisite'] ? array( $domain, '*.' . $domain ) : array( $domain );
+
 		$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg, $wordpress_options );
-	}, 10, 5 );
+	}, 10, 6 );
 	add_action( 'jurassic_ninja_create_sysuser', function( &$return, $username, $password ) {
 		try {
 			$return = create_sp_sysuser( $username, $password );

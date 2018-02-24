@@ -60,22 +60,6 @@ function add_auto_login( $password, $sysuser ) {
 	} );
 }
 
-function features() {
-	/**
-	 * Filters the array of default values for feature flags
-	 *    add_filter( 'jurassic_ninja_features', function ( $features ) {
-	 *       $features['myfeatures'] = false;
-	 *       return $features;
-	 *    } );
-	 *
-	 * @param array $features array of default values for feature flags
-	*/
-	$features = apply_filters( 'jurassic_ninja_features', [
-		'shortlife' => false,
-	] );
-	return $features;
-}
-
 /**
  * Launches a new WordPress instance on the managed server
  * @param  String  $runtime              The PHP runtime versino to run the app on.
@@ -95,10 +79,10 @@ function features() {
  * @return Array|Null                    null or the app data as returned by ServerPilot's API on creation.
  */
 function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
-	$default_features = features();
-
+	$default_features = [
+		'shortlife' => false,
+	];
 	$features = array_merge( $default_features, $requested_features );
-
 	do_action( 'jurassic_ninja_do_feature_conditions', $features );
 
 	try {
@@ -124,8 +108,6 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 			'admin_email' => settings( 'default_admin_email_address' ),
 		) );
 		$domain = sprintf( '%s.%s', $subdomain, settings( 'domain' ) );
-		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
-		$domain_arg = $features['subdomain_multisite'] ? array( $domain, '*.' . $domain ) : array( $domain );
 
 		debug( 'Launching %s with features: %s', $domain, implode( ', ' , array_keys( array_filter( $features ) ) ) );
 
@@ -137,7 +119,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 
 		$app = null;
 
-		do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $user, $runtime, $domain_arg, $wordpress_options ] );
+		do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $user, $runtime, $domain, $wordpress_options, $features ] );
 
 		if ( is_wp_error( $app ) ) {
 			throw new \Exception( 'Error creating app: ' . $app->get_error_message() );

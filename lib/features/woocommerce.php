@@ -3,13 +3,12 @@
 namespace jn;
 
 add_action( 'jurassic_ninja_init', function() {
-	add_filter( 'jurassic_ninja_features', function( $features ) {
-		return array_merge( $features, [
-			'woocommerce' => false,
-		] );
-	} );
+	$defaults = [
+		'woocommerce' => false,
+	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) {
+	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+		$features = array_merge( $defaults, $features );
 		if ( $features['woocommerce'] ) {
 			debug( '%s: Adding WooCommerce', $domain );
 			add_woocommerce_plugin();

@@ -3,13 +3,12 @@
 namespace jn;
 
 add_action( 'jurassic_ninja_init', function() {
-	add_filter( 'jurassic_ninja_features', function( $features ) {
-		return array_merge( $features, [
-			'config-constants' => false,
-		] );
-	} );
+	$defaults = [
+		'config-constants' => false,
+	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) {
+	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+		$features = array_merge( $defaults, $features );
 		if ( $features['config-constants'] ) {
 			debug( '%s: Adding Config Constants Plugin', $domain );
 			add_config_constants_plugin();

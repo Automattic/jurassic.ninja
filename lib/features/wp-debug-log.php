@@ -3,13 +3,12 @@
 namespace jn;
 
 add_action( 'jurassic_ninja_init', function() {
-	add_filter( 'jurassic_ninja_features', function( $features ) {
-		return array_merge( $features, [
-			'wp-debug-log' => false,
-		] );
-	} );
+	$defaults = [
+		'wp-debug-log' => false,
+	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) {
+	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+		$features = array_merge( $defaults, $features );
 		if ( $features['wp-debug-log'] ) {
 			debug( '%s: Setting WP_DEBUG_LOG and WP_DEBUG_LOG to true', $domain );
 			set_wp_debug_log();

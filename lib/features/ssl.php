@@ -3,15 +3,13 @@
 namespace jn;
 
 add_action( 'jurassic_ninja_init', function() {
-	add_filter( 'jurassic_ninja_features', function( $features ) {
-		return array_merge( $features, [
-			'auto_ssl' => false,
-			'ssl' => false,
-		] );
-	} );
+	$defaults = [
+		'auto_ssl' => false,
+		'ssl' => false,
+	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) {
-
+	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+		$features = array_merge( $defaults, $features );
 		// Currently not used but the code works.
 		if ( $features['auto_ssl'] ) {
 			enable_sp_auto_ssl( $app->data->id );

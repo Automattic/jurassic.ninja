@@ -3,14 +3,13 @@
 namespace jn;
 
 add_action( 'jurassic_ninja_init', function() {
-	add_filter( 'jurassic_ninja_features', function( $features ) {
-		return array_merge( $features, [
-			'jetpack' => false,
-			'branch' => false,
-		] );
-	} );
+	$defaults = [
+		'jetpack' => false,
+		'branch' => false,
+	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) {
+	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+		$features = array_merge( $defaults, $features );
 		if ( $features['jetpack'] ) {
 			debug( '%s: Adding Jetpack', $domain );
 			add_jetpack();

@@ -15,7 +15,6 @@ Create page -> REST API endpoint /create -> launch_wordpress -> Site purge
 The `launch_wordpress` step can be subdivided like:
 
 ```
-1. Identify available features and their defaults (`jurassic_ninja_features` filter).
 2. Get requested features and merge with default_features.
 3. Decide if we need to do something regarding the requested Features (`jurassic_ninja_do_feature_conditions` action).
 4. Generate a random subdomain.
