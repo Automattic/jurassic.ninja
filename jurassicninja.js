@@ -77,7 +77,7 @@ function collectFeaturesFromFormInputs() {
 
 function collectFeaturesFromQueryString() {
 	if ( ! location.search ) {
-		return null;
+		return {};
 	}
 
 	let params = location.search.split( '?' )[1].split( '&' );
