@@ -22,7 +22,7 @@ function add_cron_job( $plugin_file ) {
 	add_action( 'jurassic_ninja_purge', 'jn\jurassic_ninja_purge_cron_task' );
 	// Remove task on plugin deactivation
 	if ( wp_next_scheduled( 'jurassic_ninja_purge' ) ) {
-		register_deactivation_hook( $plugin_file, 'jn\jurassic_ninja_cron_task_deactivation');
+		register_deactivation_hook( $plugin_file, 'jn\jurassic_ninja_cron_task_deactivation' );
 	}
 
 }
