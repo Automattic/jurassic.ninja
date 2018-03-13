@@ -12,13 +12,18 @@ require_once __DIR__ . '/settings-stuff.php';
 /**
  * Used by the main plugin file to register a cron job
  * for purging sites.
+ * @param  string $plugin_file Nothing super useful. the plugin path
  */
-function add_cron_job() {
+function add_cron_job( $plugin_file ) {
 	if ( ! wp_next_scheduled( 'jurassic_ninja_purge' ) ) {
 		wp_schedule_event( time(), 'hourly', 'jurassic_ninja_purge' );
 	}
 
 	add_action( 'jurassic_ninja_purge', 'jn\jurassic_ninja_purge_cron_task' );
+	// Remove task on plugin deactivation
+	if ( wp_next_scheduled( 'jurassic_ninja_purge' ) ) {
+		register_deactivation_hook( $plugin_file, 'jn\jurassic_ninja_cron_task_deactivation');
+	}
 
 }
 
@@ -36,4 +41,11 @@ function jurassic_ninja_purge_cron_task() {
 			);
 		}
 	}
+}
+
+/**
+ * De-registers the jurassic_ninja_purge cron task
+ */
+function jurassic_ninja_cron_task_deactivation() {
+	wp_clear_scheduled_hook( 'jurassic_ninja_purge' );
 }

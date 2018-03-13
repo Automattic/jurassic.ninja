@@ -41,7 +41,7 @@ function init() {
 		add_rest_nonce();
 		// Add wp-json /create /checkin and /extend endpoints
 		add_rest_api_endpoints();
-		add_cron_job();
+		add_cron_job( __FILE__ );
 		add_admin_bar_node();
 	}
 
