@@ -37,12 +37,16 @@ function add_cron_job( $plugin_file ) {
  */
 function jurassic_ninja_purge_cron_task() {
 	if ( settings( 'purge_sites_when_cron_runs', true ) ) {
+		debug( 'Running sites purge cron task for Jurassic Ninja' );
 		$return = purge_sites();
 		if ( is_wp_error( $return ) ) {
 			debug( 'There was an error purging sites: (%s) - %s',
 				$return->get_error_code(),
 				$return->get_error_message()
 			);
+		}
+		if ( is_array( $return ) && count( $return ) ) {
+			debug( 'Purged %s Jurassic Ninja site(s).', count( $return ) );
 		}
 	}
 }
