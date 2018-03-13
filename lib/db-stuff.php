@@ -16,7 +16,7 @@ function db() {
  * for the activation process.
  * It will create a few tables needed for janitorial matters
  *
- * @param  string $plugin_file Naothing super useful. the plugin path
+ * @param  string $plugin_file Nothing super useful. the plugin path
  * @return [type]              [description]
  */
 function create_tables( $plugin_file ) {
