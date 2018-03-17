@@ -111,6 +111,19 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		$site_title = settings( 'use_subdomain_based_wordpress_title', false ) ?
 			ucwords( str_replace( '-', ' ', $subdomain ) ) :
 			'My WordPress Site';
+		/**
+		 * Filters the WordPress options for setting up the site
+		 *
+		 * @since 3.0
+		 *
+		 * @param array $wordpress_options {
+		 *           An array of properties used for setting up the WordPress site for the first time.
+		 *           @type string site_title               The title of the site we're creating.
+		 *           @type string admin_user               The username for the admin account.
+		 *           @type string admin_password           The password or the admin account.
+		 *           @type string admin_email              The email address for the admin account.
+		 * }
+		 */
 		$wordpress_options = apply_filters( 'jurassic_ninja_wordpress_options', array(
 			'site_title' => $site_title,
 			'admin_user' => 'demo',
@@ -460,6 +473,11 @@ function mark_site_as_checked_in( $domain ) {
  */
 function purge_sites() {
 	$sites = sites_to_be_purged();
+	/**
+	 * Filters the array of users listed by ServerPilot
+	 *
+	 * @param array $users The users returend by serverpilot
+	 */
 	$system_users  = apply_filters( 'jurassic_ninja_sysuser_list', [] );
 	if ( is_wp_error( $system_users ) ) {
 		debug( 'There was an error fetching users list for purging: (%s) - %s',

@@ -193,5 +193,12 @@ function add_settings_page() {
 			),
 		),
 	];
+	/**
+	 * Filters the argument passed to the RationalOptionPages constructor
+	 *
+	 * @since 3.0
+	 *
+	 * @param array  $options_page The options page key/values for RationalOptionPages::__contruct()
+	 */
 	new \RationalOptionPages( apply_filters( 'jurassic_ninja_settings_options_page' , $options_page ) );
 }

@@ -58,7 +58,16 @@ function add_rest_api_endpoints() {
 				]
 			);
 		}
-
+		/**
+		 * Filter the final URL for a site.
+		 *
+		 * Useful for the ssl feature that updated the URL scheme.
+		 *
+		 * @since 3.0
+		 *
+		 * @param string $domain   The domain used for the site.
+		 * @param array  $features The feature with which the site was launched.
+		 */
 		$url = apply_filters( 'jurassic_ninja_created_site_url', figure_out_main_domain( $data->domains ), $features );
 
 		$output = [
@@ -90,7 +99,16 @@ function add_rest_api_endpoints() {
 				]
 			);
 		}
-
+		/**
+		 * Filter the final URL for a site.
+		 *
+		 * Useful for the ssl feature that updated the URL scheme.
+		 *
+		 * @since 3.0
+		 *
+		 * @param string $domain   The domain used for the site.
+		 * @param array  $features The feature with which the site was launched.
+		 */
 		$url = apply_filters( 'jurassic_ninja_created_site_url', figure_out_main_domain( $data->domains ), $features );
 
 		$output = [
@@ -213,5 +231,12 @@ function create_endpoint_feature_defaults() {
 	$defaults = [
 		'shortlife' => false,
 	];
+	/**
+	 * Filters the default features coming from a REST request
+	 *
+	 * @since 3.0
+	 *
+	 * @param array  $defaults The feature with which launch_wordpress() is called.
+	 */
 	return apply_filters( 'jurassic_ninja_rest_feature_defaults', $defaults );
 }

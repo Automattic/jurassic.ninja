@@ -32,6 +32,13 @@ add_action( 'jurassic_ninja_init', function() {
 
 add_action( 'jurassic_ninja_admin_init', function() {
 	add_filter( 'jurassic_ninja_settings_options_page', function( $options_page ) {
+		/**
+		 * Filter settings about default plugins.
+		 *
+		 * @since 3.0
+		 *
+		 * @param array $settings_default_plugins Array of settings entries. See RationalOptionPages docs.
+		 */
 		$fields = apply_filters( 'jurassic_ninja_settings_options_page_default_plugins', [
 			'add_jetpack_by_default' => [
 				'id' => 'add_jetpack_by_default',
