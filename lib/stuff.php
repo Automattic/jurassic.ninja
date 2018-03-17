@@ -83,6 +83,16 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		'shortlife' => false,
 	];
 	$features = array_merge( $default_features, $requested_features );
+	/**
+	 * Fired before launching a site, and as soon as we merge feature defaults and requested features
+	 *
+	 * Alloes to react to requested features in case some condition is not met. e.g. requesting both types of multisite installations.
+	 *
+	 * @since 3.0
+	 *
+	 * @param array $features defaults and requested features merged.
+	 *
+	 */
 	do_action( 'jurassic_ninja_do_feature_conditions', $features );
 
 	try {
@@ -118,7 +128,31 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		debug( 'Creating app for %s under sysuser %s', $domain, $user->data->name );
 
 		$app = null;
-
+		/**
+		 * Fired for the purpose of launching a site.
+		 *
+		 * Allows to be hooked so to implement a real site launcher function
+		 *
+		 * @since 3.0
+		 *
+		 * @param array $args {
+		 *     All we need to describe a php app with WordPress
+		 *
+		 *     @type object $app                 Passed by reference. This object should contain the resulting data after creating a PHP app.
+		 *     @type object $user                An object that is the result of creating a new system user under which the app will run.
+		 *     @type string $runtime             The PHP version we're going to use.
+		 *     @type string $domain              The domain under which this app will be running.
+		 *     @type array  $wordpress_options {
+		 *           An array of properties used for setting up the WordPress site for the first time.
+		 *           @type string site_title               The title of the site we're creating.
+		 *           @type string admin_user               The username for the admin account.
+		 *           @type string admin_password           The password or the admin account.
+		 *           @type string admin_email              The email address for the admin account.
+		 *     }
+		 *     $type array $features             The list of features we're going to add to the WordPress installation.
+		 * }
+		 *
+		 */
 		do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $user, $runtime, $domain, $wordpress_options, $features ] );
 
 		if ( is_wp_error( $app ) ) {
@@ -127,14 +161,42 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		log_new_site( $app->data, $features['shortlife'] );
 
 		/**
-		 * Allow the enqueue of commands for features with each launched site.
-		 * @param array $features The current feature flags
+		 * Allows the enqueueing of commands for features with each launched site.
+		 *
+		 * This fires before adding the auto login features
+		 *
+		 * @since 3.0
+		 *
+		 * @param array $args {
+		 *     All we need to describe a php app with WordPress
+		 *
+		 *     @type object $app                 Passed by reference. This object contains the resulting data after creating a PHP app.
+		 *     $type array $features             The list of features we're going to add to the WordPress installation.
+		 *     @type string $domain              The domain under which this app will be running.
+		 * }
+		 *
 		 */
 		do_action_ref_array( 'jurassic_ninja_add_features_before_auto_login', [ &$app, $features, $domain ] );
 
 		debug( '%s: Adding Companion Plugin for Auto Login', $domain );
 		add_auto_login( $password, $user->data->name );
 
+		/**
+		 * Allows the enqueueing of commands for features with each launched site.
+		 *
+		 * This fires after adding the auto login features
+		 *
+		 * @since 3.0
+		 *
+		 * @param array $args {
+		 *     All we need to describe a php app with WordPress
+		 *
+		 *     @type object $app                 Passed by reference. This object contains the resulting data after creating a PHP app.
+		 *     $type array $features             The list of features we're going to add to the WordPress installation.
+		 *     @type string $domain              The domain under which this app will be running.
+		 * }
+		 *
+		 */
 		do_action_ref_array( 'jurassic_ninja_add_features_after_auto_login', [ &$app, $features, $domain ] );
 
 		// Runs the command via SSH
@@ -217,6 +279,22 @@ function figure_out_main_domain( $domains ) {
 function generate_new_user( $password ) {
 	$username = generate_random_username();
 	$return = null;
+	/**
+	 * Fired for hooking and actually creating a system user
+	 *
+	 * This fires before launching a site
+	 *
+	 * @since 3.0
+	 *
+	 * @param array $args {
+	 *     All we need to describe a system user
+	 *
+	 *     @type object $return              Passed by reference. This object should container the resulting data after creating a system user.
+	 *     @type string $username            The username.
+	 *     @type string $password            The password for the user.
+	 * }
+	 *
+	 */
 	do_action_ref_array( 'jurassic_ninja_create_sysuser', [ &$return, $username, $password ] );
 
 	if ( is_wp_error( $return ) ) {
@@ -400,6 +478,19 @@ function purge_sites() {
 			return in_array( $user->name, $site_users, true );
 	} );
 	foreach ( $purge as $user ) {
+		/**
+		 * Fired for hooking a function that actually deletes a site
+		 *
+		 * @since 3.0
+		 *
+		 * @param array $args {
+		 *     All we need to delete a site
+		 *
+		 *     @type object $return     Passed by reference. This object contains the resulting data after deleting a PHP app.
+		 *     @type object $user       An object that represents system user under which the app will run.
+		 * }
+		 *
+		 */
 		do_action_ref_array( 'jurassic_ninja_delete_site', [ &$return, $user ] );
 		if ( is_wp_error( $return ) ) {
 			debug( 'There was an error purging site for user %s: (%s) - %s',
