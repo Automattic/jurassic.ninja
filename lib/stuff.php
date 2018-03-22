@@ -24,16 +24,7 @@ function debug() {
 }
 
 require_once __DIR__ . '/rest-api-stuff.php';
-require_once __DIR__ . '/features/multisite.php';
-require_once __DIR__ . '/features/ssl.php';
-require_once __DIR__ . '/features/plugins.php';
-require_once __DIR__ . '/features/config-constants.php';
-require_once __DIR__ . '/features/gutenberg.php';
-require_once __DIR__ . '/features/jetpack-beta.php';
-require_once __DIR__ . '/features/woocommerce.php';
-require_once __DIR__ . '/features/wordpress-beta-tester.php';
-require_once __DIR__ . '/features/wp-debug-log.php';
-require_once __DIR__ . '/features/wp-log-viewer.php';
+require_feature_files();
 require_once __DIR__ . '/serverpilot-stuff.php';
 
 define( 'REST_API_NAMESPACE', 'jurassic.ninja' );
@@ -58,6 +49,32 @@ function add_auto_login( $password, $sysuser ) {
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );
+}
+
+/**
+ * Just loops through a filtered array of files inside the features directory and requires them
+ *
+ * @return [type] [description]
+ */
+function require_feature_files() {
+	$available_features = [
+		'/features/multisite.php',
+		'/features/ssl.php',
+		'/features/plugins.php',
+		'/features/config-constants.php',
+		'/features/gutenberg.php',
+		'/features/jetpack-beta.php',
+		'/features/woocommerce.php',
+		'/features/wordpress-beta-tester.php',
+		'/features/wp-debug-log.php',
+		'/features/wp-log-viewer.php',
+	];
+
+	$available_features =  apply_filters( 'jurassic_ninja_available_features', $available_features );
+	foreach( $available_features as $feature_file ) {
+		require_once PLUGIN_DIR . $feature_file;
+	}
+	return $available_features;
 }
 
 /**

@@ -13,6 +13,8 @@ if ( ! defined( '\\ABSPATH' ) ) {
 	exit;
 }
 
+define( 'PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+
 require_once __DIR__ . '/lib/error-stuff.php';
 
 init_or_fail_if_no_dependencies_installed();
