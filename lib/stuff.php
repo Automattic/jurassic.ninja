@@ -344,52 +344,16 @@ function generate_random_password() {
 
 /**
  * Generates a random subdomain based on an adjective and sustantive.
- * Tries to filter out some potentially offensive combinations
  * The words come from:
- *      https://animalcorner.co.uk/animals/dung-beetle/
- *      http://grammar.yourdictionary.com/parts-of-speech/adjectives/list-of-adjective-words.html
- * Tne name is slugified.
+ *      lib/words/adjectives.txt
+ *      lib/words/nouns.txt
+ * Tne return value is slugified.
  *
  * @return string A slugified subdomain.
  */
 function generate_random_subdomain() {
-	$blacklisted_words = [
-		'african',
-		'american',
-		'asian',
-		'australian',
-		'black',
-		'booby',
-		'british',
-		'chinese',
-		'cuban',
-		'dung',
-		'erect',
-		'eurasian',
-		'european',
-		'foolish',
-		'indian',
-		'italian',
-		'japanese',
-		'mexican',
-		'peruvian',
-		'southern',
-		'northern',
-		'sperm',
-		'stupid',
-		'sumatran',
-		'syrian',
-	];
-	// Filter out some words that could lead to offensive combinations
-	$max_attempts = 10;
-	$regexp = implode( '|', $blacklisted_words );
-	$name = 'First try';
-	$i = 0;
-
-	do {
-		$generator = new CustomNameGenerator();
-		$name = $generator->getName( settings( 'use_alliterations_for_subdomain', true ) );
-	} while ( $i++ < $max_attempts && preg_match( "($regexp)", $name ) === 1 );
+	$generator = new CustomNameGenerator();
+	$name = $generator->getName( settings( 'use_alliterations_for_subdomain', true ) );
 
 	$slug = create_slug( $name );
 	return $slug;

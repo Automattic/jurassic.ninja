@@ -134,7 +134,6 @@ dromedary
 duck
 duck-billed
 ducks
-dung
 dwarf
 dwelling
 eagle
@@ -153,7 +152,6 @@ elephants
 elk
 emperor
 emu
-erect-crested
 ermine
 ethiopian
 eurasian
