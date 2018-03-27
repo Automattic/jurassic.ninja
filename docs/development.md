@@ -42,3 +42,6 @@ But the main hooks to look are:
 * jurassic_ninja_add_features_before_auto_login (Action).
 * jurassic_ninja_add_features_after_auto_login (Action).
 * jurassic_ninja_feature_command (Filter).
+* jurassic_ninja_created_site_url (Filter).
+
+
