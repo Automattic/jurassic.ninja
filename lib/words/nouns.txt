@@ -5,8 +5,6 @@ adelie
 albatross
 alligator
 alpaca
-amazonian
-american
 amphibian
 anaconda
 angelfish
@@ -150,12 +148,8 @@ egret
 elephant
 elephants
 elk
-emperor
 emu
 ermine
-ethiopian
-eurasian
-european
 eyed
 fairy
 falcon
@@ -228,7 +222,6 @@ ground
 grouse
 guan
 guanaco
-guinea
 guineafowl
 gull
 guppy
@@ -251,7 +244,6 @@ heron
 herring
 hippopotamus
 hoary
-hobo
 honey
 hookworm
 hoopoe
@@ -275,13 +267,10 @@ ibis
 ibisbill
 iguana
 impala
-indian
-italian
 jackal
 jacket
 jaguar
 jambu
-japanese
 javan
 jay
 jellyfish
@@ -364,9 +353,7 @@ mastodon
 meadowlark
 mealy
 meerkat
-mexican
 mice
-military
 milkweed
 millipedes
 mink
@@ -523,7 +510,6 @@ scarab
 scarlet
 schneiders
 scorpion
-scottish
 sea
 seahorse
 seal
@@ -566,7 +552,6 @@ sole
 solenodon
 solitary
 song
-southern
 sparrow
 spectacled
 spider
@@ -592,14 +577,12 @@ striped
 sturgeon
 sugar
 sumatran
-swallow
 swamp
 swan
 swift
 swiftlet
 swordfish
 swordtail
-syrian
 tahr
 tailed
 takin
