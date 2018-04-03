@@ -72,9 +72,11 @@ And add this content using the Text version of the editor:
 
 ### Using a docker container for testing
 
-It may be convenient to use this plugin using a docker image for local development. Make sure that [docker is installed and running](https://docs.docker.com/install/) before proceeding.
+It may be convenient to use this plugin using a docker container for local development.
 
-1. In project directory create `jndb` folder where WordPress DB will be stored:
+Make sure that [docker is installed and running](https://docs.docker.com/install/) before proceeding.
+
+1. Create `jndb` folder in the root of this source code, where WordPress DB will be stored:
 
 ```sh
 mkdir ./jndb
