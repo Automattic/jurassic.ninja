@@ -15,4 +15,4 @@ Some features are:
 - Setting of wp-config constants like WP_DEBU and WP_DEBUG_LOG.  (`wp-debug-log.php`).
 - Launching multisite installations instead of single site( '')
 
-Refer to the [API](docs/development.md#API) section of the development doc to find out about existing hooks.
+Refer to the [API](../docs/development.md#API) section of the development doc to find out about existing hooks.

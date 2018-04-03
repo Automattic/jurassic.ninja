@@ -48,7 +48,7 @@ On plugin activation, this plugin will create two tables on the same database yo
 
 All of the frontend site launching is done by a little piece of Javascript that detects if current page is on the `/create` path and if it's the case it just launches a request in the background to this plugin's REST API in order to launch a new site.
 
-**Create a page with the slug `create` **
+**Create a page with the slug `create`**
 
 Create a page titled **Create**. Make sure its slug is `/create`.
 
@@ -72,9 +72,11 @@ And add this content using the Text version of the editor:
 
 ### Using a docker container for testing
 
-It may be convenient to use this plugin using a docker image for local development. Make sure that [docker is installed and running](https://docs.docker.com/install/) before proceeding.
+It may be convenient to use this plugin using a docker container for local development.
 
-1. In project directory create `jndb` folder where WordPress DB will be stored:
+Make sure that [docker is installed and running](https://docs.docker.com/install/) before proceeding.
+
+1. Create `jndb` folder in the root of this source code, where WordPress DB will be stored:
 
 ```sh
 mkdir ./jndb
