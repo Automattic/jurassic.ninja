@@ -1,60 +1,58 @@
 # jurassic.ninja
 
-A frontend to launching ephemeral WordPress instances that auto-destroy after some time
+A frontend to launching ephemeral WordPress instances that auto-destroy after some time.
 
 ## Usage
 
 ### Requirements
 
-* An ubuntu box managed by ServerPilot
-* A ServerPilot plan. One of the paid plans. Coach plan is OK. This is to take advantage of multiple sysusers management
-* `sshpass` installed on the box.
-* `wp cli` and `composer` (which is already installed by ServerPilot).
+* An [ubuntu box managed by ServerPilot](https://serverpilot.io/community/articles/connect-a-digitalocean-server.html).
+* A [ServerPilot plan](https://serverpilot.io/community/articles/how-to-upgrade-your-account.html). One of the paid plans. Coach plan is OK. This is to take advantage of multiple sysusers management.
+* [sshpass](https://linux.die.net/man/1/sshpass) installed on the box. (Just `apt-get install sshpass` after you have the Ubuntu box set up).
 * **Have a domain name you fully control**.
-* Add wildcard A record for every subdomain under that domain, pointing to the box's IP addresss.
+    * Add a wildcard A record for every subdomain under that domain, pointing to the box's IP addresss.
 
 ### Installation
 
-**Warning**: On plugin activation, this plugin will create two tables on the same DB your WordPress is running.
+This software is implemented as a WordPress plugin that can be added on top of WordPress and configured via wp-admin.
 
-Basically the steps are
+On plugin activation, this plugin will create two tables on the same database your WordPress is running. Named `sites` and `purged`.
+
 
 1. Install the plugin and activate it.
 1. Create the needed pages (home and `/create`).
 1. Configure ServerPilot credentials.
 
-#### Install the Plugin
+#### 1. Install the Plugin
 
-Install it
+* Get the bundle from GitHub.
 
-```sh
-wp plugin install https://github.com/oskosk/jurassic.ninja/archive/master.zip
-```
+    ```sh
+    wp plugin install https://github.com/oskosk/jurassic.ninja/archive/master.zip
+    ```
 
-Install composer dependencies
+* Install composer dependencies
 
-```sh
-cd wp-content/plugins/jurassic.ninja
-composer install
-```
+    ```sh
+    cd wp-content/plugins/jurassic.ninja
+    composer install
+    ```
 
-#### Activate the plugin
+* **Activate the plugin**
 
-```sh
-wp plugin activate jurassic.ninja
-```
+    ```sh
+    wp plugin activate jurassic.ninja
+    ```
 
-#### Create needed pages
+#### 2. Create pages for launching the sites.
 
-All of the frontend magic is done by a little piece of Javascript that detects if current page is
-on the `/create` route and if it's the case it just launches a request in the background
-to the plugin's REST API in order to launch a new site.
+All of the frontend site launching is done by a little piece of Javascript that detects if current page is on the `/create` path and if it's the case it just launches a request in the background to this plugin's REST API in order to launch a new site.
 
-#### Create a /create page_title
+**Create a page with the slug `create` **
 
 Create a page titled **Create**. Make sure its slug is `/create`.
 
-And add this using the Text version of the editor:
+And add this content using the Text version of the editor:
 
 ```html
 <img id="img1" src="https://media.giphy.com/media/uIRyMKFfmoHyo/giphy.gif" style="display:none" />
@@ -62,19 +60,19 @@ And add this using the Text version of the editor:
 <p class="lead" id="progress">Launching a fresh WP with a Jetpack ...</p>
 ```
 
-#### Create a home page with a link to `/create`
+**Create a home page with a link to `/create`**
 
 1. Create a new page and configure it a static front page with a link to `/create`.
 
-#### Configure Jurassic Ninja Settings page in wp-admin
+#### 3. Configure Jurassic Ninja Settings page in wp-admin
 
 1. Visit the Jurassic Ninja Settings page in wp-admin.
 2. Configure your Server pilot client id, client key and server id.
 3. Configure the top-domain on which this is going to create sites.
 
-#### Using docker image for testing
+### Using a docker container for testing
 
-It is convenient to test the application using a docker image. Make sure that docker is installed and running before proceed.
+It may be convenient to use this plugin using a docker image for local development. Make sure that [docker is installed and running](https://docs.docker.com/install/) before proceeding.
 
 1. In project directory create `jndb` folder where WordPress DB will be stored:
 

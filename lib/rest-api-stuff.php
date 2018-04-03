@@ -22,15 +22,7 @@ function add_rest_api_endpoints() {
 		},
 	];
 	add_post_endpoint( 'create', function ( $request ) {
-		$defaults = [
-			'jetpack' => (bool)settings( 'add_jetpack_by_default', true ),
-			'jetpack-beta' => (bool) settings( 'add_jetpack_beta_by_default', false ),
-			'woocommerce' => (bool) settings( 'add_woocommerce_by_default', false ),
-			'wp-debug-log' => (bool) settings( 'set_wp_debug_log_by_default', false ),
-			'shortlife' => false,
-			'subdomain_multisite' => false,
-			'ssl' => (bool) settings( 'ssl_use_custom_certificate', false ),
-		];
+		$defaults = create_endpoint_feature_defaults();
 		$json_params = $request->get_json_params();
 
 		if ( ! settings( 'enable_launching', true ) ) {
@@ -42,15 +34,6 @@ function add_rest_api_endpoints() {
 		$features = array_merge( $defaults, [
 			'shortlife' => isset( $json_params['shortlived'] ) && (bool) $json_params['shortlived'],
 		] );
-		if ( isset( $json_params['jetpack'] ) ) {
-			$features['jetpack'] = $json_params['jetpack'];
-		}
-		if ( isset( $json_params['woocommerce'] ) ) {
-			$features['woocommerce'] = $json_params['woocommerce'];
-		}
-		if ( isset( $json_params['wp-debug-log'] ) ) {
-			$features['wp-debug-log'] = $json_params['wp-debug-log'];
-		}
 
 		/**
 		 * Filters the features requested through the /create REST API endpoint
@@ -61,25 +44,8 @@ function add_rest_api_endpoints() {
 		 * @param array $json_params The body of the json request.
 		 */
 		$features = apply_filters( 'jurassic_ninja_rest_create_request_features', $features, $json_params );
-
 		if ( is_wp_error( $features ) ) {
 			return $features;
-		}
-
-		if ( isset( $json_params['jetpack-beta'] ) ) {
-			$url = get_jetpack_beta_url( $json_params['branch'] );
-
-			if ( $url === null ) {
-				return new \WP_Error(
-					'failed_to_launch_site_with_branch',
-					esc_html__( 'Invalid branch name or not ready yet: ' . $json_params['branch'] ),
-					[
-						'status' => 400,
-					]
-				);
-			}
-			$features['jetpack-beta'] = $json_params['jetpack-beta'];
-			$features['branch'] = $json_params['branch'];
 		}
 
 		$data = launch_wordpress( 'php7.0', $features );
@@ -92,9 +58,17 @@ function add_rest_api_endpoints() {
 				]
 			);
 		}
-		// See note in launch_wordpress() about why we can't launch subdomain_multisite with ssl.
-		$schema = $features['ssl'] && ! $features['subdomain_multisite'] ? 'https' : 'http';
-		$url = "$schema://" . figure_out_main_domain( $data->domains );
+		/**
+		 * Filter the final URL for a site.
+		 *
+		 * Useful for the ssl feature that updated the URL scheme.
+		 *
+		 * @since 3.0
+		 *
+		 * @param string $domain   The domain used for the site.
+		 * @param array  $features The feature with which the site was launched.
+		 */
+		$url = apply_filters( 'jurassic_ninja_created_site_url', figure_out_main_domain( $data->domains ), $features );
 
 		$output = [
 			'url' => $url,
@@ -103,11 +77,9 @@ function add_rest_api_endpoints() {
 	}, $permission_callback );
 
 	add_post_endpoint( 'specialops/create', function ( $request ) {
+		$defaults = create_endpoint_feature_defaults();
 		$json_params = $request->get_json_params();
-		$defaults = [
-			'subdomain_multisite' => false,
-			'ssl' => (bool) settings( 'ssl_use_custom_certificate', false ),
-		];
+
 		$features = $json_params && is_array( $json_params ) ? $json_params : [];
 		$features = array_merge( $defaults, $features );
 		if ( ! settings( 'enable_launching', true ) ) {
@@ -117,6 +89,7 @@ function add_rest_api_endpoints() {
 		}
 
 		$data = launch_wordpress( $features['runtime'], $features );
+
 		if ( null === $data ) {
 			return new \WP_Error(
 				'failed_to_launch_site',
@@ -126,9 +99,17 @@ function add_rest_api_endpoints() {
 				]
 			);
 		}
-		// See note in launch_wordpress() about why we can't launch subdomain_multisite with ssl.
-		$schema = $features['ssl'] && ! $features['subdomain_multisite'] ? 'https' : 'http';
-		$url = "$schema://" . figure_out_main_domain( $data->domains );
+		/**
+		 * Filter the final URL for a site.
+		 *
+		 * Useful for the ssl feature that updated the URL scheme.
+		 *
+		 * @since 3.0
+		 *
+		 * @param string $domain   The domain used for the site.
+		 * @param array  $features The feature with which the site was launched.
+		 */
+		$url = apply_filters( 'jurassic_ninja_created_site_url', figure_out_main_domain( $data->domains ), $features );
 
 		$output = [
 			'url' => $url,
@@ -246,16 +227,16 @@ function add_endpoint( $namespace, $path, $callback, $register_rest_route_option
 	} );
 }
 
-function get_jetpack_beta_url( $branch_name ) {
-	$branch_name = str_replace( '/', '_', $branch_name );
-	$manifest_url = "https://betadownload.jetpack.me/jetpack-branches.json";
-	$manifest = json_decode( wp_remote_retrieve_body( wp_remote_get( $manifest_url ) ) );
-
-	if ( ( 'rc' === $branch_name || 'master' === $branch_name ) && isset( $manifest->{$branch_name}->download_url ) ) {
-		return $manifest->{$branch_name}->download_url;
-	}
-
-	if ( isset( $manifest->pr->{$branch_name}->download_url ) ) {
-		return $manifest->pr->{$branch_name}->download_url;
-	}
+function create_endpoint_feature_defaults() {
+	$defaults = [
+		'shortlife' => false,
+	];
+	/**
+	 * Filters the default features coming from a REST request
+	 *
+	 * @since 3.0
+	 *
+	 * @param array  $defaults The feature with which launch_wordpress() is called.
+	 */
+	return apply_filters( 'jurassic_ninja_rest_feature_defaults', $defaults );
 }

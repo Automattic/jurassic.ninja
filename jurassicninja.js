@@ -8,29 +8,7 @@ init();
 
 function init() {
 	if ( isCreatePage() ) {
-		const shortlived = param( 'shortlived' );
-		const jetpack = param( 'jetpack' );
-		const woocommerce = param( 'woocommerce' );
-		const jetpack_beta = param( 'jetpack-beta' );
-		const wp_debug_log = param( 'wp-debug-log' )
-		const branch = param( 'branch' )
-		const features = {};
-		if ( shortlived !== null ) {
-			features.shortlived = shortlived;
-		}
-		if ( jetpack !== null ) {
-			features.jetpack = jetpack;
-		}
-		if ( woocommerce !== null ) {
-			features.woocommerce = woocommerce;
-		}
-		if ( wp_debug_log !== null ) {
-			features[ 'wp-debug-log' ] = wp_debug_log;
-		}
-		if ( jetpack_beta !== null ) {
-			features[ 'jetpack-beta' ] = jetpack_beta;
-			features.branch = ( branch !== null ? branch : 'stable' );
-		}
+		features = collectFeaturesFromQueryString();
 
 		setTimeout( () => {
 			launchSite( jQuery, features );
@@ -95,6 +73,30 @@ function collectFeaturesFromFormInputs() {
 		return Object.assign( {}, acc, { [ jQuery( el ).data( 'feature' ) ] : jQuery( el ).val() } );
 	}, {} );
 	return Object.assign( features, features_in_selects );
+}
+
+function collectFeaturesFromQueryString() {
+	if ( ! location.search ) {
+		return {};
+	}
+
+	let params = location.search.split( '?' )[1].split( '&' );
+	let features = {};
+
+	for ( var p of params ) {
+		if ( p.includes( '=' ) ) {
+			const splitParam = p.split( '=' )
+			features[ splitParam[0] ] = splitParam[1]
+		} else {
+			if ( p.startsWith( 'no' ) ) {
+				features[ p.slice( 2 ) ] = false
+			} else {
+				features[ p ] = true
+			}
+		}
+	}
+
+	return features;
 }
 
 function isSpecialOpsPage() {

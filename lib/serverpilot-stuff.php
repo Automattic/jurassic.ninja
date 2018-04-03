@@ -15,6 +15,59 @@ if ( ! defined( '\\ABSPATH' ) ) {
 
 $serverpilot_instance = null;
 
+add_action( 'jurassic_ninja_init', function() {
+	add_action( 'jurassic_ninja_create_app', function( &$app, $user, $runtime, $domain, $wordpress_options, $features ) {
+		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
+		$domain_arg = isset( $features['subdomain_multisite'] ) && $features['subdomain_multisite'] ? array( $domain, '*.' . $domain ) : array( $domain );
+
+		$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg, $wordpress_options );
+	}, 10, 6 );
+	add_action( 'jurassic_ninja_create_sysuser', function( &$return, $username, $password ) {
+		try {
+			$return = create_sp_sysuser( $username, $password );
+		} catch ( \Exception $e ) {
+			$return = new \WP_Error( $e->getCode(), $e->getMessage() );
+		}
+	}, 10, 3 );
+
+	add_filter( 'jurassic_ninja_sysuser_list', function( $users ) {
+		$return = array_merge( $users,  get_sp_sysuser_list() );
+		return $return;
+	} );
+	add_filter( 'jurassic_ninja_delete_site', function( &$return, $user ) {
+		$return = delete_sp_sysuser( $user->id );
+		return $return;
+	}, 10, 2 );
+} );
+
+add_action( 'jurassic_ninja_admin_init', function() {
+	add_filter( 'jurassic_ninja_settings_options_page', function( $options_page ) {
+		$settings = [
+			'title' => __( 'ServerPilot Configuration', 'jurassic-ninja' ),
+			'text' => '<p>' . __( 'Configure ServerPilot client Id and Key. This need to be one of the paid plans. At least a Coach Plan', 'jurassic-ninja' ) . '</p>',
+			'fields' => array(
+				'serverpilot_server_id' => array(
+					'id' => 'serverpilot_server_id',
+					'title' => __( 'ServerPilot Server Id', 'jurassic-ninja' ),
+					'text' => __( 'A ServerPilot Server Id.' ),
+				),
+				'serverpilot_client_id' => array(
+					'id' => 'serverpilot_client_id',
+					'title' => __( 'ServerPilot Client Id', 'jurassic-ninja' ),
+					'text' => __( 'A ServerPilot Client id.' ),
+				),
+				'serverpilot_client_key' => array(
+					'id' => 'serverpilot_client_key',
+					'title' => __( 'ServerPilot Key', 'jurassic-ninja' ),
+					'text' => __( 'A ServerPilot Client key.' ),
+				),
+			),
+		];
+		$options_page[ SETTINGS_KEY ]['sections']['serverpilot'] = $settings;
+		return $options_page;
+	}, 5 );
+} );
+
 /**
  * Returns a ServerPilot instance
  * @return [type] [description]
@@ -89,7 +142,7 @@ function delete_sp_sysuser( $id ) {
  * @param  string $app_id The ServerPilot id for the app
  * @return [type]         [description]
  */
-function enable_auto_ssl( $app_id ) {
+function enable_sp_auto_ssl( $app_id ) {
 	try {
 		$data = sp()->ssl_auto( $app_id );
 		wait_for_serverpilot_action( $data->actionid );
@@ -106,7 +159,7 @@ function enable_auto_ssl( $app_id ) {
  * @param  string $app_id The ServerPilot id for the app
  * @return [type]         [description]
  */
-function enable_ssl( $app_id ) {
+function enable_sp_ssl( $app_id ) {
 	$private_key = settings( 'ssl_private_key' );
 	$certificate = settings( 'ssl_certificate' );
 	$ca_certificates = settings( 'ssl_ca_certificates', null );
@@ -130,7 +183,7 @@ function enable_ssl( $app_id ) {
 		 * Leaving it commented in case something breaks eventually.
 		 */
 		// wait_for_serverpilot_action( $data->actionid );
-		
+
 		// Enable redirection from https to http
 		$data = sp()->ssl_force( $app_id, true );
 		wait_for_serverpilot_action( $data->actionid );

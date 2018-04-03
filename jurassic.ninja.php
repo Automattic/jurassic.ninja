@@ -3,7 +3,7 @@
 /*
  * Plugin Name: Jurassic Ninja
  * Description: Launch ephemeral instances of WordPress + Jetpack using ServerPilot and an Ubuntu Box.
- * Version: 2.1
+ * Version: 3.0
  * Author: Osk
  **/
 
@@ -12,6 +12,8 @@ namespace jn;
 if ( ! defined( '\\ABSPATH' ) ) {
 	exit;
 }
+
+define( 'PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
 require_once __DIR__ . '/lib/error-stuff.php';
 
@@ -27,10 +29,18 @@ init_or_fail_if_no_dependencies_installed();
 function init() {
 	require_once __DIR__ . '/lib/cron-stuff.php';
 	require_once __DIR__ . '/lib/db-stuff.php';
-	require_once __DIR__ . '/lib/serverpilot-stuff.php';
 	require_once __DIR__ . '/lib/settings-stuff.php';
 	require_once __DIR__ . '/lib/stuff.php';
 
+	/**
+	 * Done before adding settings page or anything else related to Jurassic Ninja Admin specifics.
+	 *
+	 * It's here so we can hook early to other filters that impace the admin pages like settings.
+	 *
+	 * @since 3.0
+	 *
+	 */
+	do_action( 'jurassic_ninja_admin_init' );
 	//Create settings page
 	add_settings_page();
 	// Settings problems include credentials and IDs not configured
@@ -44,7 +54,15 @@ function init() {
 		add_cron_job( __FILE__ );
 		add_admin_bar_node();
 	}
-
+	/**
+	 * Done after adding settings page and before anything else related to Jurassic Ninja specifics.
+	 *
+	 * It's here so we can hook to other filters after creating the REST API ednpoints, added cron tasks and admi-related stuff
+	 *
+	 * @since 3.0
+	 *
+	 */
+	do_action( 'jurassic_ninja_init' );
 	// Yeah create two tables for tracking the launched sites.
 	create_tables( __FILE__ );
 }
@@ -104,6 +122,15 @@ function add_scripts() {
 	add_action( 'wp_enqueue_scripts', function () {
 		if ( page_is_launching_page() ) {
 			wp_enqueue_script( 'jurassicninja.js', plugins_url( '', __FILE__ ) . '/jurassicninja.js', false, false, true );
+			/**
+			 * Done after enqueueing the jurassic.ninja.js file
+			 *
+			 * This action happens during a wp_enqueue_scripts hook.
+			 *
+			 * @since 3.0
+			 *
+			 */
+			do_action( 'jurassic_ninja_enqueue_scripts' );
 		}
 	} );
 }
