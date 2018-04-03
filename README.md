@@ -48,7 +48,7 @@ On plugin activation, this plugin will create two tables on the same database yo
 
 All of the frontend site launching is done by a little piece of Javascript that detects if current page is on the `/create` path and if it's the case it just launches a request in the background to this plugin's REST API in order to launch a new site.
 
-**Create a page with the slug `create` **
+**Create a page with the slug `create`**
 
 Create a page titled **Create**. Make sure its slug is `/create`.
 
