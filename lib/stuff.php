@@ -68,6 +68,7 @@ function require_feature_files() {
 		'/features/wordpress-beta-tester.php',
 		'/features/wp-debug-log.php',
 		'/features/wp-log-viewer.php',
+		'/features/wp-rollback.php',
 	];
 
 	$available_features =  apply_filters( 'jurassic_ninja_available_features', $available_features );
