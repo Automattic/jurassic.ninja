@@ -68,6 +68,7 @@ function require_feature_files() {
 		'/features/wordpress-beta-tester.php',
 		'/features/wp-debug-log.php',
 		'/features/wp-log-viewer.php',
+		'/features/wp-downgrade.php',
 		'/features/wp-rollback.php',
 	];
 
