@@ -10,7 +10,7 @@ add_action( 'jurassic_ninja_init', function() {
 	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		if ( $features['wp-rollback'] ) {
-			debug( '%s: Adding Wp Rollback', $domain );
+			debug( '%s: Adding WP Rollback', $domain );
 			add_wp_rollback_plugin();
 		}
 	}, 10, 3 );
@@ -30,7 +30,7 @@ add_action( 'jurassic_ninja_init', function() {
 } );
 
 /**
- * Installs and activates Wp Rollback on the site.
+ * Installs and activates WP Rollback on the site.
  */
 function add_wp_rollback_plugin() {
 	$cmd = 'wp plugin install wp-rollback --activate' ;
