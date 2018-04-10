@@ -6,7 +6,7 @@ add_action( 'jurassic_ninja_init', function() {
 	$defaults = [
 		'gutenberg' => false,
 	];
-        add_filter( 'jurassic_ninja_rest_feature_defaults', function( $defaults ) {
+	add_filter( 'jurassic_ninja_rest_feature_defaults', function( $defaults ) {
 		return array_merge( $defaults, [
 			'gutenberg' => false
 		] );
