@@ -61,6 +61,7 @@ function require_feature_files() {
 		'/features/multisite.php',
 		'/features/ssl.php',
 		'/features/plugins.php',
+		'/features/code-snippets.php',
 		'/features/config-constants.php',
 		'/features/gutenberg.php',
 		'/features/jetpack-beta.php',
