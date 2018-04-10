@@ -27,7 +27,7 @@ add_action( 'jurassic_ninja_init', function() {
 				if ( is_wp_error( $response ) ) {
 					debug( 'Error enabling SSL for %s. Check the next log line for a dump of the WP_Error', $domain );
 					debug( print_r( $response, true ) );
-					throw new \Exception( 'Error creating sysuser: ' . $return->get_error_message() );
+					throw new \Exception( 'Error enabling SSL: ' . $response->get_error_message() );
 				}
 			}
 		}
