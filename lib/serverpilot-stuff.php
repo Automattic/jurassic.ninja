@@ -16,11 +16,11 @@ if ( ! defined( '\\ABSPATH' ) ) {
 $serverpilot_instance = null;
 
 add_action( 'jurassic_ninja_init', function() {
-	add_action( 'jurassic_ninja_create_app', function( &$app, $user, $runtime, $domain, $wordpress_options, $features ) {
+	add_action( 'jurassic_ninja_create_app', function( &$app, $user, $php_version, $domain, $wordpress_options, $features ) {
 		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
 		$domain_arg = isset( $features['subdomain_multisite'] ) && $features['subdomain_multisite'] ? array( $domain, '*.' . $domain ) : array( $domain );
 
-		$app = create_sp_app( $user->data->name, $user->data->id, $runtime, $domain_arg, $wordpress_options );
+		$app = create_sp_app( $user->data->name, $user->data->id, $php_version, $domain_arg, $wordpress_options );
 	}, 10, 6 );
 	add_action( 'jurassic_ninja_create_sysuser', function( &$return, $username, $password ) {
 		try {
@@ -86,16 +86,16 @@ function sp() {
 
 /**
  * Creates a PHP app using ServerPilot's API
- * @param  String $name      The nickname of the App
- * @param  String $sysuserid The System User that will "own" this App
- * @param  String $runtime   The PHP runtime for an App. Choose from php5.4, php5.5, php5.6, php7.0, or php7.1.
- * @param  Array  $domains   An array of domains that will be used in the webserver's configuration
- * @param  Array  $wordpress An array containing the following keys: site_title , admin_user , admin_password , and admin_email
- * @return Object            An object with the new app data.
+ * @param  String $name          The nickname of the App
+ * @param  String $sysuserid     The System User that will "own" this App
+ * @param  String $php_version   The PHP version for an App. Choose from php5.4, php5.5, php5.6, php7.0, or php7.1.
+ * @param  Array  $domains       An array of domains that will be used in the webserver's configuration
+ * @param  Array  $wordpress     An array containing the following keys: site_title , admin_user , admin_password , and admin_email
+ * @return Object                An object with the new app data.
  */
-function create_sp_app( $name, $sysuserid, $runtime, $domains, $wordpress ) {
+function create_sp_app( $name, $sysuserid, $php_version, $domains, $wordpress ) {
 	try {
-		$app = sp()->app_create( $name, $sysuserid, $runtime, $domains, $wordpress );
+		$app = sp()->app_create( $name, $sysuserid, $php_version, $domains, $wordpress );
 		wait_for_serverpilot_action( $app->actionid );
 		return $app;
 	} catch ( \ServerPilotException $e ) {

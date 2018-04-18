@@ -88,7 +88,7 @@ function add_rest_api_endpoints() {
 			] );
 		}
 
-		$data = launch_wordpress( $features['runtime'], $features );
+		$data = launch_wordpress( $features['php_version'], $features );
 
 		if ( null === $data ) {
 			return new \WP_Error(
