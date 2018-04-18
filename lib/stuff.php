@@ -98,7 +98,7 @@ function require_feature_files() {
  *         boolean wp-log-viewer         Should we add WP Log Viewer plugin to the site?
  * @return Array|Null                    null or the app data as returned by ServerPilot's API on creation.
  */
-function launch_wordpress( $php_version = 'php7.0', $requested_features = [] ) {
+function launch_wordpress( $php_version = 'default', $requested_features = [] ) {
 	$default_features = [
 		'shortlife' => false,
 	];

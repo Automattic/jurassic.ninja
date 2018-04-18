@@ -48,7 +48,7 @@ function add_rest_api_endpoints() {
 			return $features;
 		}
 
-		$data = launch_wordpress( 'php7.0', $features );
+		$data = launch_wordpress( 'default', $features );
 		if ( null === $data ) {
 			return new \WP_Error(
 				'failed_to_launch_site',

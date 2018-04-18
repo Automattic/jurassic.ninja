@@ -19,7 +19,24 @@ add_action( 'jurassic_ninja_init', function() {
 	add_action( 'jurassic_ninja_create_app', function( &$app, $user, $php_version, $domain, $wordpress_options, $features ) {
 		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
 		$domain_arg = isset( $features['subdomain_multisite'] ) && $features['subdomain_multisite'] ? array( $domain, '*.' . $domain ) : array( $domain );
+		// Mitigate ungraceful PHP-FPM restart for shortlived sites by randomizing PHP version
+		// PHP does not support graceful "restart" so every php-pool gets closed
+		// each time ServerPilot needs to SIGUSR1 php for reloading configuration
+		$shortlife_php_versions_alternatives = [
+			'php7.2',
+			'php7.0',
+			'php5.6',
+			'php5.5',
+			'php5.4',
+		];
+		if ( $features['shortlife'] && 'default' === $php_version ) {
+			$php_version = $shortlife_php_versions_alternatives[ array_rand( $shortlife_php_versions_alternatives ) ];
+		}
+		if ( ! $features['shortlife'] && 'default' === $php_version ) {
+			$php_version = 'php7.0';
+		}
 
+		debug( 'Launching %s on PHP version: %s', $domain, $php_version );
 		$app = create_sp_app( $user->data->name, $user->data->id, $php_version, $domain_arg, $wordpress_options );
 	}, 10, 6 );
 	add_action( 'jurassic_ninja_create_sysuser', function( &$return, $username, $password ) {
