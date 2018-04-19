@@ -32,8 +32,9 @@ add_action( 'jurassic_ninja_init', function() {
 		if ( isset( $json_params['jetpack-beta'] ) && $json_params['jetpack-beta'] ) {
 			$url = get_jetpack_beta_url( $branch );
 
+			$error = null;
 			if ( null === $url ) {
-				return new \WP_Error(
+				$error = new \WP_Error(
 					'failed_to_launch_site_with_branch',
 					esc_html__( 'Invalid branch name or not ready yet: ' . $branch ),
 					[
@@ -41,7 +42,7 @@ add_action( 'jurassic_ninja_init', function() {
 					]
 				);
 			}
-			$features['jetpack-beta'] = $json_params['jetpack-beta'];
+			$features['jetpack-beta'] = $error === null ? $json_params['jetpack-beta'] : $error ;
 			$features['branch'] = $branch;
 		}
 

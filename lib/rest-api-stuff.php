@@ -44,8 +44,12 @@ function add_rest_api_endpoints() {
 		 * @param array $json_params The body of the json request.
 		 */
 		$features = apply_filters( 'jurassic_ninja_rest_create_request_features', $features, $json_params );
-		if ( is_wp_error( $features ) ) {
-			return $features;
+		// Check if any feature errored
+		foreach( $features as $feature ) {
+			if ( is_wp_error( $feature ) ) {
+				return $feature;
+			}
+
 		}
 
 		$data = launch_wordpress( 'default', $features );
