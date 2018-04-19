@@ -456,7 +456,11 @@ function mark_site_as_checked_in( $domain ) {
  * @return [type] [description]
  */
 function purge_sites() {
+	$MAX_SITES = 10;
 	$sites = sites_to_be_purged();
+	// Purge MAX_SITES at most so the purge task does not interfere
+	// with sites creation given that ServerPilot runs tasks in series.
+	$sites = array_slice( $sites, 0, $MAX_SITES );
 	/**
 	 * Filters the array of users listed by ServerPilot
 	 *
