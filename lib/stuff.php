@@ -82,7 +82,7 @@ function require_feature_files() {
 
 /**
  * Launches a new WordPress instance on the managed server
- * @param  String  $runtime              The PHP runtime versino to run the app on.
+ * @param  String  $php_version          The PHP version to run the app on.
  * @param  Array   $features             Array of features to enable
  *         boolean config-constants      Should we add the Config Constants plugin to the site?
  *         boolean auto_ssl              Should we add Let's Encrypt-based SSL for the site?
@@ -98,7 +98,7 @@ function require_feature_files() {
  *         boolean wp-log-viewer         Should we add WP Log Viewer plugin to the site?
  * @return Array|Null                    null or the app data as returned by ServerPilot's API on creation.
  */
-function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
+function launch_wordpress( $php_version = 'default', $requested_features = [] ) {
 	$default_features = [
 		'shortlife' => false,
 	];
@@ -173,7 +173,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		 *
 		 *     @type object $app                 Passed by reference. This object should contain the resulting data after creating a PHP app.
 		 *     @type object $user                An object that is the result of creating a new system user under which the app will run.
-		 *     @type string $runtime             The PHP version we're going to use.
+		 *     @type string $php_version         The PHP version we're going to use.
 		 *     @type string $domain              The domain under which this app will be running.
 		 *     @type array  $wordpress_options {
 		 *           An array of properties used for setting up the WordPress site for the first time.
@@ -186,7 +186,7 @@ function launch_wordpress( $runtime = 'php7.0', $requested_features = [] ) {
 		 * }
 		 *
 		 */
-		do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $user, $runtime, $domain, $wordpress_options, $features ] );
+		do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $user, $php_version, $domain, $wordpress_options, $features ] );
 
 		if ( is_wp_error( $app ) ) {
 			throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
