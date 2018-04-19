@@ -30,6 +30,7 @@ function init() {
 	require_once __DIR__ . '/lib/cron-stuff.php';
 	require_once __DIR__ . '/lib/db-stuff.php';
 	require_once __DIR__ . '/lib/settings-stuff.php';
+	require_once __DIR__ . '/lib/shortcode-stuff.php';
 	require_once __DIR__ . '/lib/stuff.php';
 
 	/**
@@ -52,6 +53,7 @@ function init() {
 		// Add wp-json /create /checkin and /extend endpoints
 		add_rest_api_endpoints();
 		add_cron_job( __FILE__ );
+		add_shortcodes( __FILE__ );
 		add_admin_bar_node();
 	}
 	/**

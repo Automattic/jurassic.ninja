@@ -1,0 +1,1 @@
+<p class="lead" id="progress">Launching a fresh WP with a Jetpack ...</p>
