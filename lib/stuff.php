@@ -40,7 +40,7 @@ define( 'SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubuserconten
  * Installs and activates the Jurassic Ninja companion plugin on the site.
  * @param string $password System password for ssh.
  */
-function add_auto_login( $password, $sysuser ) {
+function add_auto_login( $sysuser, $password ) {
 	$companion_api_base_url = rest_url( REST_API_NAMESPACE );
 	$companion_plugin_url = COMPANION_PLUGIN_URL;
 	$cmd = 'wp option add auto_login 1'
@@ -152,15 +152,6 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 
 		debug( 'Launching %s with features: %s', $domain, implode( ', ', array_keys( array_filter( $features ) ) ) );
 
-		debug( 'Creating sysuser for %s', $domain );
-
-		$user = generate_new_user( $password );
-		$app_name = $user->name;
-		$sysusername = $user->name;
-		$sysuser = $user->id;
-
-		debug( 'Creating app for %s under sysuser %s', $domain, $sysuser );
-
 		$app = null;
 		// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
 		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
@@ -175,8 +166,6 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		 *     All we need to describe a php app with WordPress
 		 *
 		 *     @type object $app                 Passed by reference. This object should contain the resulting data after creating a PHP app.
-		 *     @type object $app_name            The name to assign to the PHP app.
-		 *     @type object $sysuser             An id for system user that the app will run on.
 		 *     @type string $php_version         The PHP version we're going to use.
 		 *     @type string $domain              The domain under which this app will be running.
 		 *     @type array  $wordpress_options {
@@ -190,13 +179,13 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		 * }
 		 *
 		 */
-		do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $app_name, $sysuser, $php_version, $domain, $wordpress_options, $features ] );
+		do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $php_version, $domain, $wordpress_options, $features ] );
 		// phpcs:enable
 
 		if ( is_wp_error( $app ) ) {
 			throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
 		}
-		log_new_site( $app_name, $domain, $features['shortlife'] );
+		log_new_site( $app['sysuser'], $domain, $features['shortlife'] );
 
 		// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
 		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
@@ -220,7 +209,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		// phpcs:enable
 
 		debug( '%s: Adding Companion Plugin for Auto Login', $domain );
-		add_auto_login( $password, $app_name );
+		add_auto_login( $app['sysuser'], $password );
 
 		// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
 		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
@@ -246,7 +235,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		// Runs the command via SSH
 		// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
 		debug( '%s: Adding features', $domain );
-		run_commands_for_features( $sysusername, $password, $domain );
+		run_commands_for_features( $app['sysuser'], $password, $domain );
 
 		debug( 'Finished launching %s', $domain );
 		return $app;
@@ -316,40 +305,6 @@ function figure_out_main_domain( $domains ) {
 }
 
 /**
- * Generates a new username with a pseudo random name on the managed server.
- * @param  string $password The password to be assigned for the user
- * @return [type]           [description]
- */
-function generate_new_user( $password ) {
-	$username = generate_random_username();
-	$return = null;
-	// Here PHP Codesniffer parses &$return as if it were a deprecated pass-by-reference but it is not
-	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
-	/**
-	 * Fired for hooking and actually creating a system user
-	 *
-	 * This fires before launching a site
-	 *
-	 * @since 3.0
-	 *
-	 * @param array $args {
-	 *     All we need to describe a system user
-	 *
-	 *     @type object $return              Passed by reference. This object should container the resulting data after creating a system user.
-	 *     @type string $username            The username.
-	 *     @type string $password            The password for the user.
-	 * }
-	 *
-	 */
-	do_action_ref_array( 'jurassic_ninja_create_sysuser', [ &$return, $username, $password ] );
-	// phpcs:enable
-	if ( is_wp_error( $return ) ) {
-		throw new \Exception( 'Error creating sysuser: ' . $return->get_error_message() );
-	}
-	return $return->data;
-}
-
-/**
  * Generates a random string of 12 characters.
  * @return string A string with random characters to be used as password for the WordPress administrator
  */
@@ -398,13 +353,13 @@ function l( $stuff ) {
 
 /**
  * Stores a record for a freshly created site
- * @param  string $app_name   Name of the app
+ * @param  string $sysuser   Name of the app
  * @param  string $domain     Domain configured for the app
  */
-function log_new_site( $app_name, $domain, $shortlived = false ) {
+function log_new_site( $sysuser, $domain, $shortlived = false ) {
 	db()->insert( 'sites',
 		[
-			'username' => $app_name,
+			'username' => $sysuser,
 			'domain' => $domain,
 			'created' => current_time( 'mysql', 1 ),
 			'shortlived' => $shortlived,

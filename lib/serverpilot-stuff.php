@@ -16,7 +16,7 @@ if ( ! defined( '\\ABSPATH' ) ) {
 $serverpilot_instance = null;
 
 add_action( 'jurassic_ninja_init', function() {
-	add_action( 'jurassic_ninja_create_app', function( &$app, $app_name, $sysuser, $php_version, $domain, $wordpress_options, $features ) {
+	add_action( 'jurassic_ninja_create_app', function( &$app, $php_version, $domain, $wordpress_options, $features ) {
 		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
 		$domain_arg = ( isset( $features['subdomain_multisite'] ) && $features['subdomain_multisite'] ) ? array( $domain, '*.' . $domain ) : array( $domain );
 		// Mitigate ungraceful PHP-FPM restart for shortlived sites by randomizing PHP version
@@ -36,24 +36,39 @@ add_action( 'jurassic_ninja_init', function() {
 			$php_version = 'php7.0';
 		}
 
+		debug( 'Creating sysuser for %s', $domain );
+
+		$username = generate_random_username();
+
+		$user = null;
+		try {
+			$user = create_sp_sysuser( $username, $wordpress_options['admin_password'] );
+		} catch ( \Exception $e ) {
+			$user = new \WP_Error( $e->getCode(), $e->getMessage() );
+		}
+
+		if ( is_wp_error( $user ) ) {
+			throw new \Exception( 'Error creating sysuser: ' . $user->get_error_message() );
+		}
+
+		$sysuser = $user->name;
+		$sysuser_id = $user->id;
+		// For now, just use the generated username for naming the app.
+		$app_name = $user->name;
+		debug( 'Creating app for %s under sysuser %s', $domain, $sysuser );
+
 		debug( 'Launching %s on PHP version: %s', $domain, $php_version );
-		$sp_app = create_sp_app( $app_name, $sysuser, $php_version, $domain_arg, $wordpress_options );
+		$sp_app = create_sp_app( $app_name, $sysuser_id, $php_version, $domain_arg, $wordpress_options );
 		$app = [
+			'name' => $app_name,
+			'sysuser' => $sysuser,
 			'domain' => $domain,
 			'features' => $features,
 			'php_version' => $php_version,
-			'name' => $app_name,
 			'wordpress_options' => $wordpress_options,
 			'sp_data' => $sp_app->data,
 		];
-	}, 10, 7 );
-	add_action( 'jurassic_ninja_create_sysuser', function( &$return, $username, $password ) {
-		try {
-			$return = create_sp_sysuser( $username, $password );
-		} catch ( \Exception $e ) {
-			$return = new \WP_Error( $e->getCode(), $e->getMessage() );
-		}
-	}, 10, 3 );
+	}, 10, 5 );
 
 	add_filter( 'jurassic_ninja_sysuser_list', function( $users ) {
 		$return = array_merge( $users, get_sp_sysuser_list() );
@@ -112,15 +127,15 @@ function sp() {
 /**
  * Creates a PHP app using ServerPilot's API
  * @param  String $name          The nickname of the App
- * @param  String $sysuserid     The System User that will "own" this App
+ * @param  String $sysuser_id    The System User that will "own" this App
  * @param  String $php_version   The PHP version for an App. Choose from php5.4, php5.5, php5.6, php7.0, or php7.1.
  * @param  Array  $domains       An array of domains that will be used in the webserver's configuration
  * @param  Array  $wordpress     An array containing the following keys: site_title , admin_user , admin_password , and admin_email
  * @return Object                An object with the new app data.
  */
-function create_sp_app( $name, $sysuserid, $php_version, $domains, $wordpress ) {
+function create_sp_app( $name, $sysuser_id, $php_version, $domains, $wordpress ) {
 	try {
-		$app = sp()->app_create( $name, $sysuserid, $php_version, $domains, $wordpress );
+		$app = sp()->app_create( $name, $sysuser_id, $php_version, $domains, $wordpress );
 		wait_for_serverpilot_action( $app->actionid );
 		return $app;
 	} catch ( \ServerPilotException $e ) {
@@ -138,7 +153,7 @@ function create_sp_sysuser( $username, $password ) {
 	try {
 		$user = sp()->sysuser_create( settings( 'serverpilot_server_id' ), $username, $password );
 		wait_for_serverpilot_action( $user->actionid );
-		return $user;
+		return $user->data;
 	} catch ( \ServerPilotException $e ) {
 		return new \WP_Error( $e->getCode(), $e->getMessage() );
 	}
@@ -236,14 +251,6 @@ function get_sp_app_list() {
 function get_sp_sysuser_list() {
 	try {
 		return sp()->sysuser_list()->data;
-	} catch ( \ServerPilotException $e ) {
-		return new \WP_Error( $e->getCode(), $e->getMessage() );
-	}
-}
-
-function update_sp_sysuser( $sysuserid, $password ) {
-	try {
-		return sp()->sysuser_update( $sysuserid, $password );
 	} catch ( \ServerPilotException $e ) {
 		return new \WP_Error( $e->getCode(), $e->getMessage() );
 	}
