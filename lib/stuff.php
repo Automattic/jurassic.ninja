@@ -80,7 +80,8 @@ function require_feature_files() {
  * Launches a new WordPress instance on the managed server
  * @param  String  $php_version          The PHP version to run the app on.
  * @param  Array   $features             Array of features to enable
- *         boolean config-constants      Should we add the Config Constants plugin to the site?
+ *         boolean code-snippets         Should we add Code Snippets plugin to the site?
+ *         boolean config-constants      Should we add Config Constants plugin to the site?
  *         boolean auto_ssl              Should we add Let's Encrypt-based SSL for the site?
  *         boolean ssl                   Should we add the configured SSL certificate for the site?
  *         boolean gutenberg             Should we add Gutenberg to the site?
@@ -91,7 +92,9 @@ function require_feature_files() {
  *         boolean woocommerce           Should we add WooCommerce plugin to the site?
  *         boolean wordpress-beta-tester Should we add Jetpack Beta Tester plugin to the site?
  *         boolean wp-debug-log          Should we set WP_DEBUG and WP_DEBUG log to true ?
+ *         boolean wp-downgrade          Should we add WP Downgrade plugin to the site?
  *         boolean wp-log-viewer         Should we add WP Log Viewer plugin to the site?
+ *         boolean wp-rollback           Should we add WP Rollback plugin to the site?
  * @return Array|Null                    null or the app data as returned by ServerPilot's API on creation.
  */
 function launch_wordpress( $php_version = 'default', $requested_features = [] ) {
