@@ -155,8 +155,11 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		debug( 'Creating sysuser for %s', $domain );
 
 		$user = generate_new_user( $password );
+		$app_name = $user->name;
+		$sysusername = $user->name;
+		$sysuser = $user->id;
 
-		debug( 'Creating app for %s under sysuser %s', $domain, $user->data->name );
+		debug( 'Creating app for %s under sysuser %s', $domain, $sysuser );
 
 		$app = null;
 		// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
@@ -172,7 +175,8 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		 *     All we need to describe a php app with WordPress
 		 *
 		 *     @type object $app                 Passed by reference. This object should contain the resulting data after creating a PHP app.
-		 *     @type object $user                An object that is the result of creating a new system user under which the app will run.
+		 *     @type object $app_name            The name to assign to the PHP app.
+		 *     @type object $sysuser             An id for system user that the app will run on.
 		 *     @type string $php_version         The PHP version we're going to use.
 		 *     @type string $domain              The domain under which this app will be running.
 		 *     @type array  $wordpress_options {
@@ -186,13 +190,13 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		 * }
 		 *
 		 */
-		do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $user, $php_version, $domain, $wordpress_options, $features ] );
+		do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $app_name, $sysuser, $php_version, $domain, $wordpress_options, $features ] );
 		// phpcs:enable
 
 		if ( is_wp_error( $app ) ) {
 			throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
 		}
-		log_new_site( $app->data, $features['shortlife'] );
+		log_new_site( $app_name, $domain, $features['shortlife'] );
 
 		// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
 		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
@@ -216,7 +220,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		// phpcs:enable
 
 		debug( '%s: Adding Companion Plugin for Auto Login', $domain );
-		add_auto_login( $password, $user->data->name );
+		add_auto_login( $password, $app_name );
 
 		// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
 		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
@@ -242,10 +246,10 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		// Runs the command via SSH
 		// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
 		debug( '%s: Adding features', $domain );
-		run_commands_for_features( $user->data->name, $password, $domain );
+		run_commands_for_features( $sysusername, $password, $domain );
 
 		debug( 'Finished launching %s', $domain );
-		return $app->data;
+		return $app;
 	} catch ( \Exception $e ) {
 		debug( '%s: Error [%s]: %s', $domain, $e->getCode(), $e->getMessage() );
 		return null;
@@ -342,7 +346,7 @@ function generate_new_user( $password ) {
 	if ( is_wp_error( $return ) ) {
 		throw new \Exception( 'Error creating sysuser: ' . $return->get_error_message() );
 	}
-	return $return;
+	return $return->data;
 }
 
 /**
@@ -394,14 +398,14 @@ function l( $stuff ) {
 
 /**
  * Stores a record for a freshly created site
- * @param  Array $data Site data as returned by ServerPilot's API on creation
- * @return [type]       [description]
+ * @param  string $app_name   Name of the app
+ * @param  string $domain     Domain configured for the app
  */
-function log_new_site( $data, $shortlived = false ) {
+function log_new_site( $app_name, $domain, $shortlived = false ) {
 	db()->insert( 'sites',
 		[
-			'username' => $data->name,
-			'domain' => figure_out_main_domain( $data->domains ),
+			'username' => $app_name,
+			'domain' => $domain,
 			'created' => current_time( 'mysql', 1 ),
 			'shortlived' => $shortlived,
 		]

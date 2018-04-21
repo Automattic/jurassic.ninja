@@ -16,7 +16,7 @@ if ( ! defined( '\\ABSPATH' ) ) {
 $serverpilot_instance = null;
 
 add_action( 'jurassic_ninja_init', function() {
-	add_action( 'jurassic_ninja_create_app', function( &$app, $user, $php_version, $domain, $wordpress_options, $features ) {
+	add_action( 'jurassic_ninja_create_app', function( &$app, $app_name, $sysuser, $php_version, $domain, $wordpress_options, $features ) {
 		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
 		$domain_arg = ( isset( $features['subdomain_multisite'] ) && $features['subdomain_multisite'] ) ? array( $domain, '*.' . $domain ) : array( $domain );
 		// Mitigate ungraceful PHP-FPM restart for shortlived sites by randomizing PHP version
@@ -37,8 +37,16 @@ add_action( 'jurassic_ninja_init', function() {
 		}
 
 		debug( 'Launching %s on PHP version: %s', $domain, $php_version );
-		$app = create_sp_app( $user->data->name, $user->data->id, $php_version, $domain_arg, $wordpress_options );
-	}, 10, 6 );
+		$sp_app = create_sp_app( $app_name, $sysuser, $php_version, $domain_arg, $wordpress_options );
+		$app = [
+			'domain' => $domain,
+			'features' => $features,
+			'php_version' => $php_version,
+			'name' => $app_name,
+			'wordpress_options' => $wordpress_options,
+			'sp_data' => $sp_app->data,
+		];
+	}, 10, 7 );
 	add_action( 'jurassic_ninja_create_sysuser', function( &$return, $username, $password ) {
 		try {
 			$return = create_sp_sysuser( $username, $password );
@@ -199,7 +207,6 @@ function enable_sp_ssl( $app_id ) {
 		 * Tested a few sites and nothing broke.
 		 * Leaving it commented in case something breaks eventually.
 		 */
-		// wait_for_serverpilot_action( $data->actionid );
 
 		// Enable redirection from https to http
 		$data = sp()->ssl_force( $app_id, true );

@@ -47,8 +47,8 @@ function add_rest_api_endpoints() {
 			}
 		}
 
-		$data = launch_wordpress( $features['php_version'], $features );
-		if ( null === $data ) {
+		$app = launch_wordpress( 'default', $features );
+		if ( null === $app ) {
 			return new \WP_Error(
 				'failed_to_launch_site',
 				esc_html__( 'There was an error launching the site.', 'jurassic-ninja' ),
@@ -67,7 +67,7 @@ function add_rest_api_endpoints() {
 		 * @param string $domain   The domain used for the site.
 		 * @param array  $features The feature with which the site was launched.
 		 */
-		$url = apply_filters( 'jurassic_ninja_created_site_url', figure_out_main_domain( $data->domains ), $features );
+		$url = apply_filters( 'jurassic_ninja_created_site_url', $app['domain'], $features );
 
 		$output = [
 			'url' => $url,

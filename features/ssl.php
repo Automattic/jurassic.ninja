@@ -12,7 +12,7 @@ add_action( 'jurassic_ninja_init', function() {
 		$features = array_merge( $defaults, $features );
 		// Currently not used but the code works.
 		if ( $features['auto_ssl'] ) {
-			enable_sp_auto_ssl( $app->data->id );
+			enable_sp_auto_ssl( $app['sp_data']->id );
 		}
 		// We can't easily enable SSL for subodmains because
 		// wildcard certificates don't support multiple levels of subdomains
@@ -23,7 +23,7 @@ add_action( 'jurassic_ninja_init', function() {
 				debug( 'Both ssl and auto_ssl features were requested. Ignoring ssl and launching with auto_ssl' );
 			} else {
 				debug( '%s: Enabling custom SSL', $domain );
-				$response = enable_sp_ssl( $app->data->id );
+				$response = enable_sp_ssl( $app['sp_data']->id );
 				if ( is_wp_error( $response ) ) {
 					debug( 'Error enabling SSL for %s. Check the next log line for a dump of the WP_Error', $domain );
 					// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_print_r
