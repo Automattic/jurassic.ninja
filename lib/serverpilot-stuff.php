@@ -105,7 +105,7 @@ add_action( 'jurassic_ninja_admin_init', function() {
 		];
 		$options_page[ SETTINGS_KEY ]['sections']['serverpilot'] = $settings;
 		return $options_page;
-	}, 5 );
+	}, 15 );
 } );
 
 /**
