@@ -28,7 +28,7 @@ On plugin activation, this plugin will create two tables on the same database yo
 * Get the bundle from GitHub.
 
     ```sh
-    wp plugin install https://github.com/oskosk/jurassic.ninja/archive/master.zip
+    wp plugin install https://github.com/Automattic/jurassic.ninja/archive/master.zip
     ```
 
 * Install composer dependencies
