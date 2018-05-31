@@ -66,6 +66,7 @@ function require_feature_files() {
 		'/features/gutenberg.php',
 		'/features/jetpack-beta.php',
 		'/features/woocommerce.php',
+		'/features/woocommerce-beta-tester.php',
 		'/features/wordpress-beta-tester.php',
 		'/features/wp-debug-log.php',
 		'/features/wp-log-viewer.php',
