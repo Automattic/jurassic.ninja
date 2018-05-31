@@ -16,6 +16,38 @@ add_action( 'jurassic_ninja_init', function() {
 			add_woocommerce_beta_tester_plugin();
 		}
 	}, 10, 3 );
+
+	add_filter( 'jurassic_ninja_rest_feature_defaults', function( $defaults ) {
+		return array_merge( $defaults, [
+			'woocommerce-beta-tester' => (bool) settings( 'add_woocommerce_beta_tester_by_default', false ),
+		] );
+	} );
+
+	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) {
+		if ( isset( $json_params['woocommerce-beta-tester'] ) ) {
+			$features['woocommerce-beta-tester'] = $json_params['woocommerce-beta-tester'];
+			// The WooCommerce Beta Tester Plugin works only when woocommerce is installed and active too
+			if ( $features['woocommerce-beta-tester'] ) {
+				$features['woocommerce'] = true;
+			}
+		}
+		return $features;
+	}, 10, 2 );
+} );
+
+add_action( 'jurassic_ninja_admin_init', function( $fields ) {
+	add_filter( 'jurassic_ninja_settings_options_page_default_plugins', function( $fields ) {
+		$field = [
+			'add_woocommerce_beta_tester_by_default' => [
+				'id' => 'add_woocommerce_beta_tester_by_default',
+				'title' => __( 'Add WooCommerce Beta Tester plugin to every launched WordPress', 'jurassic-ninja' ),
+				'text' => __( 'Install and activate WooCommerce Beta Tester on launch', 'jurassic-ninja' ),
+				'type' => 'checkbox',
+				'checked' => false,
+			],
+		];
+		return array_merge( $fields, $field );
+	}, 10 );
 } );
 
 /**
