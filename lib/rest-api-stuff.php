@@ -89,8 +89,8 @@ function add_rest_api_endpoints() {
 		 * Filters the features requested through the /specialops/create REST API endpoint
 		 *
 		 * Should only hook here for special cases.
-		 * Like in the case of the WooCommerce Beta Tester which currently is functionless
-		 * unless WooCommerce is installed too.
+		 * Like in the case of the WooCommerce Beta Tester which currently provides no functionality unless
+		 * WooCommerce is installed too.
 		 *
 		 * If any filter returns a WP_Error, then the request is finished with status 500
 		 *
