@@ -45,11 +45,10 @@ function add_rest_api_endpoints() {
 		 */
 		$features = apply_filters( 'jurassic_ninja_rest_create_request_features', $features, $json_params );
 		// Check if any feature errored
-		foreach( $features as $feature ) {
+		foreach ( $features as $feature ) {
 			if ( is_wp_error( $feature ) ) {
 				return $feature;
 			}
-
 		}
 
 		$data = launch_wordpress( 'default', $features );
@@ -86,6 +85,25 @@ function add_rest_api_endpoints() {
 
 		$features = $json_params && is_array( $json_params ) ? $json_params : [];
 		$features = array_merge( $defaults, $features );
+		/**
+		 * Filters the features requested through the /specialops/create REST API endpoint
+		 *
+		 * Should only hook here for special cases.
+		 * Like in the case of the WooCommerce Beta Tester which currently provides no functionality unless
+		 * WooCommerce is installed too.
+		 *
+		 * If any filter returns a WP_Error, then the request is finished with status 500
+		 *
+		 * @param array $features    The current feature flags.
+		 * @param array $json_params The body of the json request.
+		 */
+		$features = apply_filters( 'jurassic_ninja_rest_specialops_create_request_features', $features, $json_params );
+		// Check if any feature errored
+		foreach ( $features as $feature ) {
+			if ( is_wp_error( $feature ) ) {
+				return $feature;
+			}
+		}
 		if ( ! settings( 'enable_launching', true ) ) {
 			return new \WP_Error( 'site_launching_disabled', __( 'Site launching is disabled right now' ), [
 				'status' => 503,
