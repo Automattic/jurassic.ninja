@@ -75,7 +75,7 @@ function require_feature_files() {
 		'/features/wp-rollback.php',
 	];
 
-	$available_features =  apply_filters( 'jurassic_ninja_available_features', $available_features );
+	$available_features = apply_filters( 'jurassic_ninja_available_features', $available_features );
 	foreach( $available_features as $feature_file ) {
 		require_once PLUGIN_DIR . $feature_file;
 	}
