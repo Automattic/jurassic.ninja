@@ -24,3 +24,17 @@ add_action( 'jurassic_ninja_init', function() {
 	} );
 } );
 
+add_action( 'jurassic_ninja_admin_init', function() {
+	add_filter( 'jurassic_ninja_settings_options_page', function( $options_page ) {
+		$field = [
+			'id' => 'use_user_email_as_admin_email',
+			'title' => __( 'Set the user\'s email address as the site\'s admin email address', 'jurassic-ninja' ),
+			'text' => __( 'If the user launching a site is logged in, use their email address for the site', 'jurassic-ninja' ),
+			'type' => 'checkbox',
+			'checked' => false,
+		];
+		$options_page[ SETTINGS_KEY ]['sections']['domain']['fields']['use_user_email_as_admin_email'] = $field;
+		return $options_page;
+	}, 10 );
+} );
+
