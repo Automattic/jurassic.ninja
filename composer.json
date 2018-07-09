@@ -12,7 +12,7 @@
 		"squizlabs/php_codesniffer": "*"
 	},
 	"scripts": {
-		"changelog": "git changelog -a changelog.md",
+		"changelog": "git changelog  changelog.md",
 		"lint": "vendor/bin/phpcs",
 		"test": "vendor/bin/phpunit"
 	}
