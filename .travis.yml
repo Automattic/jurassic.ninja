@@ -1,0 +1,28 @@
+language: php
+
+cache:
+  directories:
+    - vendor
+php:
+  - 7.1
+
+stages:
+  - lint
+  - test
+
+jobs:
+  include:
+  - stage: lint
+    install: composer install
+    script: composer lint -- --warning-severity=0
+  - stage: test
+    install: composer install
+    script: composer test -- --testdox
+
+# Run push builds only on aster
+branches:
+  only:
+    - master
+
+notifications:
+   email: false
