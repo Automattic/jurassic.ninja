@@ -1,4 +1,16 @@
 
+3.6.1 / 2018-07-08
+==================
+
+  * Bump to 3.6.1
+  * add script composer changelog
+  * Add Travis configuration
+  * Fix some lint issues
+  * Add linter
+  * add script composer test
+  * Add some basic test scaffolding
+  * Add changelog file
+
 3.6 / 2018-06-18
 ================
 
