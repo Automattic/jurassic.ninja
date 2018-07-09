@@ -76,7 +76,7 @@ function init_or_fail_if_no_dependencies_installed() {
 
 	add_error_notices();
 	if ( ! is_dir( __DIR__ . '/vendor' ) ) {
-		push_error( new \WP_Error( 'no-dependencies', __( 'Run composer install first' ) ) );
+		push_error( new \WP_Error( 'no-dependencies', __( 'Run composer install first', 'jurassic-ninja' ) ) );
 	} else {
 		init();
 	}

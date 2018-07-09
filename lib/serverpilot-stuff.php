@@ -18,7 +18,7 @@ $serverpilot_instance = null;
 add_action( 'jurassic_ninja_init', function() {
 	add_action( 'jurassic_ninja_create_app', function( &$app, $user, $php_version, $domain, $wordpress_options, $features ) {
 		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
-		$domain_arg = isset( $features['subdomain_multisite'] ) && $features['subdomain_multisite'] ? array( $domain, '*.' . $domain ) : array( $domain );
+		$domain_arg = ( isset( $features['subdomain_multisite'] ) && $features['subdomain_multisite'] ) ? array( $domain, '*.' . $domain ) : array( $domain );
 		// Mitigate ungraceful PHP-FPM restart for shortlived sites by randomizing PHP version
 		// PHP does not support graceful "restart" so every php-pool gets closed
 		// each time ServerPilot needs to SIGUSR1 php for reloading configuration
@@ -48,7 +48,7 @@ add_action( 'jurassic_ninja_init', function() {
 	}, 10, 3 );
 
 	add_filter( 'jurassic_ninja_sysuser_list', function( $users ) {
-		$return = array_merge( $users,  get_sp_sysuser_list() );
+		$return = array_merge( $users, get_sp_sysuser_list() );
 		return $return;
 	} );
 	add_filter( 'jurassic_ninja_delete_site', function( &$return, $user ) {
@@ -66,17 +66,17 @@ add_action( 'jurassic_ninja_admin_init', function() {
 				'serverpilot_server_id' => array(
 					'id' => 'serverpilot_server_id',
 					'title' => __( 'ServerPilot Server Id', 'jurassic-ninja' ),
-					'text' => __( 'A ServerPilot Server Id.' ),
+					'text' => __( 'A ServerPilot Server Id.', 'jurassic-ninja' ),
 				),
 				'serverpilot_client_id' => array(
 					'id' => 'serverpilot_client_id',
 					'title' => __( 'ServerPilot Client Id', 'jurassic-ninja' ),
-					'text' => __( 'A ServerPilot Client id.' ),
+					'text' => __( 'A ServerPilot Client id.', 'jurassic-ninja' ),
 				),
 				'serverpilot_client_key' => array(
 					'id' => 'serverpilot_client_key',
 					'title' => __( 'ServerPilot Key', 'jurassic-ninja' ),
-					'text' => __( 'A ServerPilot Client key.' ),
+					'text' => __( 'A ServerPilot Client key.', 'jurassic-ninja' ),
 				),
 			),
 		];
@@ -182,7 +182,7 @@ function enable_sp_ssl( $app_id ) {
 	$ca_certificates = settings( 'ssl_ca_certificates', null );
 
 	if ( ! $private_key || ! $certificate ) {
-		return new \WP_Error( 'ssl_settings_not_present', __( 'Certificate or Private key are not configured' ) );
+		return new \WP_Error( 'ssl_settings_not_present', __( 'Certificate or Private key are not configured', 'jurassic-ninja' ) );
 	}
 
 	if ( ! $ca_certificates ) {
@@ -249,7 +249,6 @@ function update_sp_sysuser( $sysuserid, $password ) {
  */
 function wait_for_serverpilot_action( $action_id ) {
 	$sp = sp();
-	$ok = false;
 	do {
 		sleep( 1 );
 		$status = $sp->action_info( $action_id );

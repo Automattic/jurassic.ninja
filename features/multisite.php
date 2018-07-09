@@ -11,11 +11,11 @@ add_action( 'jurassic_ninja_init', function() {
 	add_action( 'jurassic_ninja_do_feature_conditions', function( $features ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		if ( $features['subdir_multisite'] && $features['subdomain_multisite'] ) {
-			throw new \Exception( 'not-both-multisite-types', __( "Don't try to enable both types of multisite" ) );
+			throw new \Exception( 'not-both-multisite-types', __( "Don't try to enable both types of multisite", 'jurassic-ninja' ) );
 		}
 	} );
 
-	add_action( 'jurassic_ninja_add_features_after_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_add_features_after_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		// Enabling multisite is done very late so we can install plugins first without
 		// having to decide if network activate them afterwards.

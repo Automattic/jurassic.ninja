@@ -8,7 +8,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'branch' => false,
 	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		if ( $features['jetpack'] ) {
 			debug( '%s: Adding Jetpack', $domain );
@@ -50,7 +50,7 @@ add_action( 'jurassic_ninja_admin_init', function() {
 		] );
 		$settings = [
 			'title' => __( 'Default plugins', 'jurassic-ninja' ),
-			'text' => '<p>' . __( 'Choose plugins you want installed on launch by default.' ) . '</p>',
+			'text' => '<p>' . __( 'Choose plugins you want installed on launch by default.', 'jurassic-ninja' ) . '</p>',
 			'fields' => $fields,
 		];
 

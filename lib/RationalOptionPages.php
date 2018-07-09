@@ -9,6 +9,7 @@
  * @copyright	Copyright (c) 2016
  * @link		http://jeremyhixon.com
  * @version		1.0.0
+ * phpcs:ignoreFile -- this is not a core file
  */
 class RationalOptionPages {
 	/* ==========================================================================

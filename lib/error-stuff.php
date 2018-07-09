@@ -28,30 +28,31 @@ function admin_noticies() {
 	}
 	?>
 	<div class="notice notice-warning is-dismissible">
-		<h4><?php echo esc_html__( 'Jurassic ninja' ); ?></h4>
+		<h4><?php echo esc_html__( 'Jurassic ninja', 'jurassic-ninja' ); ?></h4>
 		<ul>
 			<?php
 			foreach ( errors() as $error ) {
-			?>
+				?>
 				<li>
 				<?php echo esc_html( $error->get_error_message() ); ?>
 				</li>
-			<?php
+				<?php
 			}
 
 			if ( $settings_problems ) {
 				$settings_problems = settings_problems();
 				$settings_url = menu_page_url( 'jurassic_ninja_settings', false );
 				?>
-				<?php echo esc_html__( 'You need to get to ' ); ?>
-				<a href=<?php echo esc_html( $settings_url ); ?>><?php echo esc_html__( 'Jurassic Ninja Settings' ); ?></a>
+				<?php echo esc_html__( 'You need to get to ', 'jurassic-ninja' ); ?>
+				<a href=<?php echo esc_html( $settings_url ); ?>><?php echo esc_html__( 'Jurassic Ninja Settings', 'jurassic-ninja' ); ?></a>
 				<?php
-					echo sprintf( esc_html__( ' and configure %s to be able to launch sites.' ), esc_html( list_in_words( $settings_problems ) ) );
+					/* translators: is a domain name */
+					echo sprintf( esc_html__( ' and configure %s to be able to launch sites.', 'jurassic-ninja' ), esc_html( list_in_words( $settings_problems ) ) );
 			}
 			?>
 		</ul>
 	</div>
-<?php
+	<?php
 }
 
 /**
@@ -62,7 +63,7 @@ function admin_noticies() {
 function list_in_words( $list = [] ) {
 	$last = array_pop( $list );
 	$s = join( ', ', $list );
-	$s .= count( $list ) ? __( ' and ' ) . $last : $last ;
+	$s .= count( $list ) ? __( ' and ', 'jurassic-ninja' ) . $last : $last;
 	return $s;
 }
 

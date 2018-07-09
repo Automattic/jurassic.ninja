@@ -2,5 +2,17 @@
 	"require": {
 		"daverogers/serverpilot-php": "1.*",
 		"nubs/random-name-generator": "1.*"
+	},
+	"require-dev": {
+	       "dealerdirect/phpcodesniffer-composer-installer": "^0.4.4",
+	       "wp-coding-standards/wpcs": "^0.14.0",
+	        "sirbrillig/phpcs-variable-analysis": "^2.0",
+	        "wimg/php-compatibility": "^8.1",
+		"phpunit/phpunit": "^6.4",
+		"squizlabs/php_codesniffer": "*"
+	},
+	"scripts": {
+		"lint": "vendor/bin/phpcs",
+		"test": "vendor/bin/phpunit"
 	}
 }

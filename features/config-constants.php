@@ -7,7 +7,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'config-constants' => false,
 	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		if ( $features['config-constants'] ) {
 			debug( '%s: Adding Config Constants Plugin', $domain );

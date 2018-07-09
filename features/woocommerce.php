@@ -7,7 +7,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'woocommerce' => false,
 	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		if ( $features['woocommerce'] ) {
 			debug( '%s: Adding WooCommerce', $domain );
@@ -29,7 +29,7 @@ add_action( 'jurassic_ninja_init', function() {
 	}, 10, 2 );
 } );
 
-add_action( 'jurassic_ninja_admin_init', function( $fields ) {
+add_action( 'jurassic_ninja_admin_init', function() {
 	add_filter( 'jurassic_ninja_settings_options_page_default_plugins', function( $fields ) {
 		$field = [
 			'add_woocommerce_by_default' => [
@@ -48,7 +48,7 @@ add_action( 'jurassic_ninja_admin_init', function( $fields ) {
  * Installs and activates WooCommerce on the site.
  */
 function add_woocommerce_plugin() {
-	$cmd = 'wp plugin install woocommerce --activate' ;
+	$cmd = 'wp plugin install woocommerce --activate';
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );

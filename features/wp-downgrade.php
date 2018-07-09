@@ -7,7 +7,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'wp-downgrade' => false,
 	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		if ( $features['wp-downgrade'] ) {
 			debug( '%s: Adding WP Downgrade', $domain );
@@ -33,7 +33,7 @@ add_action( 'jurassic_ninja_init', function() {
  * Installs and activates WP Downgrade on the site.
  */
 function add_wp_downgrade_plugin() {
-	$cmd = 'wp plugin install wp-downgrade --activate' ;
+	$cmd = 'wp plugin install wp-downgrade --activate';
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );

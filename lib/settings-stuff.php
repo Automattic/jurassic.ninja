@@ -26,7 +26,7 @@ function settings( $key = null, $default = null ) {
 	}
 
 	if ( ! isset( $options[ $key ] ) ) {
-		return func_num_args() === 2 ? $default : null ;
+		return func_num_args() === 2 ? $default : null;
 	}
 
 	return $options[ $key ];
@@ -84,7 +84,7 @@ function add_settings_page() {
 	$options_page = [
 		'jurassic-ninja' => array(
 			'page_title' => __( 'Jurassic Ninja Sites Admin', 'jurassic-ninja' ),
-			'menu_title' => __( 'Jurassic Ninja' ),
+			'menu_title' => __( 'Jurassic Ninja', 'jurassic-ninja' ),
 			'icon_url' => 'dashicons-tickets',
 			'menu_slug' => 'jurassic_ninja',
 			'sections' => array(
@@ -107,7 +107,7 @@ function add_settings_page() {
 						'domain' => array(
 							'id' => 'domain',
 							'title' => __( 'The parent domain for each launched WordPress', 'jurassic-ninja' ),
-							'text' => __( 'Every created site will be created with a subodmain abcd.jurassic.ninja' ),
+							'text' => __( 'Every created site will be created with a subodmain abcd.jurassic.ninja', 'jurassic-ninja' ),
 							'placeholder' => 'jurassic.ninja',
 							'value' => 'jurassic.ninja',
 						),
@@ -200,5 +200,5 @@ function add_settings_page() {
 	 *
 	 * @param array  $options_page The options page key/values for RationalOptionPages::__contruct()
 	 */
-	new \RationalOptionPages( apply_filters( 'jurassic_ninja_settings_options_page' , $options_page ) );
+	new \RationalOptionPages( apply_filters( 'jurassic_ninja_settings_options_page', $options_page ) );
 }

@@ -52,14 +52,16 @@ function jurassic_ninja_create_table() {
 	) $charset_collate;";
 
 	if ( ! function_exists( 'dbDelta' ) ) {
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 	}
 
 	try {
+		// phpcs:disable Generic.PHP.NoSilencedErrors.Discouraged
 		@dbDelta( $sql );
 		@dbDelta( $sql2 );
+		// phpcs:enable
 
 	} catch ( \Exception $e ) {
-		push_error( new \WP_Error( 'error_creating_administartive_tables' ) );
+		push_error( new \WP_Error( 'error_creating_administartive_tables', $e->getMessage() ) );
 	}
 }
