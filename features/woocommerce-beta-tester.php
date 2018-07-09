@@ -9,7 +9,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'woocommerce-beta-tester' => false,
 	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		if ( $features['woocommerce-beta-tester'] ) {
 			debug( '%s: Adding WooCommerce Beta Tester Plugin', $domain );
@@ -46,7 +46,7 @@ add_action( 'jurassic_ninja_init', function() {
 	}, 10, 2 );
 } );
 
-add_action( 'jurassic_ninja_admin_init', function( $fields ) {
+add_action( 'jurassic_ninja_admin_init', function() {
 	add_filter( 'jurassic_ninja_settings_options_page_default_plugins', function( $fields ) {
 		$field = [
 			'add_woocommerce_beta_tester_by_default' => [

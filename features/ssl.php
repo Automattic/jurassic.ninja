@@ -26,7 +26,9 @@ add_action( 'jurassic_ninja_init', function() {
 				$response = enable_sp_ssl( $app->data->id );
 				if ( is_wp_error( $response ) ) {
 					debug( 'Error enabling SSL for %s. Check the next log line for a dump of the WP_Error', $domain );
+					// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_print_r
 					debug( print_r( $response, true ) );
+					// phpcs:enable
 					throw new \Exception( 'Error enabling SSL: ' . $response->get_error_message() );
 				}
 			}
@@ -40,7 +42,7 @@ add_action( 'jurassic_ninja_init', function() {
 
 	add_filter( 'jurassic_ninja_created_site_url', function( $domain, $features ) {
 		// See note in launch_wordpress() about why we can't launch subdomain_multisite with ssl.
-		$schema = $features['ssl'] && ! $features['subdomain_multisite'] ? 'https' : 'http';
+		$schema = ( $features['ssl'] && ! $features['subdomain_multisite'] ) ? 'https' : 'http';
 		$url = "$schema://" . $domain;
 		return $url;
 	}, 10, 2 );
@@ -50,7 +52,7 @@ add_action( 'jurassic_ninja_admin_init', function() {
 	add_filter( 'jurassic_ninja_settings_options_page', function( $options_page ) {
 		$settings = [
 			'title' => __( 'SSL Configuration', 'jurassic-ninja' ),
-			'text' => '<p>' . __( 'Paste a wildcard SSL certificate and the private key used to generate it.' ) . '</p>',
+			'text' => '<p>' . __( 'Paste a wildcard SSL certificate and the private key used to generate it.', 'jurassic-ninja' ) . '</p>',
 			'fields' => array(
 				'ssl_use_custom_certificate' => array(
 					'id' => 'ssl_use_custom_certificate',
@@ -61,19 +63,19 @@ add_action( 'jurassic_ninja_admin_init', function() {
 				'ssl_certificate' => array(
 					'id' => 'ssl_certificate',
 					'title' => __( 'SSL certificate', 'jurassic-ninja' ),
-					'text' => __( 'Paste the text here.' ),
+					'text' => __( 'Paste the text here.', 'jurassic-ninja' ),
 					'type' => 'textarea',
 				),
 				'ssl_private_key' => array(
 					'id' => 'ssl_private_key',
 					'title' => __( 'The private key used to create the certificate', 'jurassic-ninja' ),
-					'text' => __( 'Paste the text here.' ),
+					'text' => __( 'Paste the text here.', 'jurassic-ninja' ),
 					'type' => 'textarea',
 				),
 				'ssl_ca_certificates' => array(
 					'id' => 'ssl_ca_certificates',
 					'title' => __( 'CA certificates', 'jurassic-ninja' ),
-					'text' => __( 'Paste the text here.' ),
+					'text' => __( 'Paste the text here.', 'jurassic-ninja' ),
 					'type' => 'textarea',
 				),
 			),

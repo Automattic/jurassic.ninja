@@ -15,7 +15,7 @@ add_action( 'jurassic_ninja_init', function() {
 		return $features;
 	}, 10, 2 );
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) {
 		if ( $features['wp-log-viewer'] ) {
 			debug( '%s: Adding WP Log Viewer Plugin', $domain );
 			add_wp_log_viewer_plugin();

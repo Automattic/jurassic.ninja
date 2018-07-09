@@ -12,7 +12,7 @@ if ( ! defined( '\\ABSPATH' ) ) {
 function add_rest_api_endpoints() {
 	$permission_callback = [
 		'permission_callback' => function () {
-			return settings( 'lock_launching', false ) ? current_user_can( 'manage_options' ) : true ;
+			return settings( 'lock_launching', false ) ? current_user_can( 'manage_options' ) : true;
 		},
 	];
 
@@ -26,7 +26,7 @@ function add_rest_api_endpoints() {
 		$json_params = $request->get_json_params();
 
 		if ( ! settings( 'enable_launching', true ) ) {
-			return new \WP_Error( 'site_launching_disabled', __( 'Site launching is disabled right now' ), [
+			return new \WP_Error( 'site_launching_disabled', __( 'Site launching is disabled right now', 'jurassic-ninja' ), [
 				'status' => 503,
 			] );
 		}
@@ -55,7 +55,7 @@ function add_rest_api_endpoints() {
 		if ( null === $data ) {
 			return new \WP_Error(
 				'failed_to_launch_site',
-				esc_html__( 'There was an error launching the site.' ),
+				esc_html__( 'There was an error launching the site.', 'jurassic-ninja' ),
 				[
 					'status' => 500,
 				]
@@ -105,7 +105,7 @@ function add_rest_api_endpoints() {
 			}
 		}
 		if ( ! settings( 'enable_launching', true ) ) {
-			return new \WP_Error( 'site_launching_disabled', __( 'Site launching is disabled right now' ), [
+			return new \WP_Error( 'site_launching_disabled', __( 'Site launching is disabled right now', 'jurassic-ninja' ), [
 				'status' => 503,
 			] );
 		}
@@ -115,7 +115,7 @@ function add_rest_api_endpoints() {
 		if ( null === $data ) {
 			return new \WP_Error(
 				'failed_to_launch_site',
-				esc_html__( 'There was an error launching the site.' ),
+				esc_html__( 'There was an error launching the site.', 'jurassic-ninja' ),
 				[
 					'status' => 500,
 				]
@@ -142,7 +142,7 @@ function add_rest_api_endpoints() {
 	add_post_endpoint( 'extend', function ( $request ) {
 		$body = $request->get_json_params() ? $request->get_json_params() : [];
 		if ( ! isset( $body['domain'] ) ) {
-			return new \WP_Error( 'no_domain_in_body', __( 'You must pass a valid "domain" prop in the body' ) );
+			return new \WP_Error( 'no_domain_in_body', __( 'You must pass a valid "domain" prop in the body', 'jurassic-ninja' ) );
 		}
 		extend_site_life( $body['domain'] );
 
@@ -156,7 +156,7 @@ function add_rest_api_endpoints() {
 	add_post_endpoint( 'checkin', function ( $request ) {
 		$body = $request->get_json_params() ? $request->get_json_params() : [];
 		if ( ! isset( $body['domain'] ) ) {
-			return new \WP_Error( 'no_domain_in_body', __( 'You must pass a valid "domain" prop in the body' ) );
+			return new \WP_Error( 'no_domain_in_body', __( 'You must pass a valid "domain" prop in the body', 'jurassic-ninja' ) );
 		}
 		mark_site_as_checked_in( $body['domain'] );
 
@@ -218,7 +218,6 @@ function add_endpoint( $namespace, $path, $callback, $register_rest_route_option
 		$response = [];
 
 		try {
-			global $response;
 			$data = $callback( $request );
 			$response['status'] = 'ok';
 			$response['data'] = $data;
@@ -227,7 +226,6 @@ function add_endpoint( $namespace, $path, $callback, $register_rest_route_option
 				$response = $data;
 			}
 		} catch ( Exception $e ) {
-			global $response;
 			$response = [
 				'status' => 'error',
 				'error' => [

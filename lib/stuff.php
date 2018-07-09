@@ -19,7 +19,9 @@ if ( ! class_exists( 'CustomNameGenerator' ) ) {
  */
 function debug() {
 	if ( defined( 'WP_DEBUG' ) && WP_DEBUG && settings( 'log_debug_messages', false ) ) {
+		// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		error_log( call_user_func_array( 'sprintf', func_get_args() ) );
+		// phpcs:enable
 	}
 }
 
@@ -76,7 +78,7 @@ function require_feature_files() {
 	];
 
 	$available_features = apply_filters( 'jurassic_ninja_available_features', $available_features );
-	foreach( $available_features as $feature_file ) {
+	foreach ( $available_features as $feature_file ) {
 		require_once PLUGIN_DIR . $feature_file;
 	}
 	return $available_features;
@@ -118,7 +120,9 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 	do_action( 'jurassic_ninja_do_feature_conditions', $features );
 
 	try {
+		// phpcs:disable WordPress.WP.DeprecatedFunctions.generate_random_passwordFound
 		$password = generate_random_password();
+		// phpcs:enable
 		$subdomain = '';
 		$collision_attempts = 10;
 		do {
@@ -154,7 +158,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		) );
 		$domain = sprintf( '%s.%s', $subdomain, settings( 'domain' ) );
 
-		debug( 'Launching %s with features: %s', $domain, implode( ', ' , array_keys( array_filter( $features ) ) ) );
+		debug( 'Launching %s with features: %s', $domain, implode( ', ', array_keys( array_filter( $features ) ) ) );
 
 		debug( 'Creating sysuser for %s', $domain );
 
@@ -163,6 +167,8 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		debug( 'Creating app for %s under sysuser %s', $domain, $user->data->name );
 
 		$app = null;
+		// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
+		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
 		/**
 		 * Fired for the purpose of launching a site.
 		 *
@@ -189,12 +195,15 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		 *
 		 */
 		do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $user, $php_version, $domain, $wordpress_options, $features ] );
+		// phpcs:enable
 
 		if ( is_wp_error( $app ) ) {
 			throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
 		}
 		log_new_site( $app->data, $features['shortlife'] );
 
+		// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
+		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
 		/**
 		 * Allows the enqueueing of commands for features with each launched site.
 		 *
@@ -212,10 +221,13 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		 *
 		 */
 		do_action_ref_array( 'jurassic_ninja_add_features_before_auto_login', [ &$app, $features, $domain ] );
+		// phpcs:enable
 
 		debug( '%s: Adding Companion Plugin for Auto Login', $domain );
 		add_auto_login( $password, $user->data->name );
 
+		// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
+		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
 		/**
 		 * Allows the enqueueing of commands for features with each launched site.
 		 *
@@ -233,6 +245,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		 *
 		 */
 		do_action_ref_array( 'jurassic_ninja_add_features_after_auto_login', [ &$app, $features, $domain ] );
+		// phpcs:enable
 
 		// Runs the command via SSH
 		// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
@@ -314,6 +327,8 @@ function figure_out_main_domain( $domains ) {
 function generate_new_user( $password ) {
 	$username = generate_random_username();
 	$return = null;
+	// Here PHP Codesniffer parses &$return as if it were a deprecated pass-by-reference but it is not
+	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
 	/**
 	 * Fired for hooking and actually creating a system user
 	 *
@@ -331,7 +346,7 @@ function generate_new_user( $password ) {
 	 *
 	 */
 	do_action_ref_array( 'jurassic_ninja_create_sysuser', [ &$return, $username, $password ] );
-
+	// phpcs:enable
 	if ( is_wp_error( $return ) ) {
 		throw new \Exception( 'Error creating sysuser: ' . $return->get_error_message() );
 	}
@@ -379,7 +394,10 @@ function generate_random_username() {
  * @return [type]        [description]
  */
 function l( $stuff ) {
+	// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_error_log
+	// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_print_r
 	error_log( print_r( $stuff, true ) );
+	// phpcs:enable
 }
 
 /**
@@ -458,17 +476,17 @@ function mark_site_as_checked_in( $domain ) {
  * @return [type] [description]
  */
 function purge_sites() {
-	$MAX_SITES = 10;
+	$max_sites = 10;
 	$sites = sites_to_be_purged();
-	// Purge MAX_SITES at most so the purge task does not interfere
+	// Purge $max_sites at most so the purge task does not interfere
 	// with sites creation given that ServerPilot runs tasks in series.
-	$sites = array_slice( $sites, 0, $MAX_SITES );
+	$sites = array_slice( $sites, 0, $max_sites );
 	/**
 	 * Filters the array of users listed by ServerPilot
 	 *
 	 * @param array $users The users returend by serverpilot
 	 */
-	$system_users  = apply_filters( 'jurassic_ninja_sysuser_list', [] );
+	$system_users = apply_filters( 'jurassic_ninja_sysuser_list', [] );
 	if ( is_wp_error( $system_users ) ) {
 		debug( 'There was an error fetching users list for purging: (%s) - %s',
 			$system_users->get_error_code(),
@@ -486,6 +504,9 @@ function purge_sites() {
 			return in_array( $user->name, $site_users, true );
 	} );
 	foreach ( $purge as $user ) {
+		$return = null;
+		// Here PHP Codesniffer parses &$return as if it were a deprecated pass-by-reference but it is not
+		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
 		/**
 		 * Fired for hooking a function that actually deletes a site
 		 *
@@ -500,6 +521,7 @@ function purge_sites() {
 		 *
 		 */
 		do_action_ref_array( 'jurassic_ninja_delete_site', [ &$return, $user ] );
+		// phpcs:enable
 		if ( is_wp_error( $return ) ) {
 			debug( 'There was an error purging site for user %s: (%s) - %s',
 				$user->id,
@@ -534,7 +556,9 @@ function run_command_on_behalf( $user, $password, $cmd ) {
 	$output = null;
 	$return_value = null;
 	// Use exec instead of shell_exect so we can know if the commands failed or not
+	// phpcs:disable WordPress.PHP.DiscouragedPHPFunctions.system_calls_exec
 	exec( $run, $output, $return_value );
+	// phpcs:enable
 	if ( 0 !== $return_value ) {
 		debug( 'Commands run finished with code %s and output: %s',
 			$return_value,

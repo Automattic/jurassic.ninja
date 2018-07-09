@@ -8,7 +8,7 @@ add_action( 'jurassic_ninja_init', function() {
 	];
 	add_filter( 'jurassic_ninja_rest_feature_defaults', function( $defaults ) {
 		return array_merge( $defaults, [
-			'gutenberg' => false
+			'gutenberg' => false,
 		] );
 	} );
 
@@ -19,7 +19,7 @@ add_action( 'jurassic_ninja_init', function() {
 		return $features;
 	}, 10, 2 );
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		if ( $features['gutenberg'] ) {
 			debug( '%s: Adding Gutenberg', $domain );

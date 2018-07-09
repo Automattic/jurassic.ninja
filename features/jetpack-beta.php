@@ -8,7 +8,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'branch' => false,
 	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		if ( $features['jetpack-beta'] ) {
 			debug( '%s: Adding Jetpack Beta Tester Plugin', $domain );
@@ -36,13 +36,14 @@ add_action( 'jurassic_ninja_init', function() {
 			if ( null === $url ) {
 				$error = new \WP_Error(
 					'failed_to_launch_site_with_branch',
-					esc_html__( 'Invalid branch name or not ready yet: ' . $branch ),
+					/* translators: is a GitHub branch name */
+					sprintf( esc_html__( 'Invalid branch name or not ready yet: %s', 'jurassic-ninja' ), $branch ),
 					[
 						'status' => 400,
 					]
 				);
 			}
-			$features['jetpack-beta'] = $error === null ? $json_params['jetpack-beta'] : $error ;
+			$features['jetpack-beta'] = null === $error ? $json_params['jetpack-beta'] : $error;
 			$features['branch'] = $branch;
 		}
 
@@ -70,7 +71,7 @@ add_action( 'jurassic_ninja_admin_init', function() {
  */
 function add_jetpack_beta_plugin() {
 	$jetpack_beta_plugin_url = JETPACK_BETA_PLUGIN_URL;
-	$cmd = "wp plugin install $jetpack_beta_plugin_url --activate" ;
+	$cmd = "wp plugin install $jetpack_beta_plugin_url --activate";
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );
