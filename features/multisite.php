@@ -11,7 +11,7 @@ add_action( 'jurassic_ninja_init', function() {
 	add_action( 'jurassic_ninja_do_feature_conditions', function( $features ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		if ( $features['subdir_multisite'] && $features['subdomain_multisite'] ) {
-			throw new \Exception( 'not-both-multisite-types', __( "Don't try to enable both types of multisite", 'jurassic-ninja' ) );
+			throw new \Exception( __( "Don't try to enable both types of multisite", 'jurassic-ninja' ) );
 		}
 	} );
 
