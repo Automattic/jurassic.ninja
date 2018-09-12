@@ -16,11 +16,27 @@ add_action( 'jurassic_ninja_init', function() {
 	} );
 
 	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) {
+		// Check we're not asked for both multisite types
+		$error = null;
+		if (
+			isset( $json_params['subdir_multisite'] ) && $json_params['subdir_multisite'] &&
+			isset( $json_params['subdomain_multisite'] ) && $json_params['subdomain_multisite']
+		) {
+				$error = new \WP_Error(
+					'failed_to_launch_site_with_both_multisite_types',
+					/* translators: is a GitHub branch name */
+					esc_html__( 'You cannot request both types of multisite', 'jurassic-ninja' ),
+					[
+						'status' => 400,
+					]
+				);
+		}
+
 		if ( isset( $json_params['subdir_multisite'] ) ) {
-			$features['subdir_multisite'] = $json_params['subdir_multisite'];
+			$features['subdir_multisite'] = null === $error ? $json_params['subdir_multisite'] : $error;
 		}
 		if ( isset( $json_params['subdomain_multisite'] ) ) {
-			$features['subdomain_multisite'] = $json_params['subdomain_multisite'];
+			$features['subdomain_multisite'] = null === $error ? $json_params['subdomain_multisite'] : $error;
 		}
 		return $features;
 	}, 10, 2 );
