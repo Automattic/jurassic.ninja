@@ -15,6 +15,16 @@ add_action( 'jurassic_ninja_init', function() {
 		}
 	} );
 
+	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) {
+		if ( isset( $json_params['subdir_multisite'] ) ) {
+			$features['subdir_multisite'] = $json_params['subdir_multisite'];
+		}
+		if ( isset( $json_params['subdomain_multisite'] ) ) {
+			$features['subdomain_multisite'] = $json_params['subdomain_multisite'];
+		}
+		return $features;
+	}, 10, 2 );
+
 	add_action( 'jurassic_ninja_add_features_after_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		// Enabling multisite is done very late so we can install plugins first without
