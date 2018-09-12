@@ -8,7 +8,7 @@ add_action( 'jurassic_ninja_init', function() {
 	];
 	add_filter( 'jurassic_ninja_rest_feature_defaults', function( $defaults ) {
 		return array_merge( $defaults, [
-			'gutenberg' => false,
+			'gutenberg' => (bool) settings( 'add_gutenberg_by_default', false ),
 		] );
 	} );
 
@@ -29,6 +29,20 @@ add_action( 'jurassic_ninja_init', function() {
 
 } );
 
+add_action( 'jurassic_ninja_admin_init', function() {
+	add_filter( 'jurassic_ninja_settings_options_page_default_plugins', function( $fields ) {
+		$field = [
+			'add_gutenberg_by_default' => [
+				'id' => 'add_gutenberg_by_default',
+				'title' => __( 'Add Gutenberg to every launched WordPress', 'jurassic-ninja' ),
+				'text' => __( 'Install and activate Gutenberg on launch', 'jurassic-ninja' ),
+				'type' => 'checkbox',
+				'checked' => false,
+			],
+		];
+		return array_merge( $fields, $field );
+	}, 10 );
+} );
 /**
  * Installs and activates Gutenberg Plugin on the site.
  */
