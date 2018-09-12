@@ -22,14 +22,14 @@ add_action( 'jurassic_ninja_init', function() {
 			isset( $json_params['subdir_multisite'] ) && $json_params['subdir_multisite'] &&
 			isset( $json_params['subdomain_multisite'] ) && $json_params['subdomain_multisite']
 		) {
-				$error = new \WP_Error(
-					'failed_to_launch_site_with_both_multisite_types',
-					/* translators: is a GitHub branch name */
-					esc_html__( 'You cannot request both types of multisite', 'jurassic-ninja' ),
-					[
-						'status' => 400,
-					]
-				);
+			$error = new \WP_Error(
+				'failed_to_launch_site_with_both_multisite_types',
+				/* translators: is a GitHub branch name */
+				esc_html__( 'You cannot request both types of multisite', 'jurassic-ninja' ),
+				[
+					'status' => 400,
+				]
+			);
 		}
 
 		if ( isset( $json_params['subdir_multisite'] ) ) {
