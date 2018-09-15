@@ -15,11 +15,12 @@ add_action( 'jurassic_ninja_init', function() {
 		'wp-rollback' => 'WP Rollback',
 	];
 	$defaults = [
+		'branch' => false,
 		'code-snippets' => false,
 		'config-constants' => false,
 		'gutenberg' => false,
 		'jetpack' => false,
-		'branch' => false,
+		'woocommerce' => false,
 	];
 
 	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
@@ -36,6 +37,7 @@ add_action( 'jurassic_ninja_init', function() {
 		return array_merge( $defaults, [
 			'gutenberg' => (bool) settings( 'add_gutenberg_by_default', false ),
 			'jetpack' => (bool) settings( 'add_jetpack_by_default', true ),
+			'woocommerce' => (bool) settings( 'add_woocommerce_by_default', false ),
 		] );
 	} );
 
@@ -70,6 +72,13 @@ add_action( 'jurassic_ninja_admin_init', function() {
 				'id' => 'add_gutenberg_by_default',
 				'title' => __( 'Add Gutenberg to every launched WordPress', 'jurassic-ninja' ),
 				'text' => __( 'Install and activate Gutenberg on launch', 'jurassic-ninja' ),
+				'type' => 'checkbox',
+				'checked' => false,
+			],
+			'add_woocommerce_by_default' => [
+				'id' => 'add_woocommerce_by_default',
+				'title' => __( 'Add WooCommerce to every launched WordPress', 'jurassic-ninja' ),
+				'text' => __( 'Install and activate WooCommerce on launch', 'jurassic-ninja' ),
 				'type' => 'checkbox',
 				'checked' => false,
 			],			
