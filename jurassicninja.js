@@ -50,7 +50,7 @@ function launchSiteWithFeatures( $, features ) {
 		$( '#progress' ).text( originalProgressText );
 		$( '#progress' ).show();
 		startSpinner();
-		jurassicNinjaApi().specialops( features )
+		jurassicNinjaApi().create( features )
 			.then( response => {
 				$( '#progress' ).html( `<a href="${ response.data.url }">The new WP is ready to go, visit it!</a>` );
 				stopSpinner();
@@ -161,23 +161,6 @@ function jurassicNinjaApi() {
 		.then( checkStatusAndErrors ).then( parseJson )
 	}
 
-	function specialops( features ) {
-		const url = restApiSettings.root;
-		const nonce = restApiSettings.nonce;
-		return fetch( url + 'jurassic.ninja/specialops/create', {
-			method: 'post',
-			credentials: 'same-origin',
-			body: JSON.stringify( features ),
-			headers: {
-				'X-WP-Nonce': nonce,
-				'content-type': 'application/json',
-			}
-		} )
-		.then( checkStatusAndErrors ).then( parseJson )
-
-		;
-	}
-
 	function checkStatusAndErrors( response ) {
 		if ( response.status === 503 ) {
 			throw new Error( 'Site launching is turned off right now' );
@@ -210,5 +193,4 @@ function jurassicNinjaApi() {
 	}
 
 	this.create = create;
-	this.specialops = specialops;
 }

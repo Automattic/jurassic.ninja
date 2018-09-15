@@ -34,16 +34,6 @@ add_action( 'jurassic_ninja_init', function() {
 		return $features;
 	}, 10, 2 );
 
-	add_filter( 'jurassic_ninja_rest_specialops_create_request_features', function( $features, $json_params ) {
-		if ( isset( $json_params['woocommerce-beta-tester'] ) ) {
-			$features['woocommerce-beta-tester'] = $json_params['woocommerce-beta-tester'];
-			// The WooCommerce Beta Tester Plugin works only when woocommerce is installed and active too
-			if ( $features['woocommerce-beta-tester'] ) {
-				$features['woocommerce'] = true;
-			}
-		}
-		return $features;
-	}, 10, 2 );
 } );
 
 add_action( 'jurassic_ninja_admin_init', function() {
