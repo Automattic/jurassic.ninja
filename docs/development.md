@@ -1,6 +1,6 @@
 
 
-The regular life cycle of a Jurassic Ninja site
+##The regular life cycle of a Jurassic Ninja site
 
 ```
 * User gets to the Create page
@@ -12,7 +12,7 @@ The regular life cycle of a Jurassic Ninja site
 * The site is purged 7 days after that first auto login or 7 days after the user entered credentials the last time. This can happen if the user signed out and signed in again.
 ```
 
-The `launch_wordpress()` function can be explained as:
+## The `launch_wordpress()` function can be explained as:
 
 ```
 2. Collects requested features and merges with defaults.
@@ -26,7 +26,7 @@ The `launch_wordpress()` function can be explained as:
 ```
 
 
-### Adding Features
+## Adding Features
 
 Basically you can go an peek the `features` directory which contains a few files that make use of the available actions and filters.
 
@@ -43,5 +43,3 @@ But the main hooks to look are:
 * jurassic_ninja_add_features_after_auto_login (Action).
 * jurassic_ninja_feature_command (Filter).
 * jurassic_ninja_created_site_url (Filter).
-
-
