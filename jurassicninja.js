@@ -23,33 +23,20 @@ function init() {
 			if ( $this.data( 'feature' )  ) {
 				features[ $this.data( 'feature' ) ] = true;
 			}
-			launchSiteWithFeatures( jQuery, features );
+			launchSite( jQuery, features, true );
 			return false;
 		} )
 	}
 }
 
-function launchSite( $, features ) {
+function launchSite( $, features, resetSpinner = false ) {
 	$( function() {
 		startSpinner();
 
-		jurassicNinjaApi().create( features )
-			.then( response => {
-				$( '#progress' ).html( `<a href="${ response.data.url }">The new WP is ready to go, visit it!</a>` );
-				stopSpinner();
-			} )
-			.catch( err => {
-				$( '#progress' ).text( `Oh No! There was a problem launching the new WP. (${ err.message }).` );
-				stopSpinner( true );
-			} );
-	} );
-}
-
-function launchSiteWithFeatures( $, features ) {
-	$( function() {
-		$( '#progress' ).text( originalProgressText );
-		$( '#progress' ).show();
-		startSpinner();
+		if ( resetSpinner ) {
+			$( '#progress' ).text( originalProgressText );
+			$( '#progress' ).show();
+		}
 		jurassicNinjaApi().create( features )
 			.then( response => {
 				$( '#progress' ).html( `<a href="${ response.data.url }">The new WP is ready to go, visit it!</a>` );
