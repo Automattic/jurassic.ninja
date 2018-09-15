@@ -3,28 +3,46 @@
 namespace jn;
 
 add_action( 'jurassic_ninja_init', function() {
-	$defaults = [
-		'jetpack' => false,
-		'branch' => false,
+	$whitelist = [
+		'code-snippets' => 'Code Snippets',
+		'config-constants' => 'Config Constants',
+		'gutenberg' => 'Gutenberg',
+		'jetpack' => 'Jetpack',
+		'woocommerce' => 'WooCommerce',
+		'wordpress-beta-tester' => 'WordPress Beta Tester Plugin',
+		'wp-downgrade' => 'WP Downgrade',
+		'wp-log-viewer' => 'WP Log Viewer',
+		'wp-rollback' => 'WP Rollback',
 	];
+	// Set all defaults to false.
+	// Will probably add a filter here.
+	$defaults = array_map( function( $slug ) {
+		return false;
+	}, $whitelist );
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults, $whitelist ) {
 		$features = array_merge( $defaults, $features );
-		if ( $features['jetpack'] ) {
-			debug( '%s: Adding Jetpack', $domain );
-			add_jetpack();
+		foreach ( $whitelist as $slug => $name ) {
+			if ( isset( $features[ $slug ] ) && $features[ $slug ] ) {
+				debug( '%s: Adding %s', $domain, $name );
+				add_directory_plugin( $slug );
+			}
 		}
 	}, 10, 3 );
 
 	add_filter( 'jurassic_ninja_rest_feature_defaults', function( $defaults ) {
 		return array_merge( $defaults, [
+			'gutenberg' => (bool) settings( 'add_gutenberg_by_default', false ),
 			'jetpack' => (bool) settings( 'add_jetpack_by_default', true ),
+			'woocommerce' => (bool) settings( 'add_woocommerce_by_default', false ),
 		] );
 	} );
 
-	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) {
-		if ( isset( $json_params['jetpack'] ) ) {
-			$features['jetpack'] = $json_params['jetpack'];
+	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) use ( $whitelist ) {
+		foreach ( $whitelist as $slug => $name ) {
+			if ( isset( $json_params[ $slug ] ) && $json_params[ $slug ] ) {
+				$features[ $slug ] = $json_params[ $slug ];
+			}
 		}
 		return $features;
 	}, 10, 2 );
@@ -47,6 +65,20 @@ add_action( 'jurassic_ninja_admin_init', function() {
 				'type' => 'checkbox',
 				'checked' => true,
 			],
+			'add_gutenberg_by_default' => [
+				'id' => 'add_gutenberg_by_default',
+				'title' => __( 'Add Gutenberg to every launched WordPress', 'jurassic-ninja' ),
+				'text' => __( 'Install and activate Gutenberg on launch', 'jurassic-ninja' ),
+				'type' => 'checkbox',
+				'checked' => false,
+			],
+			'add_woocommerce_by_default' => [
+				'id' => 'add_woocommerce_by_default',
+				'title' => __( 'Add WooCommerce to every launched WordPress', 'jurassic-ninja' ),
+				'text' => __( 'Install and activate WooCommerce on launch', 'jurassic-ninja' ),
+				'type' => 'checkbox',
+				'checked' => false,
+			],
 		] );
 		$settings = [
 			'title' => __( 'Default plugins', 'jurassic-ninja' ),
@@ -60,11 +92,12 @@ add_action( 'jurassic_ninja_admin_init', function() {
 }, 1 );
 
 /**
- * Installs and activates Jetpack on the site.
+ * Installs and activates a given plugin from the Plugin Directory.
  */
-function add_jetpack() {
-	$cmd = 'wp plugin install jetpack --activate';
+function add_directory_plugin( $plugin_slug ) {
+	$cmd = "wp plugin install $plugin_slug --activate";
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );
 }
+

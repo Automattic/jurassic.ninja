@@ -3,6 +3,7 @@ const CREATE_PAGE_SLUG = '/create';
 const SPECIALOPS_CREATE_PAGE_SLUG = '/specialops';
 
 const originalProgressText = jQuery( '#progress' ).text();
+const originalProgressImage = jQuery( '#img1' ).attr( 'src' );
 
 init();
 
@@ -35,6 +36,7 @@ function launchSite( $, features, resetSpinner = false ) {
 
 		if ( resetSpinner ) {
 			$( '#progress' ).text( originalProgressText );
+			jQuery( '#img1' ).attr( 'src', originalProgressImage );
 			$( '#progress' ).show();
 		}
 		jurassicNinjaApi().create( features )

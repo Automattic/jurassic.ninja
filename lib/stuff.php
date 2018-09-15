@@ -64,17 +64,9 @@ function require_feature_files() {
 		'/features/multisite.php',
 		'/features/ssl.php',
 		'/features/plugins.php',
-		'/features/code-snippets.php',
-		'/features/config-constants.php',
-		'/features/gutenberg.php',
 		'/features/jetpack-beta.php',
-		'/features/woocommerce.php',
 		'/features/woocommerce-beta-tester.php',
-		'/features/wordpress-beta-tester.php',
 		'/features/wp-debug-log.php',
-		'/features/wp-log-viewer.php',
-		'/features/wp-downgrade.php',
-		'/features/wp-rollback.php',
 	];
 
 	$available_features = apply_filters( 'jurassic_ninja_available_features', $available_features );
