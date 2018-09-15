@@ -4,34 +4,28 @@ namespace jn;
 
 add_action( 'jurassic_ninja_init', function() {
 	$whitelist = [
-		'jetpack' => 'Jetpack',
 		'code-snippets' => 'Code Snippets',
 		'config-constants' => 'Config Constants',
 		'gutenberg' => 'Gutenberg',
+		'jetpack' => 'Jetpack',
 		'woocommerce' => 'WooCommerce',
 		'wordpress-beta-tester' => 'WordPress Beta Tester Plugin',
 		'wp-downgrade' => 'WP Downgrade',
 		'wp-log-viewer' => 'WP Log Viewer',
 		'wp-rollback' => 'WP Rollback',
 	];
-	$defaults = [
-		'code-snippets' => false,
-		'config-constants' => false,
-		'gutenberg' => false,
-		'jetpack' => false,
-		'woocommerce' => false,
-		'wordpress-beta-tester' => false,
-		'wp-downgrade' => false,
-		'wp-log-viewer' => false,
-		'wp-rollback' => false,
-	];
+	// Set all defaults to false.
+	// Will probably add a filter here.
+	$defaults = array_map( function( $slug ) {
+		return false;
+	}, $whitelist );
 
 	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults, $whitelist ) {
 		$features = array_merge( $defaults, $features );
-		foreach ( $whitelist as $key => $whitelisted ) {
-			if ( isset( $features[ $key ] ) && $features[ $key ] ) {
-				debug( '%s: Adding %s', $domain, $whitelisted );
-				add_directory_plugin( $key );
+		foreach ( $whitelist as $slug => $name ) {
+			if ( isset( $features[ $slug ] ) && $features[ $slug ] ) {
+				debug( '%s: Adding %s', $domain, $name );
+				add_directory_plugin( $slug );
 			}
 		}
 	}, 10, 3 );
@@ -45,9 +39,9 @@ add_action( 'jurassic_ninja_init', function() {
 	} );
 
 	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) use ( $whitelist ) {
-		foreach ( $whitelist as $key => $whitelisted ) {
-			if ( isset( $json_params[ $key ] ) && $json_params[ $key ] ) {
-				$features[ $key ] = $json_params[ $key ];
+		foreach ( $whitelist as $slug => $name ) {
+			if ( isset( $json_params[ $slug ] ) && $json_params[ $slug ] ) {
+				$features[ $slug ] = $json_params[ $slug ];
 			}
 		}
 		return $features;
