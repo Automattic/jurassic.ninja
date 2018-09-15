@@ -26,11 +26,11 @@ add_action( 'jurassic_ninja_init', function() {
 		'wp-rollback' => false,
 	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults, $whitelist ) {
 		$features = array_merge( $defaults, $features );
 		foreach( $whitelist as $key => $whitelisted ) {
 			if ( isset( $features[ $key ] ) && $features[ $key ] ) {
-				debug( '%s: Adding $whitelisted', $domain, $whitelisted );
+				debug( '%s: Adding %s', $domain, $whitelisted );
 				add_directory_plugin( $key );
 			}
 		}
@@ -44,7 +44,7 @@ add_action( 'jurassic_ninja_init', function() {
 		] );
 	} );
 
-	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) {
+	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params, $whitelist ) {
 		foreach( $whitelist as $key => $whitelisted ) {
 			if ( isset( $json_params[ $key ] ) && $json_params[ $key ] ) {
 				$features[$key] = $json_params[$key];
