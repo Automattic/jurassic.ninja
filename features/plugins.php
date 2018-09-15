@@ -44,7 +44,7 @@ add_action( 'jurassic_ninja_init', function() {
 		] );
 	} );
 
-	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params, $whitelist ) {
+	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) use( $whitelist ) {
 		foreach( $whitelist as $key => $whitelisted ) {
 			if ( isset( $json_params[ $key ] ) && $json_params[ $key ] ) {
 				$features[$key] = $json_params[$key];
