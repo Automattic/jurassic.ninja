@@ -103,7 +103,7 @@ function startSpinner() {
 function stopSpinner( error = false ) {
 	if ( error ) {
 		jQuery( '#img2' ).hide();
-		jQuery( '#img1' ).attr( 'src', 'https://i.imgur.com/vdyaxmx.gif' );
+		jQuery( '#img1' ).attr( 'src', jQuery( '#img1' ).data().failureImgSrc );
 	} else {
 		jQuery( '#img1' ).hide();
 		jQuery( '#img2' ).show();
