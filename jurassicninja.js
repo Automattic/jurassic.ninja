@@ -39,11 +39,13 @@ function launchSite( $, features, resetSpinner = false ) {
 		}
 		jurassicNinjaApi().create( features )
 			.then( response => {
-				$( '#progress' ).html( `<a href="${ response.data.url }">The new WP is ready to go, visit it!</a>` );
+				var successMessage = $( '#progress' ).data().successMessage;
+				$( '#progress' ).html( `<a href="${ response.data.url }">${ successMessage }</a>` );
 				stopSpinner();
 			} )
 			.catch( err => {
-				$( '#progress' ).text( `Oh No! There was a problem launching the new WP. (${ err.message }).` );
+				var errorMessage = $( '#progress' ).data().errorMessage;
+				$( '#progress' ).text( `${ errorMessage } (${ err.message }).` );
 				stopSpinner( true );
 			} );
 	} );
@@ -101,7 +103,7 @@ function startSpinner() {
 function stopSpinner( error = false ) {
 	if ( error ) {
 		jQuery( '#img2' ).hide();
-		jQuery( '#img1' ).attr( 'src', 'https://i.imgur.com/vdyaxmx.gif' );
+		jQuery( '#img1' ).attr( 'src', jQuery( '#img1' ).data().failureImgSrc );
 	} else {
 		jQuery( '#img1' ).hide();
 		jQuery( '#img2' ).show();
