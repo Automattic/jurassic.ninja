@@ -105,7 +105,7 @@ function add_admin_bar_node() {
 function add_rest_nonce() {
 	add_action( 'wp_enqueue_scripts', function() {
 		// Add the nonce under the /create path and
-		// if the user is admin, add it also on /specialops
+		// if the user can manage options, add it also on /specialops
 		if ( page_is_launching_page() ) {
 			wp_localize_script( 'jurassicninja.js', 'restApiSettings', array(
 				'root' => esc_url_raw( rest_url() ),
