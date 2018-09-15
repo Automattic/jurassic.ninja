@@ -1,6 +1,6 @@
 
 
-##The regular life cycle of a Jurassic Ninja site
+## The regular life cycle of a Jurassic Ninja site
 
 ```
 * User gets to the Create page
