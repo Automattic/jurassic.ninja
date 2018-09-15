@@ -22,6 +22,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'jetpack' => false,
 		'woocommerce' => false,
 		'wordpress-beta-tester' => false,
+		'wp-downgrade' => false,
 	];
 
 	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
