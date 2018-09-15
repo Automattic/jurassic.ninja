@@ -16,11 +16,6 @@ function add_rest_api_endpoints() {
 		},
 	];
 
-	$specialops_permission_callback = [
-		'permission_callback' => function () {
-			return current_user_can( 'manage_options' );
-		},
-	];
 	add_post_endpoint( 'create', function ( $request ) {
 		$defaults = create_endpoint_feature_defaults();
 		$json_params = $request->get_json_params();
@@ -33,6 +28,7 @@ function add_rest_api_endpoints() {
 
 		$features = array_merge( $defaults, [
 			'shortlife' => isset( $json_params['shortlived'] ) && (bool) $json_params['shortlived'],
+			'php_version' => isset( $json_params['php_version'] ) ? $json_params['php_version'] : 'default',
 		] );
 
 		/**
@@ -51,7 +47,7 @@ function add_rest_api_endpoints() {
 			}
 		}
 
-		$data = launch_wordpress( 'default', $features );
+		$data = launch_wordpress( $features['php_version'], $features );
 		if ( null === $data ) {
 			return new \WP_Error(
 				'failed_to_launch_site',
@@ -78,66 +74,6 @@ function add_rest_api_endpoints() {
 		];
 		return $output;
 	}, $permission_callback );
-
-	add_post_endpoint( 'specialops/create', function ( $request ) {
-		$defaults = create_endpoint_feature_defaults();
-		$json_params = $request->get_json_params();
-
-		$features = $json_params && is_array( $json_params ) ? $json_params : [];
-		$features = array_merge( $defaults, $features );
-		/**
-		 * Filters the features requested through the /specialops/create REST API endpoint
-		 *
-		 * Should only hook here for special cases.
-		 * Like in the case of the WooCommerce Beta Tester which currently provides no functionality unless
-		 * WooCommerce is installed too.
-		 *
-		 * If any filter returns a WP_Error, then the request is finished with status 500
-		 *
-		 * @param array $features    The current feature flags.
-		 * @param array $json_params The body of the json request.
-		 */
-		$features = apply_filters( 'jurassic_ninja_rest_specialops_create_request_features', $features, $json_params );
-		// Check if any feature errored
-		foreach ( $features as $feature ) {
-			if ( is_wp_error( $feature ) ) {
-				return $feature;
-			}
-		}
-		if ( ! settings( 'enable_launching', true ) ) {
-			return new \WP_Error( 'site_launching_disabled', __( 'Site launching is disabled right now', 'jurassic-ninja' ), [
-				'status' => 503,
-			] );
-		}
-
-		$data = launch_wordpress( $features['php_version'], $features );
-
-		if ( null === $data ) {
-			return new \WP_Error(
-				'failed_to_launch_site',
-				esc_html__( 'There was an error launching the site.', 'jurassic-ninja' ),
-				[
-					'status' => 500,
-				]
-			);
-		}
-		/**
-		 * Filter the final URL for a site.
-		 *
-		 * Useful for the ssl feature that updated the URL scheme.
-		 *
-		 * @since 3.0
-		 *
-		 * @param string $domain   The domain used for the site.
-		 * @param array  $features The feature with which the site was launched.
-		 */
-		$url = apply_filters( 'jurassic_ninja_created_site_url', figure_out_main_domain( $data->domains ), $features );
-
-		$output = [
-			'url' => $url,
-		];
-		return $output;
-	}, $specialops_permission_callback );
 
 	add_post_endpoint( 'extend', function ( $request ) {
 		$body = $request->get_json_params() ? $request->get_json_params() : [];

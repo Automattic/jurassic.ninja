@@ -23,34 +23,21 @@ function init() {
 			if ( $this.data( 'feature' )  ) {
 				features[ $this.data( 'feature' ) ] = true;
 			}
-			launchSiteWithFeatures( jQuery, features );
+			launchSite( jQuery, features, true );
 			return false;
 		} )
 	}
 }
 
-function launchSite( $, features ) {
+function launchSite( $, features, resetSpinner = false ) {
 	$( function() {
 		startSpinner();
 
+		if ( resetSpinner ) {
+			$( '#progress' ).text( originalProgressText );
+			$( '#progress' ).show();
+		}
 		jurassicNinjaApi().create( features )
-			.then( response => {
-				$( '#progress' ).html( `<a href="${ response.data.url }">The new WP is ready to go, visit it!</a>` );
-				stopSpinner();
-			} )
-			.catch( err => {
-				$( '#progress' ).text( `Oh No! There was a problem launching the new WP. (${ err.message }).` );
-				stopSpinner( true );
-			} );
-	} );
-}
-
-function launchSiteWithFeatures( $, features ) {
-	$( function() {
-		$( '#progress' ).text( originalProgressText );
-		$( '#progress' ).show();
-		startSpinner();
-		jurassicNinjaApi().specialops( features )
 			.then( response => {
 				$( '#progress' ).html( `<a href="${ response.data.url }">The new WP is ready to go, visit it!</a>` );
 				stopSpinner();
@@ -161,23 +148,6 @@ function jurassicNinjaApi() {
 		.then( checkStatusAndErrors ).then( parseJson )
 	}
 
-	function specialops( features ) {
-		const url = restApiSettings.root;
-		const nonce = restApiSettings.nonce;
-		return fetch( url + 'jurassic.ninja/specialops/create', {
-			method: 'post',
-			credentials: 'same-origin',
-			body: JSON.stringify( features ),
-			headers: {
-				'X-WP-Nonce': nonce,
-				'content-type': 'application/json',
-			}
-		} )
-		.then( checkStatusAndErrors ).then( parseJson )
-
-		;
-	}
-
 	function checkStatusAndErrors( response ) {
 		if ( response.status === 503 ) {
 			throw new Error( 'Site launching is turned off right now' );
@@ -210,5 +180,4 @@ function jurassicNinjaApi() {
 	}
 
 	this.create = create;
-	this.specialops = specialops;
 }
