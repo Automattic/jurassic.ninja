@@ -9,7 +9,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'config-constants' => 'Config Constants',
 		'gutenberg' => 'Gutenberg',
 		'woocommerce' => 'WooCommerce',
-		'wordpress-beta-tester' => 'WordPress Beta Tester',
+		'wordpress-beta-tester' => 'WordPress Beta Tester Plugin',
 		'wp-downgrade' => 'WP Downgrade',
 		'wp-log-viewer' => 'WP Log Viewer',
 		'wp-rollback' => 'WP Rollback',
@@ -21,6 +21,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'gutenberg' => false,
 		'jetpack' => false,
 		'woocommerce' => false,
+		'wordpress-beta-tester' => false,
 	];
 
 	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
@@ -81,7 +82,7 @@ add_action( 'jurassic_ninja_admin_init', function() {
 				'text' => __( 'Install and activate WooCommerce on launch', 'jurassic-ninja' ),
 				'type' => 'checkbox',
 				'checked' => false,
-			],			
+			],
 		] );
 		$settings = [
 			'title' => __( 'Default plugins', 'jurassic-ninja' ),
