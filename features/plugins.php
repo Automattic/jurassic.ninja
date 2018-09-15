@@ -24,6 +24,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'wordpress-beta-tester' => false,
 		'wp-downgrade' => false,
 		'wp-log-viewer' => false,
+		'wp-rollback' => false,
 	];
 
 	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
