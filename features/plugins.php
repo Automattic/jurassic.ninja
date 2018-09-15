@@ -15,7 +15,6 @@ add_action( 'jurassic_ninja_init', function() {
 		'wp-rollback' => 'WP Rollback',
 	];
 	$defaults = [
-		'branch' => false,
 		'code-snippets' => false,
 		'config-constants' => false,
 		'gutenberg' => false,
