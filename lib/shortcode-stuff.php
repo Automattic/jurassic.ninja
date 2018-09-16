@@ -16,7 +16,7 @@ function add_shortcodes( $file ) {
 				'failure_image' => __( 'https://i.imgur.com/vdyaxmx.gif', 'jurassic-ninja' ),
 				'spinner_message' => __( 'Launching a fresh WP with a Jetpack ...', 'jurassic-ninja' ),
 			];
-			$atts = array_merge( $defaults, $atts );
+			$atts = shortcode_atts( $defaults, $atts, 'jurassic_ninja_launch_page' );
 			include( dirname( $file ) . '/lib/views/launch-site-shortcode.php' );
 			return ob_get_clean();
 		} );
