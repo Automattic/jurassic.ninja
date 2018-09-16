@@ -8,7 +8,7 @@ if ( ! defined( '\\ABSPATH' ) ) {
 
 function add_shortcodes( $file ) {
 	add_action( 'init', function() use ( $file ) {
-		add_shortcode( 'jurassic_ninja_launch_page', function( $atts ) use ( $file ) {
+		add_shortcode( 'jurassic_ninja_launch_page', function( $atts = [] ) use ( $file ) {
 			ob_start();
 			$defaults = [
 				'success_message' => __( 'The new WP is ready to go, visit it!', 'jurassic-ninja' ),
