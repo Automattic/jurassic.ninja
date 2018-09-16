@@ -52,12 +52,10 @@ All of the frontend site launching is done by a little piece of Javascript that 
 
 Create a page titled **Create**. Make sure its slug is `/create`.
 
-And add this content using the Text version of the editor:
+And use this shortcode in the page's content.
 
 ```html
-<img id="img1" class="aligncenter" style="display: none;" data-failure-img-src="https://i.imgur.com/vdyaxmx.gif" src="https://media.giphy.com/media/uIRyMKFfmoHyo/giphy.gif" />
-<img id="img2" class="aligncenter" style="display: none;" src="https://i1.wp.com/media.giphy.com/media/KF3r4Q6YCtfOM/giphy.gif?ssl=1" />
-<p id="progress" class="lead" style="text-align: center;" data-success-message="The new WP is ready to go, visit it!" data-error-message="Oh No! There was a problem launching the new WP.">Launching a fresh WP with a Jetpack ...</p>
+[jurassic_ninja_launch_page]
 ```
 
 **Create a home page with a link to `/create`**
