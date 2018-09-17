@@ -5,6 +5,7 @@ namespace jn;
 add_action( 'jurassic_ninja_init', function() {
 	$defaults = [
 		'gutenpack' => false,
+		'calypsobranch' => false,
 	];
 
 	add_action( 'jurassic_ninja_add_features_after_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
@@ -16,15 +17,18 @@ add_action( 'jurassic_ninja_init', function() {
 			debug( '%s: Activating Gutenpack blocks for calyspo branch %s', $domain, $features['calypsobranch'] );
 		}
 		$jetpack_dir = isset( $features['jetpack-beta'] ) && $features['jetpack-beta'] ? 'jetpack-dev' : 'jetpack';
-		add_gutenpack( $features['calypsobranch'] );
+		$calypsobranch = isset( $json_params['calypsobranch'] ) ? $json_params['calypsobranch'] : 'master';
+
+		add_gutenpack( $calypsobranch, $jetpack_dir );
 	}, 100, 3 );
 
 	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) {
 		if ( isset( $json_params['gutenpack'] ) ) {
 				$features['gutenpack'] = $json_params['gutenpack'];
 		}
-		$calypsobranch = isset( $json_params['calypsobranch'] ) ? $json_params['calypsobranch'] : 'master';
-
+		if ( isset( $json_params['calypsobranch'] ) ) {
+				$features['calypsobranch'] = $json_params['calypsobranch'];
+		}
 		return $features;
 	}, 10, 2 );
 } );
