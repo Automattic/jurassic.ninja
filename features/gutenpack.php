@@ -16,8 +16,8 @@ add_action( 'jurassic_ninja_init', function() {
 		if ( $features['calypsobranch'] ) {
 			debug( '%s: Activating Gutenpack blocks for calyspo branch %s', $domain, $features['calypsobranch'] );
 		}
-		$jetpack_dir = isset( $features['jetpack-beta'] ) && $features['jetpack-beta'] ? 'jetpack-dev' : 'jetpack';
-		$calypsobranch = isset( $json_params['calypsobranch'] ) ? $json_params['calypsobranch'] : 'master';
+		$jetpack_dir = ( isset( $features['jetpack-beta'] ) && $features['jetpack-beta'] ) ? 'jetpack-dev' : 'jetpack';
+		$calypsobranch = isset( $features['calypsobranch'] ) ? $features['calypsobranch'] : 'master';
 
 		add_gutenpack( $calypsobranch, $jetpack_dir );
 	}, 100, 3 );
