@@ -27,7 +27,14 @@ add_action( 'jurassic_ninja_init', function() {
 	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) {
 		if ( isset( $json_params['gutenpack'] ) ) {
 				$features['gutenpack'] = $json_params['gutenpack'];
-				if ( isset( $json_params['calypsobranch'] ) ) {
+				if ( $features['gutenpack'] ) {
+					// Force Jetpack Beta given that after this PR got merged,
+					// we can only test Gutenblocks with Jetpack in `master`
+					// or a new branch derived from latest `master`.
+					// https://github.com/Automattic/jetpack/pull/10154
+					$features['jetpack-beta'] = true;
+				}
+				if ( $features['gutenpack'] && isset( $json_params['calypsobranch'] ) ) {
 					$features['calypsobranch'] = $json_params['calypsobranch'];
 				}
 		}
