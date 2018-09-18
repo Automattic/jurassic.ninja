@@ -33,8 +33,14 @@ add_action( 'jurassic_ninja_init', function() {
 					// or a new branch derived from latest `master`.
 					// https://github.com/Automattic/jetpack/pull/10154
 					$features['jetpack-beta'] = true;
+					// Force jetpack out of the equation
+					$features['jetpack'] = false;
 				}
-				if ( $features['gutenpack'] && isset( $json_params['calypsobranch'] ) ) {
+				if (
+					$features['gutenpack'] &&
+					isset( $json_params['calypsobranch'] ) &&
+					$json_params['calypsobranch']
+				) {
 					$features['calypsobranch'] = $json_params['calypsobranch'];
 				}
 		}
