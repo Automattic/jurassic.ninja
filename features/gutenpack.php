@@ -13,8 +13,8 @@ add_action( 'jurassic_ninja_init', function() {
 		if ( $features['gutenpack'] ) {
 			debug( '%s: Installing Gutenberg blocks for Jetpack', $domain );
 			$jetpack_dir = ( isset( $features['jetpack-beta'] ) && $features['jetpack-beta'] ) ? 'jetpack-dev' : 'jetpack';
-			$calypsobranch = isset( $features['calypsobranch'] ) ? $features['calypsobranch'] : 'master';
-			if ( $features['calypsobranch'] ) {
+			$calypsobranch = ( isset( $features['calypsobranch'] ) && $features['calypsobranch'] ) ? $features['calypsobranch'] : 'master';
+			if ( 'master' !== $calypsobranch ) {
 				debug( '%s: Adding Gutenpack blocks for wp-calypso branch %s. Jetpack dir is %s', $domain, $calypsobranch, $jetpack_dir );
 			} else {
 				debug( '%s: Adding latest stable Gutenpack blocks. Jetpack dir is %s', $domain, $jetpack_dir );
