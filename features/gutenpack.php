@@ -12,14 +12,14 @@ add_action( 'jurassic_ninja_init', function() {
 		$features = array_merge( $defaults, $features );
 		if ( $features['gutenpack'] ) {
 			debug( '%s: Installing Gutenberg blocks for Jetpack', $domain );
-		}
-		if ( $features['calypsobranch'] ) {
-			debug( '%s: Activating Gutenpack blocks for calyspo branch %s', $domain, $features['calypsobranch'] );
-		}
-		$jetpack_dir = ( isset( $features['jetpack-beta'] ) && $features['jetpack-beta'] ) ? 'jetpack-dev' : 'jetpack';
-		$calypsobranch = isset( $features['calypsobranch'] ) ? $features['calypsobranch'] : 'master';
+			if ( $features['calypsobranch'] ) {
+				debug( '%s: Activating Gutenpack blocks for calyspo branch %s', $domain, $features['calypsobranch'] );
+			}
+			$jetpack_dir = ( isset( $features['jetpack-beta'] ) && $features['jetpack-beta'] ) ? 'jetpack-dev' : 'jetpack';
+			$calypsobranch = isset( $features['calypsobranch'] ) ? $features['calypsobranch'] : 'master';
 
-		add_gutenpack( $calypsobranch, $jetpack_dir );
+			add_gutenpack( $calypsobranch, $jetpack_dir );
+		}
 	}, 100, 3 );
 
 	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) {
