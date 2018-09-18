@@ -33,7 +33,10 @@ add_action( 'jurassic_ninja_init', function() {
 					// or a new branch derived from latest `master`.
 					// https://github.com/Automattic/jetpack/pull/10154
 					$features['jetpack-beta'] = true;
-					// Force jetpack out of the equation
+					if ( ! isset( $features['branch'] ) ) {
+						$features['branch'] = 'master';
+					}
+					// Also, force regular jetpack out of the equation
 					$features['jetpack'] = false;
 				}
 				if (
