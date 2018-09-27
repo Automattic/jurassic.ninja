@@ -48,7 +48,7 @@ add_action( 'jurassic_ninja_init', function() {
 			}
 		}
 		return $features;
-	}, 10, 2 );
+	}, 100, 2 );
 } );
 
 function add_gutenpack( $branch, $jetpack_dir = 'jetpack' ) {
