@@ -19,16 +19,7 @@ add_action( 'jurassic_ninja_init', function() {
 			} else {
 				debug( '%s: Adding latest stable Gutenpack blocks. Jetpack dir is %s', $domain, $jetpack_dir );
 			}
-			// Force Jetpack Beta given that after this PR got merged,
-			// we can only test Gutenblocks with Jetpack in `master`
-			// or a new branch derived from latest `master`.
-			// https://github.com/Automattic/jetpack/pull/10154
-			$features['jetpack-beta'] = true;
-			if ( ! isset( $features['branch'] ) ) {
-				$features['branch'] = 'master';
-			}
-			// Also, force regular jetpack out of the equation
-			$features['jetpack'] = false;
+
 			add_gutenpack( $calypsobranch, $jetpack_dir );
 		}
 	}, 100, 3 );
@@ -36,6 +27,18 @@ add_action( 'jurassic_ninja_init', function() {
 	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) {
 		if ( isset( $json_params['gutenpack'] ) ) {
 			$features['gutenpack'] = $json_params['gutenpack'];
+			if ( $features['gutenpack'] ) {
+				// Force Jetpack Beta given that after this PR got merged,
+				// we can only test Gutenblocks with Jetpack in `master`
+				// or a new branch derived from latest `master`.
+				// https://github.com/Automattic/jetpack/pull/10154
+				$features['jetpack-beta'] = true;
+				if ( ! isset( $json_params['branch'] ) ) {
+					$features['branch'] = 'master';
+				}
+				// Also, force regular jetpack out of the equation
+				$features['jetpack'] = false;
+			}
 			if (
 				$features['gutenpack'] &&
 				isset( $json_params['calypsobranch'] ) &&
@@ -45,7 +48,7 @@ add_action( 'jurassic_ninja_init', function() {
 			}
 		}
 		return $features;
-	}, 100, 2 );
+	}, 10, 2 );
 } );
 
 function add_gutenpack( $branch, $jetpack_dir = 'jetpack' ) {
