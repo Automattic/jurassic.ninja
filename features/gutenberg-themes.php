@@ -16,7 +16,7 @@ add_action( 'jurassic_ninja_init', function() {
 		}
 
 		if ( $features['gutenberg-theme-branch'] ) {
-			debug( '%s: Activating Jetpack %s branch in the theme', $domain, $features['gutenberg-theme-branch'] );
+			debug( '%s: Activating %s branch in the theme', $domain, $features['gutenberg-theme-branch'] );
 			activate_theme_branch( $features['gutenberg-theme-branch'] );
 		}
 	}, 10, 3 );
@@ -45,21 +45,6 @@ add_action( 'jurassic_ninja_init', function() {
 	}, 10, 2 );
 } );
 
-add_action( 'jurassic_ninja_admin_init', function() {
-	add_filter( 'jurassic_ninja_settings_options_page_default_plugins', function( $fields ) {
-		$field = [
-			'add_jetpack_beta_by_default' => [
-				'id' => 'add_jetpack_beta_by_default',
-				'title' => __( 'Add Jetpack Beta Tester plugin to every launched WordPress', 'jurassic-ninja' ),
-				'text' => __( 'Install and activate Jetpack Beta Tester on launch', 'jurassic-ninja' ),
-				'type' => 'checkbox',
-				'checked' => false,
-			],
-		];
-		return array_merge( $fields, $field );
-	}, 10 );
-} );
-
 /**
  * Installs and activates Jetpack Beta Tester plugin on the site.
  */
@@ -85,7 +70,7 @@ function get_gutenberg_theme_url( $theme, $branch_name = 'master' ) {
 	$available_gutenberg_themes = get_gutenberg_thems();
 	if ( isset( $available_gutenberg_themes[ $theme ] ) ) {
 		$url = $available_gutenberg_themes[ $theme ];
-		$url .= "$archive/$branch_name.zip";
+		$url .= "$available_gutenberg_themes/archive/$branch_name.zip";
 		return $url;
 	}
 	throw new Exception();
