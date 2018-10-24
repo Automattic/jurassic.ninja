@@ -2,7 +2,6 @@
 
 namespace jn;
 
-
 add_action( 'jurassic_ninja_init', function() {
 	$defaults = [
 		'wordpress-5-beta' => false,
