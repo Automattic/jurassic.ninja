@@ -24,9 +24,14 @@ add_action( 'jurassic_ninja_init', function() {
 	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) {
 		if ( isset( $json_params['wordpress-5-beta'] ) ) {
 			$features['wordpress-5-beta'] = $json_params['wordpress-5-beta'];
+			// Disable launching with Gutenberg if WordPress 5.0 is requested
+			// Just in case they collide at some point
+			if ( isset( $json_params['gutenberg'] ) ) {
+				$features['gutenberg'] = false;
+			}
 		}
 		return $features;
-	}, 10, 2 );
+	}, 11, 2 );
 
 } );
 
