@@ -42,9 +42,13 @@ add_action( 'jurassic_ninja_init', function() {
  */
 function add_wc_smooth_generator_plugin() {
 	$wc_smooth_generator_plugin_url = WC_SMOOTH_GENERATOR_PLUGIN_URL;
-	$cmd = "wp plugin install $wc_smooth_generator_plugin_url --activate"
+	/**
+	 * We install the plugin but don't activate until dependencies are there or it will fail
+	 */
+	$cmd = "wp plugin install $wc_smooth_generator_plugin_url"
 		. ' && pushd . && cd wp-content/plugins/wc-smooth-generator'
 		. ' && composer install'
+		. ' && wp plugin activate wc-smooth-generator'
 		. ' && popd';
 
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
