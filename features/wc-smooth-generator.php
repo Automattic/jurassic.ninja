@@ -47,7 +47,7 @@ function add_wc_smooth_generator_plugin() {
 	 */
 	$cmd = "wp plugin install $wc_smooth_generator_plugin_url"
 		. ' && pushd . && cd wp-content/plugins/wc-smooth-generator'
-		. ' && composer install'
+		. ' && composer install --no-dev'
 		. ' && wp plugin activate wc-smooth-generator'
 		. ' && popd';
 
