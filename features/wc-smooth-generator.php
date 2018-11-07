@@ -38,7 +38,7 @@ add_action( 'jurassic_ninja_init', function() {
 } );
 
 /**
- * Installs and activates WooCommerce Beta Tester plugin on the site.
+ * Installs and activates WooCommerce Smooth Generator plugin on the site.
  */
 function add_wc_smooth_generator_plugin() {
 	$wc_smooth_generator_plugin_url = WC_SMOOTH_GENERATOR_PLUGIN_URL;
