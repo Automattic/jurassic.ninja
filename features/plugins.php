@@ -2,6 +2,13 @@
 
 namespace jn;
 
+/**
+ *
+ * This feature allows installation of a few whitelisted plugins that are available on
+ * the Plugin Directory.
+ *
+ */
+
 add_action( 'jurassic_ninja_init', function() {
 	$whitelist = [
 		'code-snippets' => 'Code Snippets',

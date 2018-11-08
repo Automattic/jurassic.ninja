@@ -65,6 +65,7 @@ function require_feature_files() {
 		'/features/ssl.php',
 		'/features/plugins.php',
 		'/features/jetpack-beta.php',
+		'/features/wc-smooth-generator.php',
 		'/features/woocommerce-beta-tester.php',
 		'/features/wp-debug-log.php',
 		'/features/gutenpack.php',
