@@ -69,8 +69,9 @@ function require_feature_files() {
 		'/features/woocommerce-beta-tester.php',
 		'/features/wp-debug-log.php',
 		'/features/gutenpack.php',
-		'/features/wordpress-5-beta.php',
 		'/features/gutenberg-master.php',
+		'/features/gutenberg-nightly.php',
+		'/features/wordpress-5-beta.php',
 	];
 
 	$available_features = apply_filters( 'jurassic_ninja_available_features', $available_features );
