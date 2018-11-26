@@ -121,7 +121,7 @@ function add_rest_nonce() {
 function add_scripts() {
 	add_action( 'wp_enqueue_scripts', function () {
 		if ( page_is_launching_page() ) {
-			wp_enqueue_script( 'jurassicninja.js', plugins_url( '', __FILE__ ) . '/jurassicninja.js', false, false, true );
+			wp_enqueue_script( 'jurassicninja.js', plugins_url( '', __FILE__ ) . '/jurassicninja.js', array( 'jquery' ), false, true );
 			/**
 			 * Done after enqueueing the jurassic.ninja.js file
 			 *
@@ -143,4 +143,3 @@ function page_is_launching_page() {
 	return ( 'create' === get_page_uri()
 		|| ( current_user_can( 'manage_options' ) && 'specialops' === get_page_uri() ) );
 }
-
