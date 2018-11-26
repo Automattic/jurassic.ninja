@@ -44,13 +44,13 @@ function launchSite( $, features, resetSpinner = false ) {
 				var successMessage = $( '#progress' ).data().successMessage;
 				$( '#progress' ).html( `<a href="${ response.data.url }">${ successMessage }</a>` );
 				stopSpinner();
-				favicon_update_colour( 'red' );
+				favicon_update_colour( 'green' );
 			} )
 			.catch( err => {
 				var errorMessage = $( '#progress' ).data().errorMessage;
 				$( '#progress' ).text( `${ errorMessage } (${ err.message }).` );
 				stopSpinner( true );
-				favicon_update_colour( 'green' );
+				favicon_update_colour( 'red' );
 			} );
 	} );
 }
@@ -199,6 +199,17 @@ function favicon_update_colour( colour ) {
         l.href = href;
         return l;
     }
+
+		function remove_all_favicons() {
+				var links = document.getElementsByTagName( 'head' )[0].getElementsByTagName( 'link' );
+				for ( var i = 0; i < links.length; i++ ) {
+					if ( (/(^|\s)icon(\s|$)/i).test( links[i].getAttribute( 'rel' ) ) ) {
+							var element = links[i];
+							element.parentNode.removeChild(element);
+		        }
+		    }
+		}
+
     function get_current_favicon() {
         //get link element
         function getLinks() {
@@ -251,6 +262,7 @@ function favicon_update_colour( colour ) {
         link.type = 'image/x-icon';
         link.rel = 'shortcut icon';
         link.href = canvas.toDataURL( 'image/x-icon' );
+        remove_all_favicons(); // Remove all the favicons so that Chrome works as expeceted.
         document.getElementsByTagName( 'head' )[0].appendChild( link );
     }
 }
