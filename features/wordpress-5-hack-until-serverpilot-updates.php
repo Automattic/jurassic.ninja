@@ -26,8 +26,8 @@ add_action( 'jurassic_ninja_admin_init', function() {
 		$field = [
 			'wordpress_5_hack' => [
 				'id' => 'wordpress_5_hack',
-				'title' => __( 'For launching of WordPress 5', 'jurassic-ninja' ),
-				'text' => __( 'Until ServerPilot starts installing WordPress 5, we need this hack', 'jurassic-ninja' ),
+				'title' => __( 'Force launching of WordPress 5', 'jurassic-ninja' ),
+				'text' => __( 'Until ServerPilot starts installing WordPress 5, we need this hack.', 'jurassic-ninja' ),
 				'placeholder' => '5.0',
 				'type' => 'checkbox',
 				'checked' => false,
