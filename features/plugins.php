@@ -11,6 +11,7 @@ namespace jn;
 
 add_action( 'jurassic_ninja_init', function() {
 	$whitelist = [
+		'classic-editor' => 'Classic Editor',
 		'code-snippets' => 'Code Snippets',
 		'config-constants' => 'Config Constants',
 		'gutenberg' => 'Gutenberg',
@@ -112,4 +113,3 @@ function add_directory_plugin( $plugin_slug ) {
 		return "$s && $cmd";
 	} );
 }
-
