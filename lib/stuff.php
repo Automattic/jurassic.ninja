@@ -71,6 +71,7 @@ function require_feature_files() {
 		'/features/gutenpack.php',
 		'/features/gutenberg-master.php',
 		'/features/gutenberg-nightly.php',
+		'/features/wordpress-4.php',
 	];
 
 	$available_features = apply_filters( 'jurassic_ninja_available_features', $available_features );
@@ -632,4 +633,3 @@ function subdomain_is_used( $subdomain ) {
 	$results = db()->get_results( "select * from sites where domain='$domain' limit 1", \ARRAY_A );
 	return count( $results ) !== 0;
 }
-
