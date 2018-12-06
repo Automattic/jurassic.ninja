@@ -17,7 +17,7 @@ add_action( 'jurassic_ninja_init', function() {
 		}
 	}, 10, 3 );
 
-	add_filter( 'jurassic_ninja_rest_feature_defaults', function( $defaults ) {
+	add_filter( 'jurassic_ninja_feature_defaults_for_rest_api_request', function( $defaults ) {
 		return array_merge( $defaults, [
 			'gutenberg-nightly' => false,
 		] );

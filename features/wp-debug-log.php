@@ -15,7 +15,7 @@ add_action( 'jurassic_ninja_init', function() {
 		}
 	}, 1, 3 );
 
-	add_filter( 'jurassic_ninja_rest_feature_defaults', function( $defaults ) {
+	add_filter( 'jurassic_ninja_feature_defaults_for_rest_api_request', function( $defaults ) {
 		return array_merge( $defaults, [
 			'wp-debug-log' => (bool) settings( 'set_wp_debug_log_by_default', false ),
 		] );

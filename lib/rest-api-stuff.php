@@ -105,7 +105,7 @@ function add_rest_api_endpoints() {
 
 	add_get_endpoint( 'features', function( $request ) {
 		$available = apply_filters( 'jurassic_ninja_available_features', [] );
-		$defaults = apply_filters( 'jurassic_ninja_rest_feature_defaults', [] );
+		$defaults = apply_filters( 'jurassic_ninja_feature_defaults_for_rest_api_request', [] );
 		return [
 			'features' => [
 				'available' => $available,
@@ -205,5 +205,5 @@ function create_endpoint_feature_defaults() {
 	 *
 	 * @param array  $defaults The feature with which launch_wordpress() is called.
 	 */
-	return apply_filters( 'jurassic_ninja_rest_feature_defaults', $defaults );
+	return apply_filters( 'jurassic_ninja_feature_defaults_for_rest_api_request', $defaults );
 }
