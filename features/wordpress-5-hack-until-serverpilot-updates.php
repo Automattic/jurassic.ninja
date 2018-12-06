@@ -27,7 +27,7 @@ add_action( 'jurassic_ninja_admin_init', function() {
 				'text' => __( 'Until ServerPilot starts installing WordPress 5, we need this hack.', 'jurassic-ninja' ),
 				'type' => 'checkbox',
 				'checked' => false,
-			]
+			],
 		];
 		return array_merge( $fields, $field );
 	}, 10 );
@@ -37,7 +37,7 @@ add_action( 'jurassic_ninja_admin_init', function() {
  * Updates WordPress to latest stable available for 5.0.
  */
 function update_to_wordpress_5_latest() {
-	$cmd = "wp core update && wp core update-db";
+	$cmd = 'wp core update && wp core update-db';
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );
