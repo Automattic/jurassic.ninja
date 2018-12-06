@@ -5,6 +5,8 @@
  * If the user launching a site is logged in, the site Admin email address and the admin user's Address
  * we will the one of the user launching the site.
  *
+ * This feature does not provide an interface to users, just a setting to the admin.
+ *
  */
 
 namespace jn;
@@ -37,4 +39,3 @@ add_action( 'jurassic_ninja_admin_init', function() {
 		return $options_page;
 	}, 10 );
 } );
-
