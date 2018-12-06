@@ -72,6 +72,7 @@ function require_feature_files() {
 		'/features/gutenberg-master.php',
 		'/features/gutenberg-nightly.php',
 		'/features/wordpress-4.php',
+		'/features/wordpress-5-hack-until-serverpilot-updates.php',
 	];
 
 	$available_features = apply_filters( 'jurassic_ninja_available_features', $available_features );
