@@ -23,9 +23,10 @@ add_action( 'jurassic_ninja_init', function() {
 	];
 	// Set all defaults to false.
 	// Will probably add a filter here.
-	$defaults = array_map( function( $slug ) {
-		return false;
-	}, $whitelist );
+	$defaults = [];
+	foreach ( $whitelist as $slug => $name ) {
+		$defaults[ $slug ] = false;
+	}
 
 	add_action( 'jurassic_ninja_install_features_before_companion', function( &$app = null, $features, $domain ) use ( $defaults, $whitelist ) {
 		$features = array_merge( $defaults, $features );
@@ -37,8 +38,9 @@ add_action( 'jurassic_ninja_init', function() {
 		}
 	}, 10, 3 );
 
-	add_filter( 'jurassic_ninja_feature_defaults_for_rest_api_request', function( $defaults ) {
-		return array_merge( $defaults, [
+	add_filter( 'jurassic_ninja_feature_defaults_for_rest_api_request', function( $previous_defaults ) use ( $defaults ) {
+		// Make these plugins defaults depend on a setting
+		return array_merge( $defaults, $previous_defaults, [
 			'gutenberg' => (bool) settings( 'add_gutenberg_by_default', false ),
 			'jetpack' => (bool) settings( 'add_jetpack_by_default', true ),
 			'woocommerce' => (bool) settings( 'add_woocommerce_by_default', false ),

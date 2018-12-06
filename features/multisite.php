@@ -59,6 +59,7 @@ add_action( 'jurassic_ninja_init', function() {
 	add_filter( 'jurassic_ninja_feature_defaults_for_rest_api_request', function( $defaults ) {
 		return array_merge( $defaults, [
 			'subdomain_multisite' => false,
+			'subdir_multisite' => false,
 		] );
 	} );
 } );
@@ -95,4 +96,3 @@ function enable_subdomain_multisite( $domain ) {
 		return "$s && $cmd";
 	} );
 }
-

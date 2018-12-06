@@ -8,6 +8,12 @@ add_action( 'jurassic_ninja_init', function() {
 		'calypsobranch' => false,
 	];
 
+	add_filter( 'jurassic_ninja_feature_defaults_for_rest_api_request', function( $defaults ) {
+		return array_merge( $defaults, [
+			'gutenpack' => false,
+		] );
+	} );
+
 	add_action( 'jurassic_ninja_install_features_after_companion', function( &$app = null, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		if ( $features['gutenpack'] ) {
