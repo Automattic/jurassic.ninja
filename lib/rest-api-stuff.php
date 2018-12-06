@@ -102,6 +102,13 @@ function add_rest_api_endpoints() {
 
 		return $output;
 	} );
+
+	add_get_endpoint( 'features', function( $request ) {
+		$features = apply_filters( 'jurassic_ninja_rest_feature_defaults', [] );
+		return [
+			'features' => $features,
+		];
+	} );
 }
 
 /**
