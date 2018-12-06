@@ -8,7 +8,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'calypsobranch' => false,
 	];
 
-	add_action( 'jurassic_ninja_add_features_after_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_install_features_after_companion', function( &$app = null, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		if ( $features['gutenpack'] ) {
 			debug( '%s: Installing Gutenberg blocks for Jetpack', $domain );

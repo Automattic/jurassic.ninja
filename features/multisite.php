@@ -41,7 +41,7 @@ add_action( 'jurassic_ninja_init', function() {
 		return $features;
 	}, 10, 2 );
 
-	add_action( 'jurassic_ninja_add_features_after_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_install_features_after_companion', function( &$app = null, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		// Enabling multisite is done very late so we can install plugins first without
 		// having to decide if network activate them afterwards.

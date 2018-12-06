@@ -27,7 +27,7 @@ add_action( 'jurassic_ninja_init', function() {
 		return false;
 	}, $whitelist );
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults, $whitelist ) {
+	add_action( 'jurassic_ninja_install_features_before_companion', function( &$app = null, $features, $domain ) use ( $defaults, $whitelist ) {
 		$features = array_merge( $defaults, $features );
 		foreach ( $whitelist as $slug => $name ) {
 			if ( isset( $features[ $slug ] ) && $features[ $slug ] ) {
@@ -112,4 +112,3 @@ function add_directory_plugin( $plugin_slug ) {
 		return "$s && $cmd";
 	} );
 }
-

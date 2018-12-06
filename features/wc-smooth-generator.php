@@ -9,7 +9,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'wc-smooth-generator' => false,
 	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_install_features_before_companion', function( &$app = null, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		if ( $features['wc-smooth-generator'] ) {
 			debug( '%s: Adding WooCommerce Smooth Generator Plugin', $domain );

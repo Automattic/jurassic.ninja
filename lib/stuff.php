@@ -217,7 +217,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		 * }
 		 *
 		 */
-		do_action_ref_array( 'jurassic_ninja_add_features_before_auto_login', [ &$app, $features, $domain ] );
+		do_action_ref_array( 'jurassic_ninja_install_features_before_companion', [ &$app, $features, $domain ] );
 		// phpcs:enable
 
 		debug( '%s: Adding Companion Plugin for Auto Login', $domain );
@@ -241,7 +241,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		 * }
 		 *
 		 */
-		do_action_ref_array( 'jurassic_ninja_add_features_after_auto_login', [ &$app, $features, $domain ] );
+		do_action_ref_array( 'jurassic_ninja_install_features_after_companion', [ &$app, $features, $domain ] );
 		// phpcs:enable
 
 		// Runs the command via SSH

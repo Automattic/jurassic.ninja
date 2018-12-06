@@ -8,7 +8,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'ssl' => false,
 	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_install_features_before_companion', function( &$app, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		// Currently not used but the code works.
 		if ( $features['auto_ssl'] ) {

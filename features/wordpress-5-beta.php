@@ -7,7 +7,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'wordpress-5-beta' => false,
 	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_install_features_before_companion', function( &$app = null, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		if ( $features['wordpress-5-beta'] ) {
 			debug( '%s: Updating core to latest WordPress 5 beta release', $domain );

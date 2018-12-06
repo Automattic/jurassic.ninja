@@ -7,7 +7,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'wp-debug-log' => false,
 	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_install_features_before_companion', function( &$app = null, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		if ( $features['wp-debug-log'] ) {
 			debug( '%s: Setting WP_DEBUG_LOG and WP_DEBUG_LOG to true', $domain );

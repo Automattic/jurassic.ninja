@@ -20,9 +20,9 @@
 4. Generates a random subdomain.
 5. Creates a user. Hookable via the  `jurassic_ninja_create_sysuser` action.
 6. Launches a new environment for a PHP/MysQL app and installs WordPress. Hookable via the  `jurassic_ninja_create_app` action.
-7. Add features that need to be added before enabling the autologin mechanism (`jurassic_ninja_add_features_before_auto_login` action).
+7. Add features that need to be added before enabling the autologin mechanism (`jurassic_ninja_install_features_before_companion` action).
 8. Enable autologin.
-9. Add features that need to be added after enabling the autologin mechanism (`jurassic_ninja_add_features_before_auto_login` action).
+9. Add features that need to be added after enabling the autologin mechanism (`jurassic_ninja_install_features_before_companion` action).
 ```
 
 
@@ -39,7 +39,7 @@ But the main hooks to look are:
 * jurassic_ninja_rest_feature_defaults (Filter).
 * jurassic_ninja_rest_create_request_features (Filter ).
 * jurassic_ninja_do_feature_conditions (Action).
-* jurassic_ninja_add_features_before_auto_login (Action).
-* jurassic_ninja_add_features_after_auto_login (Action).
+* jurassic_ninja_install_features_before_companion (Action).
+* jurassic_ninja_install_features_after_companion (Action).
 * jurassic_ninja_feature_command (Filter).
 * jurassic_ninja_created_site_url (Filter).

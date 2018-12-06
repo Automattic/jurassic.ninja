@@ -9,7 +9,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'gutenberg-nightly' => false,
 	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_install_features_before_companion', function( &$app = null, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		if ( $features['gutenberg-nightly'] ) {
 			debug( '%s: Adding Gutenberg nightly release Plugin', $domain );
