@@ -40,7 +40,7 @@
 3.3.3 / 2018-04-19
 ==================
 
-  * Improve the way we handle errors for the jurassic_ninja_rest_create_request_features filter
+  * Improve the way we handle errors for the jurassic_ninja_features_from_rest_api_request filter
 
 3.3.2 / 2018-04-19
 ==================

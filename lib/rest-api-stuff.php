@@ -39,7 +39,7 @@ function add_rest_api_endpoints() {
 		 * @param array $features    The current feature flags.
 		 * @param array $json_params The body of the json request.
 		 */
-		$features = apply_filters( 'jurassic_ninja_rest_create_request_features', $features, $json_params );
+		$features = apply_filters( 'jurassic_ninja_features_from_rest_api_request', $features, $json_params );
 		// Check if any feature errored
 		foreach ( $features as $feature ) {
 			if ( is_wp_error( $feature ) ) {

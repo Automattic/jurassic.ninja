@@ -37,7 +37,7 @@ But the main hooks to look are:
 * jurassic_ninja_settings_options_page (Filter).
 * jurassic_ninja_settings_options_page_default_plugins (Filter).
 * jurassic_ninja_feature_defaults_for_rest_api_request (Filter).
-* jurassic_ninja_rest_create_request_features (Filter ).
+* jurassic_ninja_features_from_rest_api_request (Filter ).
 * jurassic_ninja_do_feature_conditions (Action).
 * jurassic_ninja_install_features_before_companion (Action).
 * jurassic_ninja_install_features_after_companion (Action).

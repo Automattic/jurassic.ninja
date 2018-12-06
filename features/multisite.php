@@ -15,7 +15,7 @@ add_action( 'jurassic_ninja_init', function() {
 		}
 	} );
 
-	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) {
+	add_filter( 'jurassic_ninja_features_from_rest_api_request', function( $features, $json_params ) {
 		// Check we're not asked for both multisite types
 		$error = null;
 		if (

@@ -24,7 +24,7 @@ add_action( 'jurassic_ninja_init', function() {
 		}
 	}, 100, 3 );
 
-	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) {
+	add_filter( 'jurassic_ninja_features_from_rest_api_request', function( $features, $json_params ) {
 		if ( isset( $json_params['gutenpack'] ) ) {
 			$features['gutenpack'] = $json_params['gutenpack'];
 			if ( $features['gutenpack'] ) {
