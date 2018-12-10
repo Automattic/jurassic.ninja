@@ -50,7 +50,7 @@ add_action( 'jurassic_ninja_init', function() {
 } );
 
 function add_gutenpack( $branch, $jetpack_dir = 'jetpack' ) {
-	$cmd = 'curl https://gist.githubusercontent.com/oskosk/1b821e70548b065cef1d9c8e6f786089/raw/build-gutenpack.sh --output build-gutenpack.sh'
+	$cmd = 'curl https://raw.githubusercontent.com/Automattic/jurassic.ninja/fix/gutenpack-build/bin/build-gutenpack.sh --output build-gutenpack.sh'
 		. " && source build-gutenpack.sh $branch $jetpack_dir";
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
