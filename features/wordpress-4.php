@@ -54,7 +54,9 @@ add_action( 'jurassic_ninja_admin_init', function() {
 function update_to_wordpress_4_latest() {
 	$wordpress_4_latest = settings( 'wordpress_4_latest', '4.9.8' );
 	// We need --force because this may be a downgrade
-	$cmd = "wp core update --version=$wordpress_4_latest --force && wp core update-db";
+	// Force the latest tag defined in settings but attempt to update the minor version just in case
+	// another minor is released before settings are updated to deal with the very latest tag for 4.
+	$cmd = "wp core update --version=$wordpress_4_latest --force && wp core update --minor";
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );
