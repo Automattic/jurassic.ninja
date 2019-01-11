@@ -69,6 +69,7 @@ cheetah
 chickadee
 chicken
 chimpanzee
+chimuelo
 chinchilla
 chinese
 chinstrap
