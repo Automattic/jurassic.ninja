@@ -69,6 +69,7 @@ cheetah
 chickadee
 chicken
 chimpanzee
+chimuelo
 chinchilla
 chinese
 chinstrap
@@ -671,4 +672,3 @@ yellow-crowned
 yellow-eyed
 zebra
 zebras
-chimuelo
