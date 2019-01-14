@@ -23,6 +23,7 @@ add_action( 'jurassic_ninja_init', function() {
 		// PHP does not support graceful "restart" so every php-pool gets closed
 		// each time ServerPilot needs to SIGUSR1 php for reloading configuration
 		$shortlife_php_versions_alternatives = [
+			'php7.3',
 			'php7.2',
 			'php7.0',
 			'php5.6',
@@ -105,7 +106,7 @@ function sp() {
  * Creates a PHP app using ServerPilot's API
  * @param  String $name          The nickname of the App
  * @param  String $sysuserid     The System User that will "own" this App
- * @param  String $php_version   The PHP version for an App. Choose from php5.4, php5.5, php5.6, php7.0, or php7.1.
+ * @param  String $php_version   The PHP version for an App. Choose among php5.4, php5.5, php5.6, php7.0, php 7.2, or php 7.3
  * @param  Array  $domains       An array of domains that will be used in the webserver's configuration
  * @param  Array  $wordpress     An array containing the following keys: site_title , admin_user , admin_password , and admin_email
  * @return Object                An object with the new app data.
