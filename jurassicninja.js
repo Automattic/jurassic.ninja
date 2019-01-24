@@ -200,15 +200,15 @@ function favicon_update_colour( colour ) {
         return l;
     }
 
-		function remove_all_favicons() {
-				var links = document.getElementsByTagName( 'head' )[0].getElementsByTagName( 'link' );
-				for ( var i = 0; i < links.length; i++ ) {
-					if ( (/(^|\s)icon(\s|$)/i).test( links[i].getAttribute( 'rel' ) ) ) {
-							var element = links[i];
-							element.parentNode.removeChild(element);
-		        }
-		    }
-		}
+    function remove_all_favicons() {
+        var links = document.getElementsByTagName( 'head' )[0].getElementsByTagName( 'link' );
+        for ( var i = 0; i < links.length; i++ ) {
+            if ( (/(^|\s)icon(\s|$)/i).test( links[i].getAttribute( 'rel' ) ) ) {
+                var element = links[i];
+              element.parentNode.removeChild(element);
+            }
+        }
+    }
 
     function get_current_favicon() {
         //get link element
