@@ -61,6 +61,7 @@ function add_auto_login( $password, $sysuser ) {
 function require_feature_files() {
 	$available_features = [
 		'/features/logged-in-user-email-address.php',
+		'/features/content.php',
 		'/features/multisite.php',
 		'/features/ssl.php',
 		'/features/plugins.php',
