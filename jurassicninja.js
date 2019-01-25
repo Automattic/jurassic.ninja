@@ -44,11 +44,13 @@ function launchSite( $, features, resetSpinner = false ) {
 				var successMessage = $( '#progress' ).data().successMessage;
 				$( '#progress' ).html( `<a href="${ response.data.url }">${ successMessage }</a>` );
 				stopSpinner();
+				favicon_update_colour( 'green' );
 			} )
 			.catch( err => {
 				var errorMessage = $( '#progress' ).data().errorMessage;
 				$( '#progress' ).text( `${ errorMessage } (${ err.message }).` );
 				stopSpinner( true );
+				favicon_update_colour( 'red' );
 			} );
 	} );
 }
@@ -101,6 +103,7 @@ function isCreatePage() {
 function startSpinner() {
 	jQuery( '#img1' ).show();
 	jQuery( '#img2' ).hide();
+	favicon_update_colour( 'orange' );
 }
 function stopSpinner( error = false ) {
 	if ( error ) {
@@ -184,4 +187,82 @@ function jurassicNinjaApi() {
 	}
 
 	this.create = create;
+}
+
+/**
+ * Adds a dot to the favicon so that you know the status of a build
+ */
+function favicon_update_colour( colour ) {
+
+    function getLocation( href ) {
+        var l = document.createElement( 'a' );
+        l.href = href;
+        return l;
+    }
+
+    function remove_all_favicons() {
+        var links = document.getElementsByTagName( 'head' )[0].getElementsByTagName( 'link' );
+        for ( var i = 0; i < links.length; i++ ) {
+            if ( (/(^|\s)icon(\s|$)/i).test( links[i].getAttribute( 'rel' ) ) ) {
+                var element = links[i];
+              element.parentNode.removeChild(element);
+            }
+        }
+    }
+
+    function get_current_favicon() {
+        //get link element
+        function getLinks() {
+            var icons = [];
+            var links = document.getElementsByTagName('head')[0].getElementsByTagName('link');
+            for (var i = 0; i < links.length; i++) {
+                if ((/(^|\s)icon(\s|$)/i).test(links[i].getAttribute('rel'))) {
+                    icons.push(links[i]);
+                }
+            }
+            return icons;
+        };
+        //if link element
+        var elms = getLinks();
+        if (elms.length === 0) {
+            elms = [document.createElement('link')];
+            elms[0].setAttribute('rel', 'icon');
+            document.getElementsByTagName('head')[0].appendChild(elms[0]);
+        }
+
+        elms.forEach( function(item) {
+            item.setAttribute( 'type', 'image/png' );
+        } );
+        return elms[ elms.length -1 ];
+    }
+
+    var favicon = get_current_favicon();
+
+    var canvas = document.createElement( 'canvas' );
+    canvas.width = 32;canvas.height = 32;
+    var ctx = canvas.getContext( '2d' );
+    var img = new Image();
+	if ( favicon.href ) {
+        var location = getLocation( favicon.href  );
+        if ( ['i1.wp.com', 'i2.wp.com','i3.wp.com', 'i4.wp.com'].indexOf( location.host ) >= 0 ) {
+           var pathSplit = location.pathname.split( '/' );
+           pathSplit.splice( 0, 2); // removes the domain part
+           img.src = pathSplit.join( '/' );
+        } else {
+            img.src = favicon.href;
+        }
+    }
+
+    img.onload = function() {
+        ctx.drawImage( img, 0, 0, 32, 32 );
+        ctx.arc(20, 20, 6, 0, 2 * Math.PI, false);
+        ctx.fillStyle = colour;
+        ctx.fill();
+        var link = favicon;
+        link.type = 'image/x-icon';
+        link.rel = 'shortcut icon';
+        link.href = canvas.toDataURL( 'image/x-icon' );
+        remove_all_favicons(); // Remove all the favicons so that Chrome works as expeceted.
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
 }
