@@ -23,6 +23,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'wp-job-manager' => 'WP Job Manager',
 		'wp-log-viewer' => 'WP Log Viewer',
 		'wp-rollback' => 'WP Rollback',
+		'wp-super-cache' => 'WP Super Cache',
 	];
 	// Set all defaults to false.
 	// Will probably add a filter here.
