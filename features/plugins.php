@@ -21,6 +21,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'wp-downgrade' => 'WP Downgrade',
 		'wp-log-viewer' => 'WP Log Viewer',
 		'wp-rollback' => 'WP Rollback',
+		'crowdsignal' => 'Crowdsignal',
 	];
 	// Set all defaults to false.
 	// Will probably add a filter here.
@@ -31,6 +32,14 @@ add_action( 'jurassic_ninja_init', function() {
 	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults, $whitelist ) {
 		$features = array_merge( $defaults, $features );
 		foreach ( $whitelist as $slug => $name ) {
+			// Hack for Crowdsignal cause it's still referred to as polldaddy on the org repo
+			if ( 'crowdsignal' === $slug ) {
+				if ( isset( $features['crowdsignal'] ) && $features['crowdsignal'] ) {
+					debug( '%s: Adding %s', $domain, $name );
+					add_directory_plugin( 'polldaddy' );
+				}
+				continue;
+			}
 			if ( isset( $features[ $slug ] ) && $features[ $slug ] ) {
 				debug( '%s: Adding %s', $domain, $name );
 				add_directory_plugin( $slug );
