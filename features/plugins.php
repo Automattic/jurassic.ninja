@@ -14,14 +14,15 @@ add_action( 'jurassic_ninja_init', function() {
 		'classic-editor' => 'Classic Editor',
 		'code-snippets' => 'Code Snippets',
 		'config-constants' => 'Config Constants',
+		'crowdsignal' => 'Crowdsignal',
 		'gutenberg' => 'Gutenberg',
 		'jetpack' => 'Jetpack',
 		'woocommerce' => 'WooCommerce',
 		'wordpress-beta-tester' => 'WordPress Beta Tester Plugin',
 		'wp-downgrade' => 'WP Downgrade',
+		'wp-job-manager' => 'WP Job Manager',
 		'wp-log-viewer' => 'WP Log Viewer',
 		'wp-rollback' => 'WP Rollback',
-		'crowdsignal' => 'Crowdsignal',
 	];
 	// Set all defaults to false.
 	// Will probably add a filter here.
