@@ -247,7 +247,7 @@ function favicon_update_colour( colour ) {
         if ( ['i1.wp.com', 'i2.wp.com','i3.wp.com', 'i4.wp.com'].indexOf( location.host ) >= 0 ) {
            var pathSplit = location.pathname.split( '/' );
            pathSplit.splice( 0, 2); // removes the domain part
-           img.src = pathSplit.join( '/' );
+           img.src = '/' + pathSplit.join( '/' ); 
         } else {
             img.src = favicon.href;
         }
