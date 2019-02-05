@@ -22,7 +22,6 @@ adverse
 advisory
 aesthetic
 afraid
-african
 aggregate
 aggressive
 agreeable
@@ -38,7 +37,6 @@ alternative
 amateur
 amazing
 ambitious
-american
 amused
 ancient
 angry
@@ -51,7 +49,6 @@ appalling
 apparent
 applicable
 appropriate
-arab
 arbitrary
 architectural
 armed
@@ -65,7 +62,6 @@ assistant
 associated
 atomic
 attractive
-australian
 automatic
 autonomous
 available
@@ -107,7 +103,6 @@ breezy
 brief
 bright
 brilliant
-british
 broad
 broken
 brown
@@ -115,12 +110,10 @@ bumpy
 burning
 busy
 calm
-canadian
 capable
 capitalist
 careful
 casual
-catholic
 causal
 cautious
 central
@@ -133,9 +126,7 @@ cheerful
 chemical
 chief
 chilly
-chinese
 chosen
-christian
 chronic
 chubby
 circular
@@ -258,7 +249,6 @@ difficult
 digital
 diplomatic
 direct
-disabled
 disappointed
 disastrous
 disciplinary
@@ -290,7 +280,6 @@ dying
 dynamic
 eager
 early
-eastern
 easy
 economic
 educational
@@ -316,7 +305,6 @@ enchanting
 encouraging
 endless
 energetic
-english
 enormous
 enthusiastic
 entire
@@ -330,7 +318,6 @@ established
 estimated
 ethical
 ethnic
-european
 eventual
 everyday
 evident
@@ -423,7 +410,6 @@ genetic
 gentle
 genuine
 geographical
-german
 giant
 gifted
 gigantic
@@ -444,7 +430,6 @@ grand
 grateful
 greasy
 great
-greek
 green
 grey
 grieving
@@ -509,7 +494,6 @@ increased
 increasing
 incredible
 independent
-indian
 indirect
 individual
 industrial
@@ -545,13 +529,10 @@ international
 intimate
 invisible
 involved
-iraqi
-irish
 irrelevant
 isolated
 itchy
 jealous
-jewish
 jittery
 joint
 jolly
@@ -564,7 +545,6 @@ keen
 key
 kind
 known
-korean
 large
 late
 latin
@@ -715,7 +695,6 @@ ordinary
 organic
 organisational
 original
-orthodox
 other
 outdoor
 outer
@@ -794,7 +773,6 @@ proper
 proposed
 prospective
 protective
-protestant
 proud
 provincial
 psychological
@@ -809,7 +787,6 @@ qualified
 quick
 quickest
 quiet
-racial
 radical
 rainy
 random
@@ -838,7 +815,6 @@ relaxed
 relevant
 reliable
 relieved
-religious
 reluctant
 remaining
 remarkable
@@ -857,7 +833,6 @@ resulting
 retail
 retired
 revolutionary
-rich
 ridiculous
 right
 rigid
@@ -867,7 +842,6 @@ rival
 roasted
 robust
 rolling
-roman
 romantic
 rotten
 rough
@@ -877,7 +851,6 @@ rude
 ruling
 running
 rural
-russian
 sacred
 sad
 safe
@@ -889,7 +862,6 @@ scary
 scattered
 scientific
 scornful
-scottish
 scrawny
 screeching
 secondary
@@ -949,7 +921,6 @@ sore
 sorry
 sound
 sour
-southern
 soviet
 spanish
 spare
@@ -1015,7 +986,6 @@ surviving
 suspicious
 sweet
 swift
-swiss
 symbolic
 sympathetic
 systematic
@@ -1133,8 +1103,6 @@ weekly
 weird
 welcome
 well
-welsh
-western
 wet
 whispering
 white
@@ -1159,7 +1127,6 @@ worthy
 written
 wrong
 xanthous
-xenophobic
 xerothermic
 yawning
 yellow
