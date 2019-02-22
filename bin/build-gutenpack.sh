@@ -13,7 +13,8 @@ echo "Getting wp-calypso branch $CALYPSO_BRANCH"
 cd $HOME \
 && git clone https://github.com/automattic/wp-calypso --depth=1 -b "$CALYPSO_BRANCH" \
 && cd wp-calypso \
-&& npx lerna bootstrap --ci \
+&& npm ci \
+&& npm run build-packages \
 && echo "Building jetpack-editor for wp-calypso branch $CALYPSO_BRANCH" \
 && npm run sdk -- gutenberg client/gutenberg/extensions/presets/jetpack \
   --output-dir=$HOME/apps/$USER/public/wp-content/plugins/"$JETPACK_DIRNAME"/_inc/blocks \
