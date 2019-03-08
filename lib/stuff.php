@@ -69,6 +69,7 @@ function require_feature_files() {
 		'/features/wc-smooth-generator.php',
 		'/features/woocommerce-beta-tester.php',
 		'/features/wp-debug-log.php',
+		'/features/block-xmlrpc.php',
 		'/features/gutenpack.php',
 		'/features/gutenberg-master.php',
 		'/features/gutenberg-nightly.php',
