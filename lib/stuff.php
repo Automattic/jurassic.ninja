@@ -85,7 +85,6 @@ function require_feature_files() {
 		'/features/woocommerce-beta-tester.php',
 		'/features/wp-debug-log.php',
 		'/features/block-xmlrpc.php',
-		'/features/gutenpack.php',
 		'/features/gutenberg-master.php',
 		'/features/gutenberg-nightly.php',
 		'/features/wordpress-4.php',
