@@ -14,12 +14,15 @@ cd $HOME \
 && git clone https://github.com/automattic/wp-calypso --depth=1 -b "$CALYPSO_BRANCH" \
 && cd wp-calypso \
 && npm ci \
-&& npm run build-packages \
 && echo "Building jetpack-editor for wp-calypso branch $CALYPSO_BRANCH" \
-&& npm run sdk -- gutenberg client/gutenberg/extensions/presets/jetpack \
-  --output-dir=$HOME/apps/$USER/public/wp-content/plugins/"$JETPACK_DIRNAME"/_inc/blocks \
+&& npx lerna bootstrap --concurrency=2 --scope '@automattic/jetpack-blocks' \
+&& npx lerna run prepublishOnly --stream --scope '@automattic/jetpack-blocks' \
+&& mv -f packages/jetpack-blocks/dist $HOME/apps/$USER/public/wp-content/plugins/"$JETPACK_DIRNAME"/_inc/blocks \
+&& echo "Forcing jetpack_gutenberg and jetpack_gutenberg_cdn filters to true" \
 && echo -e "\nadd_filter( 'jetpack_gutenberg', '__return_true', 10 );\n" >> $HOME/apps/$USER/public/wp-content/plugins/companion/companion.php \
 && echo -e "add_filter( 'jetpack_gutenberg_cdn', '__return_false', 10 );\n" >> $HOME/apps/$USER/public/wp-content/plugins/companion/companion.php \
 && cd $HOME/apps/$USER/public \
+&& echo "Removing temporary ~/wp-calypso directory" \
 && rm -rf $HOME/wp-calypso \
+&& echo "Removing ~/.npm cache directory" \
 && rm -rf $HOME/.npm
