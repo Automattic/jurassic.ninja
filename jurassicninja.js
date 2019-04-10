@@ -70,7 +70,7 @@ function collectFeaturesFromFormInputs() {
 	const features_in_text_inputs = reduce.call( text_inputs, function( acc, el ) {
 		return Object.assign( {}, acc, { [ jQuery( el ).data( 'feature' ) ] : jQuery( el ).val() } );
 	}, {} );
-	return Object.assign( features, features_in_selects,  );
+	return Object.assign( features, features_in_selects, features_in_text_inputs );
 }
 
 function collectFeaturesFromQueryString() {
