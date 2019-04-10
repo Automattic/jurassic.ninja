@@ -103,6 +103,14 @@ function add_rest_api_endpoints() {
 		return $output;
 	} );
 
+	/**
+	 * Done after registering the JN specific endpoints.
+	 *
+	 * It's here so we can hook and add more endpoints.
+	 *
+	 * @since 4.14
+	 *
+	 */
 	do_action( 'jurassic_ninja_added_rest_api_endpoints' );
 }
 
