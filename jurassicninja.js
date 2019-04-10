@@ -4,7 +4,7 @@ const SPECIALOPS_CREATE_PAGE_SLUG = '/specialops';
 
 const originalProgressText = jQuery( '#progress' ).text();
 const originalProgressImage = jQuery( '#img1' ).attr( 'src' );
-
+let availableJetpackBetaBranches = [];
 init();
 
 function init() {
@@ -17,6 +17,7 @@ function init() {
 	}
 
 	if ( isSpecialOpsPage() ) {
+		hookJetpackBranches();
 		jQuery( '[data-is-create-button]' ).click( function () {
 			const $this = jQuery( this );
 			const features = collectFeaturesFromFormInputs();
@@ -65,7 +66,11 @@ function collectFeaturesFromFormInputs() {
 	const features_in_selects = reduce.call( selects, function( acc, el ) {
 		return Object.assign( {}, acc, { [ jQuery( el ).data( 'feature' ) ] : jQuery( el ).val() } );
 	}, {} );
-	return Object.assign( features, features_in_selects );
+	const text_inputs = jQuery( 'input[type=text][data-feature]' );
+	const features_in_text_inputs = reduce.call( text_inputs, function( acc, el ) {
+		return Object.assign( {}, acc, { [ jQuery( el ).data( 'feature' ) ] : jQuery( el ).val() } );
+	}, {} );
+	return Object.assign( features, features_in_selects,  );
 }
 
 function collectFeaturesFromQueryString() {
@@ -247,7 +252,7 @@ function favicon_update_colour( colour ) {
         if ( ['i1.wp.com', 'i2.wp.com','i3.wp.com', 'i4.wp.com'].indexOf( location.host ) >= 0 ) {
            var pathSplit = location.pathname.split( '/' );
            pathSplit.splice( 0, 2); // removes the domain part
-           img.src = '/' + pathSplit.join( '/' ); 
+           img.src = '/' + pathSplit.join( '/' );
         } else {
             img.src = favicon.href;
         }
@@ -266,3 +271,52 @@ function favicon_update_colour( colour ) {
         document.getElementsByTagName( 'head' )[0].appendChild( link );
     }
 }
+
+function getAvailableJetpackBetaBranches() {
+	return fetch( '/wp-json/jurassic.ninja/available-jetpack-built-branches')
+		.then( response => response.json() )
+		.then( body => {
+			let branches = [];
+			branches.push( body.data.master );
+			branches.push( body.data.rc );
+			branches = branches.concat( Object.keys( body.data.pr ).map( title => {
+				return body.data.pr[title];
+			} ) );
+			return branches;
+		} );
+}
+
+function hookJetpackBranches() {
+	const $search_input = jQuery('#jetpack_branch');
+	const $jetpack_beta_toggle = jQuery( '[data-feature=jetpack-beta]' );
+	const search_results = document.getElementById('jetpack_branches');
+	$jetpack_beta_toggle.change( () => {
+		if ( $jetpack_beta_toggle.is( ':checked' ) ) {
+			$search_input.attr( 'disabled', false );
+		} else {
+			$search_input.attr( 'disabled', true );
+		}
+	} )
+	getAvailableJetpackBetaBranches()
+		.then( list => {
+			availableJetpackBetaBranches = list;
+
+			availableJetpackBetaBranches.forEach( branch => {
+				// Create a new <option> element.
+				const option = document.createElement('option');
+				if ( branch.pr ) {
+					option.innerHTML = 'PR #' + branch.pr;
+					option.value = branch.branch;
+				} else if ( branch.branch === 'master' ) {
+					option.innerHTML = 'Bleeding Edge';
+					option.value = 'master';
+				} else {
+					option.innerHTML = 'Release Candidate';
+					option.value = 'rc';
+				}
+				// attach the option to the datalist element
+				search_results.appendChild(option);
+			} );
+		} );
+}
+

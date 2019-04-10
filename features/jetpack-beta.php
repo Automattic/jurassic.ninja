@@ -2,6 +2,17 @@
 
 namespace jn;
 
+add_action( 'jurassic_ninja_added_rest_api_endpoints', function() {
+	add_get_endpoint( 'available-jetpack-built-branches', function ( $request ) {
+		$body = $request->get_json_params() ? $request->get_json_params() : [];
+
+		$manifest_url = 'https://betadownload.jetpack.me/jetpack-branches.json';
+		$manifest = json_decode( wp_remote_retrieve_body( wp_remote_get( $manifest_url ) ) );
+		$output = $manifest;
+		return $output;
+	} );
+} );
+
 add_action( 'jurassic_ninja_init', function() {
 	$defaults = [
 		'jetpack-beta' => false,

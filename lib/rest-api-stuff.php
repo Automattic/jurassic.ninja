@@ -102,6 +102,8 @@ function add_rest_api_endpoints() {
 
 		return $output;
 	} );
+
+	do_action( 'jurassic_ninja_added_rest_api_endpoints' );
 }
 
 /**
