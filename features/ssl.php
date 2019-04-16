@@ -31,6 +31,8 @@ add_action( 'jurassic_ninja_init', function() {
 					// phpcs:enable
 					throw new \Exception( 'Error enabling SSL: ' . $response->get_error_message() );
 				}
+				debug( '%s: Setting home and siteurl options', $domain );
+				set_home_and_site_url( $domain );
 			}
 		}
 	}, 10, 3 );
@@ -84,3 +86,12 @@ add_action( 'jurassic_ninja_admin_init', function() {
 		return $options_page;
 	} );
 } );
+
+function set_home_and_site_url( $domain ) {
+	$cmd = "wp option set siteurl https://$domain"
+		. " && wp option set home https://$domain";
+
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
+}
