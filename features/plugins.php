@@ -17,6 +17,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'crowdsignal' => 'Crowdsignal',
 		'gutenberg' => 'Gutenberg',
 		'jetpack' => 'Jetpack',
+		'vaultpress' => 'VaultPress',
 		'woocommerce' => 'WooCommerce',
 		'wordpress-beta-tester' => 'WordPress Beta Tester Plugin',
 		'wp-downgrade' => 'WP Downgrade',
