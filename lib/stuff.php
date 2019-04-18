@@ -34,6 +34,7 @@ define( 'COMPANION_PLUGIN_URL', 'https://github.com/Automattic/companion/archive
 define( 'JETPACK_BETA_PLUGIN_URL', 'https://github.com/Automattic/jetpack-beta/archive/master.zip' );
 define( 'SUBDOMAIN_MULTISITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubusercontent.com/oskosk/8cac852c793df5e4946463e2e55dfdd6/raw/a60ce4122a69c1dd36c623c9b999c36c9c8d3db8/gistfile1.txt' );
 define( 'SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubusercontent.com/oskosk/f5febd1bb65a2ace3d35feac949b47fd/raw/6ea8ffa013056f6793d3e8775329ec74d3304835/gistfile1.txt' );
+define( 'REGULAR_SITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubusercontent.com/oskosk/0dab794274742af9caddefbc73f0ad80/raw/504f60da86969a9d55487f0c4821d06928a97218/.htaccess' );
 
 /**
  * Force the site to log the creator in on the first time they visit the site
@@ -48,6 +49,18 @@ function add_auto_login( $password, $sysuser ) {
 		. " && wp option add jurassic_ninja_admin_password '$password'"
 		. " && wp option add companion_api_base_url '$companion_api_base_url'"
 		. " && wp plugin install --force $companion_plugin_url --activate";
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
+}
+
+/**
+ * Makes sure the site has an .htaccess file
+ *
+ */
+function add_htaccess() {
+	$file_url = REGULAR_SITE_HTACCESS_TEMPLATE_URL;
+	$cmd = "wget '$file_url' -O .htaccess";
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );
@@ -221,6 +234,9 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		 */
 		do_action_ref_array( 'jurassic_ninja_add_features_before_auto_login', [ &$app, $features, $domain ] );
 		// phpcs:enable
+
+		debug( '%s: Adding .htaccess file', $domain );
+		add_htaccess();
 
 		debug( '%s: Adding Companion Plugin for Auto Login', $domain );
 		add_auto_login( $password, $user->data->name );
