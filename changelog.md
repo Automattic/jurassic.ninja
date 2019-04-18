@@ -1,5 +1,269 @@
-4.15.0
- * Removed Gutenpack 
+
+4.17 / 2019-04-18
+==================
+
+  * Removed gutenpack feature
+
+4.16.1 / 2019-04-18
+===================
+
+  * Run wp rewrite after downloading htaccess file
+  * bump to 4.16.1
+  * Add htaccess file right away when creating a site
+
+4.16 / 2019-04-16
+=================
+
+  * Bump version to 4.16
+  * Add VaultPress to the whitelist of plugisn
+
+4.15.2 / 2019-04-16
+===================
+
+  * Bump to 4.15.2
+  * Set home and siteurl options on launch for sites using SSL
+
+4.15.1 / 2019-04-10
+===================
+
+  * bump to 4.15.1
+  * fix features in text inputs
+  * Document the action jurassic_ninja_added_rest_api_endpoints
+  * Bump to 4.15
+  * Add branch selector for Jetpack beta
+
+4.14.1 / 2019-03-13
+===================
+
+  * Update build gutenpack script
+  * Bump version to 4.14.1
+
+4.14 / 2019-03-08
+=================
+
+  * Bump version to 4.14
+  * Add ability to emulate XML-RPC blocking
+
+4.13.2 / 2019-02-22
+===================
+
+  * Bump to 4.13.2
+  * Fix build-gutenpack.sh to fit the calypso monorepo commands
+  * Merge pull request #165 from Automattic/remove/some-words
+  * Bump version to 4.13.1
+  * Remove some words to avoid some messy combinations
+
+4.13 / 2019-02-01
+=================
+
+  * Merge pull request #164 from Automattic/update/bump-4.1.3
+  * Bump plugin version to 4.13
+  * Merge pull request #162 from Automattic/fix/favicon-colour-changes
+  * Make sure that we use the root relative url
+
+4.12 / 2019-01-28
+=================
+
+  * Merge pull request #161 from Automattic/add/guardians-plugins
+  * Bump version to 4.12
+  * Add ability to launch with WP Super Cache plugin
+  * Add ability to launch with WP Job Manager plugin
+  * Add ability to launch with Crowdsignal plugin
+
+4.11 / 2019-01-25
+=================
+
+  * Adds tab indicator to the build page (#146)
+
+4.10 / 2019-01-24
+=================
+
+  * Merge pull request #160 from Automattic/add/content
+  * Bump version to 4.10
+  * Add feature `content` for allowing pre-generated content to be present on the site on launching
+
+4.9 / 2019-01-14
+================
+
+  * Merge pull request #159 from Automattic/add/php-7.3
+  * Bump version to 4.9
+  * Make default PHP version be PHP 7.2
+  * Add PHP 7.3 to possible versions for shortlived sites
+
+4.8 / 2019-01-11
+================
+
+  * Merge pull request #158 from Automattic/add-chimuelo
+
+add-chimuelo / 2019-01-11
+=========================
+
+  * bump properly to just 4.8
+  * move chimuelo up in the list
+  * Bump to 4.8.0
+  * add "chimuelo" to nouns list
+
+4.7.2 / 2018-12-10
+==================
+
+  * Fix Gutenpack script url path (#154)
+
+4.7.1 / 2018-12-10
+==================
+
+  * Check if branch arg is set for gutenpack feature before evaluating it (#153)
+  * Add build-gutenpack.sh script in repo (#147)
+
+4.7 / 2018-12-06
+================
+
+  * Add ability to launch with Classic Editor plugin (#152)
+
+4.6 / 2018-12-06
+================
+
+  * Add ability to launch with latest stable WordPress 4 (#150)
+  * Remove feature wordpress-5-beta as WordPress 5.0 has been released already (#149)
+
+4.5 / 2018-11-16
+================
+
+  * Add ability to launch with a nightly release of Gutenberg (#144)
+
+4.4 / 2018-11-16
+================
+
+  * Add ability to launch with bleeding edge Gutenberg (master branch) (#143)
+
+4.3 / 2018-11-07
+================
+
+  * Add ability to launch sites with the WooCommerce Smooth Generator plugin (#142)
+
+4.2 / 2018-10-24
+================
+
+  * Add ability to launch sites with latest beta release of WordPress 5.0 (#141)
+  * Fix jetpack branch when gutenpack feature is requested (#139)
+
+4.2-beta4 / 2018-09-27
+======================
+
+  * bump to 4.2 beta4
+  * .
+
+4.2-beta3 / 2018-09-27
+======================
+
+  * bump to 4.2-beta3
+  * mhhh
+
+4.2-beta2 / 2018-09-27
+======================
+
+  * move check for jetpack branch into jurassic_ninja_add_features_after_auto_login filter
+
+4.2-beta / 2018-09-27
+=====================
+
+  * Bump to 4.2-beta
+  * Set priority to 100 for gutenpack filter on REST request
+
+4.1 / 2018-09-24
+================
+
+  * Add ability to build Gutenberg blocks for Jetpack from Calypso SDK (#136)
+
+4.1-beta8 / 2018-09-18
+======================
+
+  * .
+  * .
+
+4.1-beta7 / 2018-09-18
+======================
+
+  * Deal with latest changes in Jetpack master
+
+4.1-beta6 / 2018-09-18
+======================
+
+  * .
+
+4.1-beta5 / 2018-09-18
+======================
+
+  * .
+
+4.1-beta4 / 2018-09-18
+======================
+
+  * more debugging
+
+4.1-beta3 / 2018-09-18
+======================
+
+  * oops
+
+4.1-beta / 2018-09-17
+=====================
+
+  * bump to beta
+  * Add gutenpack feature
+  * Add gutenpack feature
+  * Add gutenpack feature
+
+4.1-beta2 / 2018-09-16
+======================
+
+  * Merge pull request #134 from Automattic/fix/nojetpack
+  * bump to 4.0.1
+  * Fix acknowleding requests for features set to false
+
+4.0 / 2018-09-15
+================
+
+  * Merge pull request #133 from Automattic/update/bump-4.0
+  * .
+  * Improve docs
+  * Bump to 4.0
+  * Merge pull request #132 from Automattic/update/unify-plugins-feature-for-plugins-in-directory
+  * use loops instead of array for defaults
+  * fix spinner
+  * fixes
+  * Update features/readme.md
+  * fixes
+  * fixes
+  * remove requires for deleted files
+  * remove branch default from plugins.php
+  * unify wp-rollback and plugins
+  * unify wp-log-viewer and plugins
+  * unify wp-downgrade and plugins
+  * unify wordpress-beta-tester and plugins
+  * unify woocommerce and plugins
+  * unify gutenberg config-constants code-snippets and plugins
+  * Merge pull request #131 from Automattic/fix/some-features
+  * Add missing filters for config-constants and wordpress-beta-tester
+  * Merge pull request #129 from Automattic/update/move-messages-out-of-js
+  * Use original gif in README
+  * Make failure img src be part of markup too
+  * Move hardcoded success and error messages from JS to the Create Page content
+  * Merge pull request #128 from Automattic/update/unify-endpoints
+  * remove unneeded line
+  * simplify JS api by leaving just one launchSite function
+  * update comment
+  * Unify /specialops/create and /create API endpoints
+
+3.7 / 2018-09-12
+================
+
+  * Merge pull request #127 from Automattic/update/some-defaults
+  * spaces
+  * better error message when requesting both multisite types
+  * Fix exception parameters for multisite
+  * Bump to 3.7
+  * Allow multisite from GET parameter
+  * Add setting to have Gutenberg installed by default
 
 3.6.1 / 2018-07-08
 ==================
