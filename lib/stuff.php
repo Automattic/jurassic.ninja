@@ -60,7 +60,9 @@ function add_auto_login( $password, $sysuser ) {
  */
 function add_htaccess() {
 	$file_url = REGULAR_SITE_HTACCESS_TEMPLATE_URL;
-	$cmd = "wget '$file_url' -O .htaccess";
+	$cmd = "wget '$file_url' -O .htaccess"
+		. " && wp rewrite structure '/%year%/%monthnum%/%day%/%postname%/'"
+		. ' && wp rewrite flush';
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );
