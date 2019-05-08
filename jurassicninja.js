@@ -18,6 +18,7 @@ function init() {
 
 	if ( isSpecialOpsPage() ) {
 		hookJetpackBranches();
+		hookAvailableLanguages();
 		jQuery( '[data-is-create-button]' ).click( function () {
 			const $this = jQuery( this );
 			const features = collectFeaturesFromFormInputs();
@@ -285,6 +286,12 @@ function getAvailableJetpackBetaBranches() {
 			return branches;
 		} );
 }
+function hookAvailableLanguages() {
+	const $language_list = jQuery( '[data-feature=language]' );
+	Object.keys( availableLanguages ).forEach( l => {
+		jQuery( '#language' ).append( new Option( availableLanguages[ l ].native_name,  l ) );
+	} );
+}
 
 function hookJetpackBranches() {
 	const $search_input = jQuery('#jetpack_branch');
@@ -319,4 +326,3 @@ function hookJetpackBranches() {
 			} );
 		} );
 }
-
