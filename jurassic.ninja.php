@@ -140,6 +140,13 @@ function add_scripts() {
  * @return boolean [description]
  */
 function page_is_launching_page() {
-	return ( 'create' === get_page_uri()
-		|| ( current_user_can( 'manage_options' ) && 'specialops' === get_page_uri() ) );
+	return ( 'create' === get_page_uri() || page_is_specialops() );
+}
+
+/**
+ * Returns true if currently on a /specialops page
+ * @return boolean [description]
+ */
+function page_is_specialops() {
+	return current_user_can( 'manage_options' ) && 'specialops' === get_page_uri();
 }
