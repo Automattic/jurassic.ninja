@@ -32,7 +32,7 @@ add_action( 'jurassic_ninja_init', function() {
 			$php_version = $shortlife_php_versions_alternatives[ array_rand( $shortlife_php_versions_alternatives ) ];
 		}
 		if ( ! $features['shortlife'] && 'default' === $php_version ) {
-			$php_version = 'php7.2';
+			$php_version = 'php7.3';
 		}
 
 		debug( 'Launching %s on PHP version: %s', $domain, $php_version );
