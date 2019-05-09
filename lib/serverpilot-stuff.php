@@ -27,8 +27,6 @@ add_action( 'jurassic_ninja_init', function() {
 			'php7.2',
 			'php7.0',
 			'php5.6',
-			'php5.5',
-			'php5.4',
 		];
 		if ( $features['shortlife'] && 'default' === $php_version ) {
 			$php_version = $shortlife_php_versions_alternatives[ array_rand( $shortlife_php_versions_alternatives ) ];
