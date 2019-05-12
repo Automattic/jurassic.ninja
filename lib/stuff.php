@@ -177,9 +177,11 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 
 		debug( 'Creating sysuser for %s', $domain );
 
-		$user = generate_new_user( $password );
+		$username = generate_random_username();
 
-		debug( 'Creating app for %s under sysuser %s', $domain, $user->data->name );
+		$user = generate_new_user( $username, $password );
+
+		debug( 'Creating app for %s under sysuser %s', $domain, $username );
 
 		$app = null;
 		// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
@@ -339,11 +341,12 @@ function figure_out_main_domain( $domains ) {
 
 /**
  * Generates a new username with a pseudo random name on the managed server.
+ *
+ * @param  string $username The username.
  * @param  string $password The password to be assigned for the user
  * @return [type]           [description]
  */
-function generate_new_user( $password ) {
-	$username = generate_random_username();
+function generate_new_user( $username, $password ) {
 	$return = null;
 	// Here PHP Codesniffer parses &$return as if it were a deprecated pass-by-reference but it is not
 	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
