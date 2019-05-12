@@ -214,6 +214,9 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $user, $php_version, $domain, $wordpress_options, $features ] );
 		// phpcs:enable
 
+		if ( ! $app ) {
+			throw new \Exception( 'No app was created.' );
+		}
 		if ( is_wp_error( $app ) ) {
 			throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
 		}
