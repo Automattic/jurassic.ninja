@@ -75,6 +75,7 @@ function add_htaccess() {
  */
 function require_feature_files() {
 	$available_features = [
+		'/features/plesk-stuff.php',
 		'/features/logged-in-user-email-address.php',
 		'/features/content.php',
 		'/features/multisite.php',
