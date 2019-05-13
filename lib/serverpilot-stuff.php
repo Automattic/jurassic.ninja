@@ -16,7 +16,8 @@ if ( ! defined( '\\ABSPATH' ) ) {
 $serverpilot_instance = null;
 
 add_action( 'jurassic_ninja_init', function() {
-	add_action( 'jurassic_ninja_create_app', function( &$app, $user, $php_version, $domain, $wordpress_options, $features ) {
+	add_action( 'jurassic_ninja_create_app', function( &$app, $username, $php_version, $domain, $wordpress_options, $features ) {
+		$user = generate_new_user( $username, $wordpress_options['admin_password'] );
 		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
 		$domain_arg = ( isset( $features['subdomain_multisite'] ) && $features['subdomain_multisite'] ) ? array( $domain, '*.' . $domain ) : array( $domain );
 		// Mitigate ungraceful PHP-FPM restart for shortlived sites by randomizing PHP version
@@ -38,6 +39,7 @@ add_action( 'jurassic_ninja_init', function() {
 		debug( 'Launching %s on PHP version: %s', $domain, $php_version );
 		$app = create_sp_app( $user->data->name, $user->data->id, $php_version, $domain_arg, $wordpress_options );
 	}, 10, 6 );
+
 	add_action( 'jurassic_ninja_create_sysuser', function( &$return, $username, $password ) {
 		try {
 			$return = create_sp_sysuser( $username, $password );

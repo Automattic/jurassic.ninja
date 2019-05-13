@@ -179,8 +179,6 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 
 		$username = generate_random_username();
 
-		$user = generate_new_user( $username, $password );
-
 		debug( 'Creating app for %s under sysuser %s', $domain, $username );
 
 		$app = null;
@@ -197,7 +195,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		 *     All we need to describe a php app with WordPress
 		 *
 		 *     @type object $app                 Passed by reference. This object should contain the resulting data after creating a PHP app.
-		 *     @type object $user                An object that is the result of creating a new system user under which the app will run.
+		 *     @type object $username            The system user to run the site on.
 		 *     @type string $php_version         The PHP version we're going to use.
 		 *     @type string $domain              The domain under which this app will be running.
 		 *     @type array  $wordpress_options {
@@ -211,7 +209,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		 * }
 		 *
 		 */
-		do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $user, $php_version, $domain, $wordpress_options, $features ] );
+		do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $username, $php_version, $domain, $wordpress_options, $features ] );
 		// phpcs:enable
 
 		if ( ! $app ) {
@@ -247,7 +245,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		add_htaccess();
 
 		debug( '%s: Adding Companion Plugin for Auto Login', $domain );
-		add_auto_login( $password, $user->data->name );
+		add_auto_login( $password, $username );
 
 		// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
 		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
@@ -273,7 +271,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		// Runs the command via SSH
 		// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
 		debug( '%s: Adding features', $domain );
-		run_commands_for_features( $user->data->name, $password, $domain );
+		run_commands_for_features( $username, $password, $domain );
 
 		debug( 'Finished launching %s', $domain );
 		return $app->data;
