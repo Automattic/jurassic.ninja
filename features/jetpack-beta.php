@@ -39,7 +39,7 @@ add_action( 'jurassic_ninja_init', function() {
 	} );
 
 	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) {
-		$branch = isset( $json_params['branch'] ) ? $json_params['branch'] : 'master';
+		$branch = isset( $json_params['branch'] ) && $json_params['branch'] ? $json_params['branch'] : 'master';
 		if ( isset( $json_params['jetpack-beta'] ) && $json_params['jetpack-beta'] ) {
 			$url = get_jetpack_beta_url( $branch );
 
