@@ -69,6 +69,17 @@ function add_htaccess() {
 }
 
 /**
+ * Makes sure the site does not report new posts to Ping-O-Matic
+ *
+ */
+function stop_pingomatic() {
+	$cmd = 'wp option update ping_sites ""';
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
+}
+
+/**
  * Just loops through a filtered array of files inside the features directory and requires them
  *
  * @return [type] [description]
@@ -239,6 +250,11 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 
 		debug( '%s: Adding .htaccess file', $domain );
 		add_htaccess();
+		// 2020-01-17
+		// For some reason, automated scripts are being able to find out about a new Jurassic Ninja site before
+		// the person that launched it reaches the site, thus the site is locked for them.
+		debug( '%s: Stopping pings to Ping-O-Mattic', $domain );
+		stop_pingomatic();
 
 		debug( '%s: Adding Companion Plugin for Auto Login', $domain );
 		add_auto_login( $password, $user->data->name );
