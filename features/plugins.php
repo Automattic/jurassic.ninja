@@ -19,6 +19,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'jetpack' => 'Jetpack',
 		'vaultpress' => 'VaultPress',
 		'woocommerce' => 'WooCommerce',
+		'woocommerce-pay' => 'WC Pay',
 		'wordpress-beta-tester' => 'WordPress Beta Tester Plugin',
 		'wp-downgrade' => 'WP Downgrade',
 		'wp-job-manager' => 'WP Job Manager',
@@ -42,6 +43,13 @@ add_action( 'jurassic_ninja_init', function() {
 					add_directory_plugin( 'polldaddy' );
 				}
 				continue;
+			}
+			// Special case for WC Pay.
+			if ( 'woocommerce-pay' === $slug ) {
+				debug( '%s: Adding WooCommerce Admin', $domain );
+				add_directory_plugin( 'woocommerce-admin');
+				debug( '%s: Adding %s', $domain, $name );
+				add_directory_plugin( 'https://github.com/Automattic/woocommerce-payments/releases/latest/download/woocommerce-payments.zip' );
 			}
 			if ( isset( $features[ $slug ] ) && $features[ $slug ] ) {
 				debug( '%s: Adding %s', $domain, $name );
