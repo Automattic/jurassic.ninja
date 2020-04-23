@@ -165,7 +165,7 @@ function jurassicNinjaApi() {
 		if ( response.status === 503 ) {
 			throw new Error( 'Site launching is turned off right now' );
 		}
-		if ( response.status === 403 ) {
+		if ( response.status === 401 ) {
 			throw new Error( 'Launching sites is currently restricted to authenticated users' );
 		}
 		// 400 status are custom WP_Error when features are requested in a bad way
