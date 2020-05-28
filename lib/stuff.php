@@ -191,7 +191,10 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 
 		debug( 'Creating app for %s under sysuser %s', $domain, $user->data->name );
 
-		$app = launch_site( $user, $password, $php_version, $domain, $wordpress_options, $features );
+		$app = null;
+		if ( ! $app = get_unused_site()  ) {
+			$app = launch_site( $user, $password, $php_version, $domain, $wordpress_options, $features );
+		}
 
 		add_features_before_auto_login( $app, $features, $domain );
 
@@ -407,6 +410,9 @@ function add_features_after_auto_login( &$app, $features, $domain ) {
 	// phpcs:enable
 }
 
+function get_unused_site() {
+	return false;
+}
 
 function launch_site( $user, $password, $php_version, $domain, $wordpress_options, $features ) {
 	$app = null;
