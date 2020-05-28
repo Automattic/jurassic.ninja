@@ -194,26 +194,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		$app = launch_site( $user, $password, $php_version, $domain, $wordpress_options, $features );
 
 
-		// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
-		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
-		/**
-		 * Allows the enqueueing of commands for features with each launched site.
-		 *
-		 * This fires before adding the auto login features
-		 *
-		 * @since 3.0
-		 *
-		 * @param array $args {
-		 *     All we need to describe a php app with WordPress
-		 *
-		 *     @type object $app                 Passed by reference. This object contains the resulting data after creating a PHP app.
-		 *     $type array $features             The list of features we're going to add to the WordPress installation.
-		 *     @type string $domain              The domain under which this app will be running.
-		 * }
-		 *
-		 */
-		do_action_ref_array( 'jurassic_ninja_add_features_before_auto_login', [ &$app, $features, $domain ] );
-		// phpcs:enable
+		add_features_before_auto_login( $app, $features, $domain );
 
 		debug( '%s: Adding .htaccess file', $domain );
 		add_htaccess();
@@ -400,6 +381,28 @@ function l( $stuff ) {
 	// phpcs:enable
 }
 
+function add_features_before_auto_login( &$app, $features, $domain ) {
+	// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
+	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
+	/**
+	 * Allows the enqueueing of commands for features with each launched site.
+	 *
+	 * This fires before adding the auto login features
+	 *
+	 * @since 3.0
+	 *
+	 * @param array $args {
+	 *     All we need to describe a php app with WordPress
+	 *
+	 *     @type object $app                 Passed by reference. This object contains the resulting data after creating a PHP app.
+	 *     $type array $features             The list of features we're going to add to the WordPress installation.
+	 *     @type string $domain              The domain under which this app will be running.
+	 * }
+	 *
+	 */
+	do_action_ref_array( 'jurassic_ninja_add_features_before_auto_login', [ &$app, $features, $domain ] );
+	// phpcs:enable
+}
 
 function launch_site( $user, $password, $php_version, $domain, $wordpress_options, $features ) {
 	$app = null;
