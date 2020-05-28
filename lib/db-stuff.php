@@ -32,6 +32,7 @@ function jurassic_ninja_create_table() {
 	$sql = "CREATE TABLE sites (
 		`id` INT NOT NULL AUTO_INCREMENT,
 		username text not null,
+		password text not null,
 		domain text not null,
 		created datetime ,
 		last_logged_in datetime ,

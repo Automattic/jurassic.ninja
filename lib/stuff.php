@@ -225,7 +225,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		if ( is_wp_error( $app ) ) {
 			throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
 		}
-		log_new_site( $app->data, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
+		log_new_site( $app->data, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
 
 		// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
 		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
@@ -438,11 +438,12 @@ function l( $stuff ) {
  * @param  Array $data Site data as returned by ServerPilot's API on creation
  * @return [type]       [description]
  */
-function log_new_site( $data, $shortlived = false, $launched_by = null ) {
+function log_new_site( $data, $password, $shortlived = false, $launched_by = null ) {
 	$launched_by = $launched_by ? $launched_by->user_login : '';
 	db()->insert( 'sites',
 		[
 			'username' => $data->name,
+			'password' => $password,
 			'domain' => figure_out_main_domain( $data->domains ),
 			'created' => current_time( 'mysql', 1 ),
 			'shortlived' => $shortlived,
