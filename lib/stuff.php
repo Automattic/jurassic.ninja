@@ -189,7 +189,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 
 		$user = generate_new_user( $password );
 
-		debug( 'Creating app for %s under sysuser %s', $domain, $user->data->name );
+		debug( 'Creating app for %s under sysuser %s', $domain, $user->name );
 
 		$app = null;
 		if ( ! $app = get_unused_site()  ) {
@@ -207,14 +207,14 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		stop_pingomatic();
 
 		debug( '%s: Adding Companion Plugin for Auto Login', $domain );
-		add_auto_login( $password, $user->data->name );
+		add_auto_login( $password, $user->name );
 
 		add_features_after_auto_login( $app, $features, $domain ); 
 
 		// Runs the command via SSH
 		// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
 		debug( '%s: Adding features', $domain );
-		run_commands_for_features( $user->data->name, $password, $domain );
+		run_commands_for_features( $user->name, $password, $domain );
 
 		debug( 'Finished launching %s', $domain );
 		return $app;

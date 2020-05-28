@@ -36,7 +36,7 @@ add_action( 'jurassic_ninja_init', function() {
 		}
 
 		debug( 'Launching %s on PHP version: %s', $domain, $php_version );
-		$app = create_sp_app( $user->data->name, $user->data->id, $php_version, $domain_arg, $wordpress_options );
+		$app = create_sp_app( $user->name, $user->id, $php_version, $domain_arg, $wordpress_options );
 	}, 10, 6 );
 	add_action( 'jurassic_ninja_create_sysuser', function( &$return, $username, $password ) {
 		try {
@@ -129,7 +129,7 @@ function create_sp_sysuser( $username, $password ) {
 	try {
 		$user = sp()->sysuser_create( settings( 'serverpilot_server_id' ), $username, $password );
 		wait_for_serverpilot_action( $user->actionid );
-		return $user;
+		return $user->data;
 	} catch ( \ServerPilotException $e ) {
 		return new \WP_Error( $e->getCode(), $e->getMessage() );
 	}
