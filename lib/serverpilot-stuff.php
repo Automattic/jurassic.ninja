@@ -113,7 +113,7 @@ function create_sp_app( $name, $sysuserid, $php_version, $domains, $wordpress ) 
 	try {
 		$app = sp()->app_create( $name, $sysuserid, $php_version, $domains, $wordpress );
 		wait_for_serverpilot_action( $app->actionid );
-		return $app;
+		return $app->data;
 	} catch ( \ServerPilotException $e ) {
 		return new \WP_Error( $e->getCode(), $e->getMessage() );
 	}

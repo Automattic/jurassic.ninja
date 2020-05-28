@@ -217,7 +217,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		run_commands_for_features( $user->data->name, $password, $domain );
 
 		debug( 'Finished launching %s', $domain );
-		return $app->data;
+		return $app;
 	} catch ( \Exception $e ) {
 		debug( '%s: Error [%s]: %s', $domain, $e->getCode(), $e->getMessage() );
 		return null;
@@ -448,8 +448,8 @@ function launch_site( $user, $password, $php_version, $domain, $wordpress_option
 	if ( is_wp_error( $app ) ) {
 		throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
 	}
-	log_new_unused_site( $app->data, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
-	log_new_site( $app->data, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
+	log_new_unused_site( $app, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
+	log_new_site( $app, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
 
 	return $app;
 }
