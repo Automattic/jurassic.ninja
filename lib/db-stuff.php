@@ -35,7 +35,7 @@ function jurassic_ninja_create_table() {
 		password text not null,
 		domain text not null,
 		created datetime ,
-		last_logged_in datetime ,
+		last_logged_in datetime,
 		checked_in datetime,
 		shortlived boolean not null DEFAULT 0,
 		launched_by text not null,
@@ -47,10 +47,19 @@ function jurassic_ninja_create_table() {
 		username text not null,
 		domain text not null,
 		created datetime ,
-		last_logged_in datetime ,
+		last_logged_in datetime,
 		checked_in datetime,
 		shortlived boolean not null DEFAULT 0,
 		launched_by text not null,
+		PRIMARY KEY  (id)
+	) $charset_collate;";
+
+	$sql3 = "CREATE TABLE unused_sites (
+		`id` INT NOT NULL AUTO_INCREMENT,
+		username text not null,
+		password text not null,
+		domain text not null,
+		created datetime,
 		PRIMARY KEY  (id)
 	) $charset_collate;";
 
@@ -62,6 +71,7 @@ function jurassic_ninja_create_table() {
 		// phpcs:disable Generic.PHP.NoSilencedErrors.Discouraged
 		@dbDelta( $sql );
 		@dbDelta( $sql2 );
+		@dbDelta( $sql3 );
 		// phpcs:enable
 
 	} catch ( \Exception $e ) {
