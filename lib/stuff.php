@@ -191,41 +191,8 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 
 		debug( 'Creating app for %s under sysuser %s', $domain, $user->data->name );
 
-		$app = null;
-		// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
-		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
-		/**
-		 * Fired for the purpose of launching a site.
-		 *
-		 * Allows to be hooked so to implement a real site launcher function
-		 *
-		 * @since 3.0
-		 *
-		 * @param array $args {
-		 *     All we need to describe a php app with WordPress
-		 *
-		 *     @type object $app                 Passed by reference. This object should contain the resulting data after creating a PHP app.
-		 *     @type object $user                An object that is the result of creating a new system user under which the app will run.
-		 *     @type string $php_version         The PHP version we're going to use.
-		 *     @type string $domain              The domain under which this app will be running.
-		 *     @type array  $wordpress_options {
-		 *           An array of properties used for setting up the WordPress site for the first time.
-		 *           @type string site_title               The title of the site we're creating.
-		 *           @type string admin_user               The username for the admin account.
-		 *           @type string admin_password           The password or the admin account.
-		 *           @type string admin_email              The email address for the admin account.
-		 *     }
-		 *     $type array $features             The list of features we're going to add to the WordPress installation.
-		 * }
-		 *
-		 */
-		do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $user, $php_version, $domain, $wordpress_options, $features ] );
-		// phpcs:enable
+		$app = launch_site( $user, $password, $php_version, $domain, $wordpress_options, $features );
 
-		if ( is_wp_error( $app ) ) {
-			throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
-		}
-		log_new_site( $app->data, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
 
 		// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
 		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
@@ -433,8 +400,69 @@ function l( $stuff ) {
 	// phpcs:enable
 }
 
+
+function launch_site( $user, $password, $php_version, $domain, $wordpress_options, $features ) {
+	$app = null;
+	// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
+	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
+	/**
+	 * Fired for the purpose of launching a site.
+	 *
+	 * Allows to be hooked so to implement a real site launcher function
+	 *
+	 * @since 3.0
+	 *
+	 * @param array $args {
+	 *     All we need to describe a php app with WordPress
+	 *
+	 *     @type object $app                 Passed by reference. This object should contain the resulting data after creating a PHP app.
+	 *     @type object $user                An object that is the result of creating a new system user under which the app will run.
+	 *     @type string $php_version         The PHP version we're going to use.
+	 *     @type string $domain              The domain under which this app will be running.
+	 *     @type array  $wordpress_options {
+	 *           An array of properties used for setting up the WordPress site for the first time.
+	 *           @type string site_title               The title of the site we're creating.
+	 *           @type string admin_user               The username for the admin account.
+	 *           @type string admin_password           The password or the admin account.
+	 *           @type string admin_email              The email address for the admin account.
+	 *     }
+	 *     $type array $features             The list of features we're going to add to the WordPress installation.
+	 * }
+	 *
+	 */
+	do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $user, $php_version, $domain, $wordpress_options, $features ] );
+	// phpcs:enable
+	if ( is_wp_error( $app ) ) {
+		throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
+	}
+	log_new_unused_site( $app->data, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
+	log_new_site( $app->data, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
+
+	return $app;
+}
+
 /**
  * Stores a record for a freshly created site
+ * @param  Array $data Site data as returned by ServerPilot's API on creation
+ * @return [type]       [description]
+ */
+function log_new_unused_site( $data, $password, $shortlived = false, $launched_by = null ) {
+	$launched_by = $launched_by ? $launched_by->user_login : '';
+	db()->insert( 'unused_sites',
+		[
+			'username' => $data->name,
+			'password' => $password,
+			'domain' => figure_out_main_domain( $data->domains ),
+			'created' => current_time( 'mysql', 1 )
+		]
+	);
+	if ( db()->last_error ) {
+		l( db()->last_error );
+	};
+}
+
+/**
+ * Stores a record for a launched site
  * @param  Array $data Site data as returned by ServerPilot's API on creation
  * @return [type]       [description]
  */
