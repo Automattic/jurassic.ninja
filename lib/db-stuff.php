@@ -60,6 +60,7 @@ function jurassic_ninja_create_table() {
 		password text not null,
 		domain text not null,
 		created datetime,
+		app_id text not null,
 		PRIMARY KEY  (id)
 	) $charset_collate;";
 

@@ -193,7 +193,6 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 
 		$app = launch_site( $user, $password, $php_version, $domain, $wordpress_options, $features );
 
-
 		add_features_before_auto_login( $app, $features, $domain );
 
 		debug( '%s: Adding .htaccess file', $domain );
@@ -458,6 +457,7 @@ function log_new_unused_site( $data, $password, $shortlived = false, $launched_b
 	$launched_by = $launched_by ? $launched_by->user_login : '';
 	db()->insert( 'unused_sites',
 		[
+			'app_id' => $data->id,
 			'username' => $data->name,
 			'password' => $password,
 			'domain' => figure_out_main_domain( $data->domains ),
