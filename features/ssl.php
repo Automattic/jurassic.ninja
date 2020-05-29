@@ -8,7 +8,7 @@ add_action( 'jurassic_ninja_init', function() {
 		'ssl' => false,
 	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_add_features_after_create_app', function( &$app, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
 		// Currently not used but the code works.
 		if ( $features['auto_ssl'] ) {
@@ -18,7 +18,7 @@ add_action( 'jurassic_ninja_init', function() {
 		// wildcard certificates don't support multiple levels of subdomains
 		// and this can result in awful experience.
 		// Need to explorer a little bit better
-		if ( $features['ssl'] && ! $features['subdomain_multisite'] ) {
+		if ( $features['ssl'] && ! ( isset( $features['subdomain_multisite'] ) && $features['subdomain_multisite'] ) ) {
 			if ( $features['auto_ssl'] ) {
 				debug( 'Both ssl and auto_ssl features were requested. Ignoring ssl and launching with auto_ssl' );
 			} else {

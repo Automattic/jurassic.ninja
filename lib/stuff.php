@@ -127,7 +127,7 @@ function require_feature_files() {
  *         boolean wp-log-viewer         Should we add WP Log Viewer plugin to the site?
  * @return Array|Null                    null or the app data as returned by ServerPilot's API on creation.
  */
-function launch_wordpress( $php_version = 'default', $requested_features = [] ) {
+function launch_wordpress( $php_version = 'default', $requested_features = [], $spare = false ) {
 	$default_features = [
 		'shortlife' => false,
 	];
@@ -192,31 +192,37 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 		debug( 'Creating app for %s under sysuser %s', $domain, $user->name );
 
 		$app = null;
-		if ( ! $app = get_unused_site()  ) {
-			$app = launch_site( $user, $password, $php_version, $domain, $wordpress_options, $features );
+		if ( $app = get_unused_site( $php_version, $domain ) ) {
+			$user = $app['username'];
+			$password = $app['password'];
+		} else {
+			$app = create_php_app( $user, $password, $php_version, $domain, $wordpress_options, $features, $spare );
 		}
 
-		add_features_before_auto_login( $app, $features, $domain );
+		if ( ! $spare ) {
+			log_new_site( $app, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
 
-		debug( '%s: Adding .htaccess file', $domain );
-		add_htaccess();
-		// 2020-01-17
-		// For some reason, automated scripts are being able to find out about a new Jurassic Ninja site before
-		// the person that launched it reaches the site, thus the site is locked for them.
-		debug( '%s: Stopping pings to Ping-O-Mattic', $domain );
-		stop_pingomatic();
+			add_features_before_auto_login( $app, $features, $domain );
 
-		debug( '%s: Adding Companion Plugin for Auto Login', $domain );
-		add_auto_login( $password, $user->name );
+			debug( '%s: Adding .htaccess file', $domain );
+			add_htaccess();
+			// 2020-01-17
+			// For some reason, automated scripts are being able to find out about a new Jurassic Ninja site before
+			// the person that launched it reaches the site, thus the site is locked for them.
+			debug( '%s: Stopping pings to Ping-O-Mattic', $domain );
+			stop_pingomatic();
 
-		add_features_after_auto_login( $app, $features, $domain ); 
+			debug( '%s: Adding Companion Plugin for Auto Login', $domain );
+			add_auto_login( $password, $user->name );
 
-		// Runs the command via SSH
-		// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
-		debug( '%s: Adding features', $domain );
-		run_commands_for_features( $user->name, $password, $domain );
+			add_features_after_auto_login( $app, $features, $domain ); 
 
-		debug( 'Finished launching %s', $domain );
+			// Runs the command via SSH
+			// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
+			debug( '%s: Adding features', $domain );
+			run_commands_for_features( $user->name, $password, $domain );
+			debug( 'Finished launching %s', $domain );
+		}
 		return $app;
 	} catch ( \Exception $e ) {
 		debug( '%s: Error [%s]: %s', $domain, $e->getCode(), $e->getMessage() );
@@ -410,11 +416,21 @@ function add_features_after_auto_login( &$app, $features, $domain ) {
 	// phpcs:enable
 }
 
-function get_unused_site() {
+function get_unused_site( $php_version, $domain ) {
+	return false;
+	$unused = db()->get_results( "select * from unused_sites where app_id LIMIT 1", \ARRAY_A );
+	$unused = count( $unused ) ? $unused[ 0 ] : false;
+	$app = get_sp_app( $unused['id'] );
+	update_sp_app( $unused['id'], null, [ $domain ] );
+	return $app;
+	debug( print_r( $app, true ) );
 	return false;
 }
 
-function launch_site( $user, $password, $php_version, $domain, $wordpress_options, $features ) {
+function create_php_app( $user, $password, $php_version, $domain, $wordpress_options, $features, $unused = false ) {
+	if ( $unused ) {
+		$domain = sprintf( '%s.spare', $user->name );
+	}
 	$app = null;
 	// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
 	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
@@ -449,8 +465,9 @@ function launch_site( $user, $password, $php_version, $domain, $wordpress_option
 		throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
 	}
 	log_new_unused_site( $app, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
-	log_new_site( $app, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
 
+	do_action_ref_array( 'jurassic_ninja_add_features_after_create_app', [ &$app, $features, $domain ] );
+	debug( 'Finished creating PHP app %s', $domain );
 	return $app;
 }
 
