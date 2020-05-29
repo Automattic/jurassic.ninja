@@ -114,6 +114,7 @@ function create_sp_app( $name, $sysuserid, $php_version, $domains, $wordpress ) 
 	}
 }
 
+
 /**
  * Creates a system user using ServerPilot's API
  * @param  String $username The username
@@ -214,6 +215,24 @@ function get_sp_app_list() {
 	} catch ( \ServerPilotException $e ) {
 		return new \WP_Error( $e->getCode(), $e->getMessage() );
 	}
+}
+
+function get_sp_app( $app_id ) {
+        try {
+                return sp()->app_info( $app_id )->data;
+        } catch ( \ServerPilotException $e ) {
+                return new \WP_Error( $e->getCode(), $e->getMessage() );
+        }
+}
+
+function update_sp_app( $app_id, $php_version = null, $domains = null ) {
+        try {
+		$response = sp()->app_update( $app_id, $php_version, $domains );
+		wait_for_serverpilot_action( $response->actionid );
+		return $response->data;
+        } catch ( \ServerPilotException $e ) {
+		return new \WP_Error( $e->getCode(), $e->getMessage() );
+        }
 }
 
 /**
