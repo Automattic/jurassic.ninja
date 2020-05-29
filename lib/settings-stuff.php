@@ -8,6 +8,16 @@ if ( ! defined( '\\ABSPATH' ) ) {
 
 define( 'SETTINGS_KEY', 'jurassic-ninja-settings' );
 
+function available_php_versions() {
+	return [
+		'7.4' => __( '7.4', 'jurassic-ninja' ),
+		'7.3' => __( '7.3', 'jurassic-ninja' ),
+		'7.2' => __( '7.2', 'jurassic-ninja' ),
+		'7.0' => __( '7.0', 'jurassic-ninja' ),
+		'5.6' => __( '5.6', 'jurassic-ninja' ),
+	];
+}
+
 /**
  * Access a plugin option
  * @param  String $key The particular option we want to access
@@ -138,6 +148,14 @@ function add_settings_page() {
 							'text' => __( 'Default interval for considering a site to be expired if the admin never visited wp-admin. Expressed in MySQL interval format.', 'jurassic-ninja' ),
 							'placeholder' => 'INTERVAL 2 HOUR',
 							'value' => 'INTERVAL 2 HOUR',
+						),
+						'default_php_version' => array(
+							'id' => 'default_php_version',
+							'title' => 'Default PHP version for launched sites',
+							'type' => 'select',
+							'value' => '7.4',
+							'choices' => available_php_versions(),
+							'text' => 'Sites will be launched with this PHP version by default',
 						),
 						'use_subdomain_based_wordpress_title' => array(
 							'id' => 'use_subdomain_based_wordpress_title',
