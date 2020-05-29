@@ -31,8 +31,13 @@ add_action( 'jurassic_ninja_init', function() {
 					// phpcs:enable
 					throw new \Exception( 'Error enabling SSL: ' . $response->get_error_message() );
 				}
-				debug( '%s: Setting home and siteurl options', $domain );
-				set_home_and_site_url( $domain );
+				add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
+					$features = array_merge( $defaults, $features );
+					if ( $features['ssl'] ) {
+						debug( '%s: Setting home and siteurl options', $domain );
+						set_home_and_site_url( $domain );
+					}
+				}, 10, 3 );
 			}
 		}
 	}, 10, 3 );

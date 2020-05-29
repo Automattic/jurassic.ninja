@@ -22,8 +22,13 @@ class JN_CLI_Command extends \WP_CLI_Command {
 			\WP_CLI::line( sprintf( 'Launched spare site', $app->domains[0] ) );
 			return;
 		}
-		$app = launch_wordpress();
-		\WP_CLI::line( sprintf( 'Launched %s', $app->domains[0] ) );
+		try {
+			$app = launch_wordpress( 'default', [ 'ssl' => true ] );
+			\WP_CLI::line( sprintf( 'Launched %s', $app->domains[0] ) );
+
+		} catch ( \Exception $e ) {
+			\WP_CLI::line( sprintf( 'Error launching site' ) );
+		}
 	}
 }
 

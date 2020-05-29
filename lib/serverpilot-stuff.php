@@ -16,7 +16,7 @@ if ( ! defined( '\\ABSPATH' ) ) {
 $serverpilot_instance = null;
 
 add_action( 'jurassic_ninja_init', function() {
-	add_action( 'jurassic_ninja_create_app', function( &$app, $user, $php_version, $domain, $wordpress_options, $features ) {
+	add_action( 'jurassic_ninja_create_app', function( &$app, $user, $php_version, $domain, $features ) {
 		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
 		$domain_arg = ( isset( $features['subdomain_multisite'] ) && $features['subdomain_multisite'] ) ? array( $domain, '*.' . $domain ) : array( $domain );
 		// Mitigate ungraceful PHP-FPM restart for shortlived sites by randomizing PHP version
@@ -31,7 +31,7 @@ add_action( 'jurassic_ninja_init', function() {
 		}
 
 		debug( 'Launching %s on PHP version: %s', $domain, $php_version );
-		$app = create_sp_app( $user->name, $user->id, $php_version, $domain_arg, $wordpress_options );
+		$app = create_sp_app( $user->name, $user->id, $php_version, $domain_arg, null );
 	}, 10, 6 );
 	add_action( 'jurassic_ninja_create_sysuser', function( &$return, $username, $password ) {
 		try {
@@ -104,7 +104,7 @@ function sp() {
  * @param  Array  $wordpress     An array containing the following keys: site_title , admin_user , admin_password , and admin_email
  * @return Object                An object with the new app data.
  */
-function create_sp_app( $name, $sysuserid, $php_version, $domains, $wordpress ) {
+function create_sp_app( $name, $sysuserid, $php_version, $domains, $wordpress = null ) {
 	try {
 		$app = sp()->app_create( $name, $sysuserid, $php_version, $domains, $wordpress );
 		wait_for_serverpilot_action( $app->actionid );
@@ -113,6 +113,25 @@ function create_sp_app( $name, $sysuserid, $php_version, $domains, $wordpress ) 
 		return new \WP_Error( $e->getCode(), $e->getMessage() );
 	}
 }
+
+/**
+ * Creates a mysql database using ServerPilot's API
+ * @param  String $apid      The id of the app to attach this database.
+ * @param  String $name      The name of the Database.
+ * @param  String $username  The username that will be allowed to connect to this database
+ * @param  String $password  The password for $username.
+ * @return Object            An object with the new app data.
+ */
+function create_sp_database( $appid, $name, $username, $password ) {
+	try {
+		$response = sp()->database_create( $appid, $name, $username, $password );
+		wait_for_serverpilot_action( $response->actionid );
+		return $response->data;
+	} catch ( \ServerPilotException $e ) {
+		return new \WP_Error( $e->getCode(), $e->getMessage() );
+	}
+}
+
 
 
 /**

@@ -131,6 +131,8 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 	$default_features = [
 		'shortlife' => false,
 	];
+ 	$startTime = microtime(true);
+
 	$features = array_merge( $default_features, $requested_features );
 	/**
 	 * Fired before launching a site, and as soon as we merge feature defaults and requested features
@@ -145,67 +147,60 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 	do_action( 'jurassic_ninja_do_feature_conditions', $features );
 
 	try {
-		// phpcs:disable WordPress.WP.DeprecatedFunctions.generate_random_passwordFound
-		$password = generate_random_password();
-		// phpcs:enable
+		$password = '';
 		$subdomain = '';
-		$collision_attempts = 10;
-		do {
-			$subdomain = generate_random_subdomain();
-			// Add moar randomness to shortlived sites
-			if ( $features['shortlife'] ) {
-				$subdomain = sprintf( '%s-%s', $subdomain, rand( 2, 500 ) );
-			}
-		} while ( subdomain_is_used( $subdomain ) && $collision_attempts-- > 0 );
-			// title-case the subdomain
-			// or default to the classic My WordPress Site
-		$site_title = settings( 'use_subdomain_based_wordpress_title', false ) ?
-			ucwords( str_replace( '-', ' ', $subdomain ) ) :
-			'My WordPress Site';
-		/**
-		 * Filters the WordPress options for setting up the site
-		 *
-		 * @since 3.0
-		 *
-		 * @param array $wordpress_options {
-		 *           An array of properties used for setting up the WordPress site for the first time.
-		 *           @type string site_title               The title of the site we're creating.
-		 *           @type string admin_user               The username for the admin account.
-		 *           @type string admin_password           The password or the admin account.
-		 *           @type string admin_email              The email address for the admin account.
-		 * }
-		 */
-		$wordpress_options = apply_filters( 'jurassic_ninja_wordpress_options', array(
-			'site_title' => $site_title,
-			'admin_user' => 'demo',
-			'admin_password' => $password,
-			'admin_email' => settings( 'default_admin_email_address' ),
-		) );
-		$domain = sprintf( '%s.%s', $subdomain, settings( 'domain' ) );
+		$domain = '';
 
 		debug( 'Launching %s with features: %s', $domain, implode( ', ', array_keys( array_filter( $features ) ) ) );
 
-		debug( 'Creating sysuser for %s', $domain );
-
-		$user = generate_new_user( $password );
-
-		debug( 'Creating app for %s under sysuser %s', $domain, $user->name );
-
 		$app = null;
-		if ( $app = get_unused_site( $php_version, $domain ) ) {
-			$user = $app['username'];
-			$password = $app['password'];
+
+		$app = get_unused_site( $php_version );
+		if ( $app ) {
+			$username = $app->username;
+			$password = $app->password;
+			$domain = $app->domain;
+			$subdomain = $app->subdomain;
 		} else {
-			$app = create_php_app( $user, $password, $php_version, $domain, $wordpress_options, $features, $spare );
+			$app = create_php_app( $php_version, $features, $spare );
+			$username = $app->username;
+			$password = $app->password;
+			$domain = $app->domain;
+			$subdomain = $app->subdomain;
 		}
 
 		if ( ! $spare ) {
+			$site_title = settings( 'use_subdomain_based_wordpress_title', false ) ?
+			ucwords( str_replace( '-', ' ', $subdomain ) ) :
+			'My WordPress Site';
+			/**
+			 * Filters the WordPress options for setting up the site
+			 *
+			 * @since 3.0
+			 *
+			 * @param array $wordpress_options {
+			 *           An array of properties used for setting up the WordPress site for the first time.
+			 *           @type string site_title               The title of the site we're creating.
+			 *           @type string admin_user               The username for the admin account.
+			 *           @type string admin_password           The password or the admin account.
+			 *           @type string admin_email              The email address for the admin account.
+			 * }
+			 */
+			$wordpress_options = apply_filters( 'jurassic_ninja_wordpress_options', array(
+				'site_title' => $site_title,
+				'admin_user' => 'demo',
+				'admin_password' => $password,
+				'admin_email' => settings( 'default_admin_email_address' ),
+			) );
+			install_wordpress_with_cli( $domain, $wordpress_options, $app->dbname, $app->dbusername, $app->dbpassword );
+
 			log_new_site( $app, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
 
 			add_features_before_auto_login( $app, $features, $domain );
 
 			debug( '%s: Adding .htaccess file', $domain );
 			add_htaccess();
+
 			// 2020-01-17
 			// For some reason, automated scripts are being able to find out about a new Jurassic Ninja site before
 			// the person that launched it reaches the site, thus the site is locked for them.
@@ -213,15 +208,21 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 			stop_pingomatic();
 
 			debug( '%s: Adding Companion Plugin for Auto Login', $domain );
-			add_auto_login( $password, $user->name );
+			add_auto_login( $password, $username );
 
-			add_features_after_auto_login( $app, $features, $domain ); 
+			add_features_after_auto_login( $app, $features, $domain );
 
-			// Runs the command via SSH
-			// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
 			debug( '%s: Adding features', $domain );
-			run_commands_for_features( $user->name, $password, $domain );
-			debug( 'Finished launching %s', $domain );
+
+
+			// Run command via SSH
+			// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
+			run_commands_for_features( $username, $password, $domain );
+			$endTime = microtime(true);
+			$diff = round($endTime - $startTime);
+			$minutes = floor($diff / 60); //only minutes
+			$seconds = $diff % 60;//remaining seconds, using modulo operator
+			debug( "Finished launching %s. Took %02d:%02d.\n", $domain, $minutes, $seconds );
 		}
 		return $app;
 	} catch ( \Exception $e ) {
@@ -287,6 +288,34 @@ function figure_out_main_domain( $domains ) {
 	} );
 	// reset() trick to get first item
 	return reset( $valid );
+}
+
+/**
+ * Downloads WordPress, creates a wp-config.php file and installs WordPress admin user.
+ *
+ * @param  [type] $domain            The domain name that will be configured for the site.
+ * @param  [type] $wordpress_options WordPress options for the admin user and site. Resembling ServerPilot's parameter for creating an app
+ * @param  [type] $dbname            The database name this WordPress will connect to.
+ * @param  [type] $dbusername        The database username this WordPress will use.
+ * @param  [type] $dbpassword        The database password this WordPress will use.
+ */
+function install_wordpress_with_cli( $domain, $wordpress_options, $dbname, $dbusername, $dbpassword ) {
+	$cmd = sprintf(
+		'wp core download'
+		. ' && wp config create --dbname="%s" --dbuser="%s" --dbpass="%s"'
+		. ' && wp core install --url="%s" --title="%s" --admin_user="%s" --admin_password="%s" --admin_email="%s"',
+		$dbname,
+		$dbusername,
+		$dbpassword,
+		$domain,
+		$wordpress_options['site_title'],
+		$wordpress_options['admin_user'],
+		$wordpress_options['admin_password'],
+		$wordpress_options['admin_email']
+	);
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
 }
 
 /**
@@ -416,21 +445,42 @@ function add_features_after_auto_login( &$app, $features, $domain ) {
 	// phpcs:enable
 }
 
-function get_unused_site( $php_version, $domain ) {
+function get_unused_site( $php_version ) {
 	return false;
-	$unused = db()->get_results( "select * from unused_sites where app_id LIMIT 1", \ARRAY_A );
-	$unused = count( $unused ) ? $unused[ 0 ] : false;
+	$unused = db()->get_results( 'select * from unused_sites where app_id LIMIT 1', \ARRAY_A );
+	$unused = count( $unused ) ? $unused[0] : false;
 	$app = get_sp_app( $unused['id'] );
-	update_sp_app( $unused['id'], null, [ $domain ] );
+	// update_sp_app( $unused['id'], null, [ $domain ] );
 	return $app;
 	debug( print_r( $app, true ) );
 	return false;
 }
 
-function create_php_app( $user, $password, $php_version, $domain, $wordpress_options, $features, $unused = false ) {
-	if ( $unused ) {
-		$domain = sprintf( '%s.spare', $user->name );
-	}
+function create_php_app( $php_version, $features, $unused = false ) {
+	$subdomain = '';
+	// phpcs:disable WordPress.WP.DeprecatedFunctions.generate_random_passwordFound
+	$password = generate_random_password();
+	// phpcs:enable
+	$collision_attempts = 10;
+	do {
+		$subdomain = generate_random_subdomain();
+		// Add moar randomness to shortlived sites
+		if ( $features['shortlife'] ) {
+			$subdomain = sprintf( '%s-%s', $subdomain, rand( 2, 500 ) );
+		}
+	} while ( subdomain_is_used( $subdomain ) && $collision_attempts-- > 0 );
+		// title-case the subdomain
+		// or default to the classic My WordPress Site
+	$domain = sprintf( '%s.%s', $subdomain, settings( 'domain' ) );
+
+	// if ( $unused ) {
+	// 	$domain = sprintf( '%s.spare', $user->name );
+	// }
+	debug( 'Creating sysuser for %s', $domain );
+
+	$user = generate_new_user( $password );
+
+	debug( 'Creating app for %s under sysuser %s', $domain, $user->name );
 	$app = null;
 	// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
 	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
@@ -459,32 +509,50 @@ function create_php_app( $user, $password, $php_version, $domain, $wordpress_opt
 	 * }
 	 *
 	 */
-	do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $user, $php_version, $domain, $wordpress_options, $features ] );
+	do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $user, $php_version, $domain, $features ] );
 	// phpcs:enable
 	if ( is_wp_error( $app ) ) {
 		throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
 	}
-	log_new_unused_site( $app, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
+	// Reuse these credentials for the database, for now...
+	$dbname = $app->name . '-wp-blah';
+	$dbusername = $app->name;
+	$dbpassword = $password;
+	$db = create_sp_database( $app->id, $dbname, $dbusername, $dbpassword );
 
+	if ( is_wp_error( $db ) ) {
+		throw new \Exception( 'Error creating database for app: ' . $app->get_error_message() );
+	}
+	log_new_unused_site( $app, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
+	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
 	do_action_ref_array( 'jurassic_ninja_add_features_after_create_app', [ &$app, $features, $domain ] );
+	// phpcs:enable
+
 	debug( 'Finished creating PHP app %s', $domain );
+	$app->username = $user->name;
+	$app->domain = $domain;
+	$app->subdomain = $subdomain;
+	$app->password = $password;
+	$app->dbname = $dbname;
+	$app->dbusername = $dbusername;
+	$app->dbpassword = $dbpassword;
 	return $app;
 }
 
 /**
  * Stores a record for a freshly created site
- * @param  Array $data Site data as returned by ServerPilot's API on creation
+ * @param  Array $app Site data as returned by ServerPilot's API on creation
  * @return [type]       [description]
  */
-function log_new_unused_site( $data, $password, $shortlived = false, $launched_by = null ) {
+function log_new_unused_site( $app, $password, $shortlived = false, $launched_by = null ) {
 	$launched_by = $launched_by ? $launched_by->user_login : '';
 	db()->insert( 'unused_sites',
 		[
-			'app_id' => $data->id,
-			'username' => $data->name,
+			'app_id' => $app->id,
+			'username' => $app->name,
 			'password' => $password,
-			'domain' => figure_out_main_domain( $data->domains ),
-			'created' => current_time( 'mysql', 1 )
+			'domain' => figure_out_main_domain( $app->domains ),
+			'created' => current_time( 'mysql', 1 ),
 		]
 	);
 	if ( db()->last_error ) {
@@ -494,19 +562,19 @@ function log_new_unused_site( $data, $password, $shortlived = false, $launched_b
 
 /**
  * Stores a record for a launched site
- * @param  Array $data Site data as returned by ServerPilot's API on creation
+ * @param  Array $app Site data as returned by ServerPilot's API on creation
  * @return [type]       [description]
  */
-function log_new_site( $data, $password, $shortlived = false, $launched_by = null ) {
+function log_new_site( $app, $password, $shortlived = false, $launched_by = null ) {
 	$launched_by = $launched_by ? $launched_by->user_login : '';
 	db()->insert( 'sites',
 		[
-			'username' => $data->name,
+			'username' => $app->name,
 			'password' => $password,
-			'domain' => figure_out_main_domain( $data->domains ),
+			'domain' => figure_out_main_domain( $app->domains ),
 			'created' => current_time( 'mysql', 1 ),
 			'shortlived' => $shortlived,
-			'launched_by' => $launched_by
+			'launched_by' => $launched_by,
 		]
 	);
 	if ( db()->last_error ) {
