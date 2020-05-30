@@ -3,7 +3,7 @@
 namespace jn;
 
 if ( ! defined( '\\ABSPATH' ) ) {
-        exit;
+	exit;
 }
 
 /**
@@ -13,8 +13,8 @@ class JN_CLI_Command extends \WP_CLI_Command {
 	/**
 	* Launch a spare site.
 	*/
-	function launch( $args ) {
-		if ( count( $args )  ) {
+	public function launch( $args ) {
+		if ( count( $args ) ) {
 			if ( $args[0] === 'spare' ) {
 				\WP_CLI::line( 'Launching a spare site' );
 			}

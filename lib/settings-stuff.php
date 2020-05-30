@@ -76,7 +76,7 @@ function settings_problems() {
 	// 	&& settings( 'serverpilot_server_id' );
 	// if ( $serverpilot_settings_set ) {
 	// 	try {
-	// 		sp()->server_info( settings( 'serverpilot_server_id' ) );
+	// 		$provisioner->serverpilot_instance->server_info( settings( 'serverpilot_server_id' ) );
 	// 	} catch ( \ServerPilotException $e ) {
 	// 		$unconfigured[] = __( 'valid ServerPilot Id, Key and Server Id for a paid plan', 'jurassic-ninja' );
 	// 	}

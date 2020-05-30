@@ -131,7 +131,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 	$default_features = [
 		'shortlife' => false,
 	];
- 	$startTime = microtime(true);
+	$start_time = microtime( true );
 
 	$features = array_merge( $default_features, $requested_features );
 	/**
@@ -214,13 +214,12 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 
 			debug( '%s: Adding features', $domain );
 
-
 			// Run command via SSH
 			// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
 			run_commands_for_features( $username, $password, $domain );
-			$endTime = microtime(true);
-			$diff = round($endTime - $startTime);
-			$minutes = floor($diff / 60); //only minutes
+			$end_time = microtime( true );
+			$diff = round( $end_time - $start_time );
+			$minutes = floor( $diff / 60 ); //only minutes
 			$seconds = $diff % 60;//remaining seconds, using modulo operator
 			debug( "Finished launching %s. Took %02d:%02d.\n", $domain, $minutes, $seconds );
 		}
@@ -326,30 +325,29 @@ function install_wordpress_with_cli( $domain, $wordpress_options, $dbname, $dbus
 function generate_new_user( $password ) {
 	$username = generate_random_username();
 	$return = null;
-	// Here PHP Codesniffer parses &$return as if it were a deprecated pass-by-reference but it is not
-	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
-	/**
-	 * Fired for hooking and actually creating a system user
-	 *
-	 * This fires before launching a site
-	 *
-	 * @since 3.0
-	 *
-	 * @param array $args {
-	 *     All we need to describe a system user
-	 *
-	 *     @type object $return              Passed by reference. This object should container the resulting data after creating a system user.
-	 *     @type string $username            The username.
-	 *     @type string $password            The password for the user.
-	 * }
-	 *
-	 */
-	do_action_ref_array( 'jurassic_ninja_create_sysuser', [ &$return, $username, $password ] );
-	// phpcs:enable
+	$return = provisioner()->create_sysuser( $username, $password );
+
 	if ( is_wp_error( $return ) ) {
 		throw new \Exception( 'Error creating sysuser: ' . $return->get_error_message() );
 	}
 	return $return;
+}
+
+/**
+ * Returns a ServerPilot instance
+ * @return [type] [description]
+ */
+function provisioner() {
+	static $jurassic_ninja_provisioner;
+	if ( ! $jurassic_ninja_provisioner ) {
+		try {
+			$provisioner_class = apply_filters( 'jurassic_ninja_provisioner_class', '\jn\ServerPilotProvisioner' );
+			$jurassic_ninja_provisioner = new $provisioner_class();
+		} catch ( \ServerPilotException $e ) {
+			push_error( new \WP_error( $e->getCode(), $e->getMessage() ) );
+		}
+	}
+	return $jurassic_ninja_provisioner;
 }
 
 /**
@@ -449,8 +447,8 @@ function get_unused_site( $php_version ) {
 	return false;
 	$unused = db()->get_results( 'select * from unused_sites where app_id LIMIT 1', \ARRAY_A );
 	$unused = count( $unused ) ? $unused[0] : false;
-	$app = get_sp_app( $unused['id'] );
-	// update_sp_app( $unused['id'], null, [ $domain ] );
+	$app = provisioner()->get_app( $unused['id'] );
+	// provisioner()->update_app( $unused['id'], null, [ $domain ] );
 	return $app;
 	debug( print_r( $app, true ) );
 	return false;
@@ -481,35 +479,8 @@ function create_php_app( $php_version, $features, $unused = false ) {
 	$user = generate_new_user( $password );
 
 	debug( 'Creating app for %s under sysuser %s', $domain, $user->name );
-	$app = null;
-	// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
-	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
-	/**
-	 * Fired for the purpose of launching a site.
-	 *
-	 * Allows to be hooked so to implement a real site launcher function
-	 *
-	 * @since 3.0
-	 *
-	 * @param array $args {
-	 *     All we need to describe a php app with WordPress
-	 *
-	 *     @type object $app                 Passed by reference. This object should contain the resulting data after creating a PHP app.
-	 *     @type object $user                An object that is the result of creating a new system user under which the app will run.
-	 *     @type string $php_version         The PHP version we're going to use.
-	 *     @type string $domain              The domain under which this app will be running.
-	 *     @type array  $wordpress_options {
-	 *           An array of properties used for setting up the WordPress site for the first time.
-	 *           @type string site_title               The title of the site we're creating.
-	 *           @type string admin_user               The username for the admin account.
-	 *           @type string admin_password           The password or the admin account.
-	 *           @type string admin_email              The email address for the admin account.
-	 *     }
-	 *     $type array $features             The list of features we're going to add to the WordPress installation.
-	 * }
-	 *
-	 */
-	do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $user, $php_version, $domain, $features ] );
+	$app = provisioner()->create_app( $user, $php_version, $domain, $features );
+
 	// phpcs:enable
 	if ( is_wp_error( $app ) ) {
 		throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
@@ -518,7 +489,7 @@ function create_php_app( $php_version, $features, $unused = false ) {
 	$dbname = $app->name . '-wp-blah';
 	$dbusername = $app->name;
 	$dbpassword = $password;
-	$db = create_sp_database( $app->id, $dbname, $dbusername, $dbpassword );
+	$db = provisioner()->create_database( $app->id, $dbname, $dbusername, $dbpassword );
 
 	if ( is_wp_error( $db ) ) {
 		throw new \Exception( 'Error creating database for app: ' . $app->get_error_message() );
@@ -645,19 +616,8 @@ function purge_sites() {
 	// Purge $max_sites at most so the purge task does not interfere
 	// with sites creation given that ServerPilot runs tasks in series.
 	$sites = array_slice( $sites, 0, $max_sites );
-	/**
-	 * Filters the array of users listed by ServerPilot
-	 *
-	 * @param array $users The users returend by serverpilot
-	 */
-	$system_users = apply_filters( 'jurassic_ninja_sysuser_list', [] );
-	if ( is_wp_error( $system_users ) ) {
-		debug( 'There was an error fetching users list for purging: (%s) - %s',
-			$system_users->get_error_code(),
-			$system_users->get_error_message()
-		);
-		return $system_users;
-	}
+	$system_users = provisioner()->sysuser_list();
+
 	$site_users = array_map(
 		function ( $site ) {
 			return $site['username'];
@@ -669,23 +629,9 @@ function purge_sites() {
 	} );
 	foreach ( $purge as $user ) {
 		$return = null;
-		// Here PHP Codesniffer parses &$return as if it were a deprecated pass-by-reference but it is not
-		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
-		/**
-		 * Fired for hooking a function that actually deletes a site
-		 *
-		 * @since 3.0
-		 *
-		 * @param array $args {
-		 *     All we need to delete a site
-		 *
-		 *     @type object $return     Passed by reference. This object contains the resulting data after deleting a PHP app.
-		 *     @type object $user       An object that represents system user under which the app will run.
-		 * }
-		 *
-		 */
-		do_action_ref_array( 'jurassic_ninja_delete_site', [ &$return, $user ] );
-		// phpcs:enable
+
+		$return = provisioner()->delete_site( $user->id );
+
 		if ( is_wp_error( $return ) ) {
 			debug( 'There was an error purging site for user %s: (%s) - %s',
 				$user->id,
