@@ -656,6 +656,7 @@ function purge_sites() {
 	$purge = array_filter( $system_users, function ( $user ) use ( $site_users ) {
 			return in_array( $user->name, $site_users, true );
 	} );
+	debug( 'Purging Jurassic Ninja sites' );
 	foreach ( $purge as $user ) {
 		$return = null;
 
@@ -672,12 +673,14 @@ function purge_sites() {
 	foreach ( $sites as $site ) {
 		log_purged_site( $site );
 	}
-	return array_map(
+	$purged = array_map(
 		function ( $site ) {
 			return $site['domain'];
 		},
 		$sites
 	);
+	return $purged;
+
 }
 
 /**

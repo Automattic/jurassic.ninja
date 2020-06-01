@@ -30,6 +30,23 @@ class JN_CLI_Command extends \WP_CLI_Command {
 			\WP_CLI::line( sprintf( 'Error launching site' ) );
 		}
 	}
+
+	/**
+	* Run the purge job.
+	*/
+	public function purge( $args ) {
+		try {
+			$purged = purge_sites();
+			if ( is_array( $purged ) && count( $purged ) ) {
+				\WP_CLI::line( sprintf( 'Purged %s Jurassic Ninja site(s).', count( $purged ) ) );
+			} else {
+				\WP_CLI::line( sprintf( "There weren't any sites to purge" ) );
+			}
+
+		} catch ( \Exception $e ) {
+			\WP_CLI::line( sprintf( 'Error purging Jurassic Ninja sites' ) );
+		}
+	}
 }
 
 \WP_CLI::add_command( 'jn', 'jn\JN_CLI_Command' );
