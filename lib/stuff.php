@@ -537,7 +537,8 @@ function log_new_unused_site( $app, $password, $shortlived = false, $launched_by
  * @return [type]       [description]
  */
 function log_new_site( $app, $password, $shortlived = false, $launched_by = null ) {
-	$launched_by = $launched_by ? $launched_by->user_login : '';
+	$launched_by = $launched_by ? $launched_by->user_login : ( is_cli_running() ? 'cli' : '' );
+
 	db()->insert( 'sites',
 		[
 			'username' => $app->name,
