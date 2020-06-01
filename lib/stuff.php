@@ -169,7 +169,6 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 			$password = $app->password;
 			$domain = $app->domain;
 			$subdomain = $app->subdomain;
-			debug( print_r( $app, true ) );
 		} else {
 			$app = create_php_app( $php_version, $features, $spare );
 			$username = $app->username;
