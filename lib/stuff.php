@@ -147,40 +147,27 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 	do_action( 'jurassic_ninja_do_feature_conditions', $features );
 
 	try {
-		$password = '';
-		$subdomain = '';
-		$domain = '';
-
 		$app = null;
-		// if ( $spare ) {
-		// 	$app = create_php_app( $php_version, $features, $spare );
-
-		// } else {
-		// 	$app = get_spare_site( $php_version );
-		// 	$username = $app->username;
-		// 	$password = $app->password;
-		// 	$domain = $app->domain;
-		// 	$subdomain = $app->subdomain;
-		// 	debug( print_r( $app, true ) );
-		// }
-		$app = $spare ? false : get_spare_site( $php_version );
-		if ( $app ) {
-			$username = $app->username;
-			$password = $app->password;
-			$domain = $app->domain;
-			$subdomain = $app->subdomain;
+		if ( $spare ) {
+			debug( 'Launching spare site' );
+			$app = create_php_app( $php_version, $features, true );
 		} else {
-			$app = create_php_app( $php_version, $features, $spare );
-			$username = $app->username;
-			$password = $app->password;
-			$domain = $app->domain;
-			$subdomain = $app->subdomain;
-			debug( 'Launching %s with features: %s', $domain, implode( ', ', array_keys( array_filter( $features ) ) ) );
-		}
+			debug( 'Launching site with features: %s', implode( ', ', array_keys( array_filter( $features ) ) ) );
+			$app = get_spare_site( $php_version );
+			if ( ! $app ) {
+				$app = create_php_app( $php_version, $features, true );
+			}
+		//}
+		// $app = $spare ? false : get_spare_site( $php_version );
+		// if ( $app ) {
+		// } else {
+		// 	$app = create_php_app( $php_version, $features, $spare );
+		// 	debug( 'Launching %s with features: %s', $app->domain, implode( ', ', array_keys( array_filter( $features ) ) ) );
+		// }
 
-		if ( ! $spare ) {
+		//if ( ! $spare ) {
 			$site_title = settings( 'use_subdomain_based_wordpress_title', false ) ?
-			ucwords( str_replace( '-', ' ', $subdomain ) ) :
+			ucwords( str_replace( '-', ' ', $app->subdomain ) ) :
 			'My WordPress Site';
 			/**
 			 * Filters the WordPress options for setting up the site
@@ -198,46 +185,45 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 			$wordpress_options = apply_filters( 'jurassic_ninja_wordpress_options', array(
 				'site_title' => $site_title,
 				'admin_user' => 'demo',
-				'admin_password' => $password,
+				'admin_password' => $app->password,
 				'admin_email' => settings( 'default_admin_email_address' ),
 			) );
-			install_wordpress_with_cli( $domain, $wordpress_options, $app->dbname, $app->dbusername, $app->dbpassword );
+			install_wordpress_with_cli( $app->domain, $wordpress_options, $app->dbname, $app->dbusername, $app->dbpassword );
 
-			log_new_site( $app, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
+			log_new_site( $app, $app->password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
 
-			add_features_before_auto_login( $app, $features, $domain );
+			add_features_before_auto_login( $app, $features, $app->domain );
 
-			debug( '%s: Adding .htaccess file', $domain );
+			debug( '%s: Adding .htaccess file', $app->domain );
 			add_htaccess();
 
 			// 2020-01-17
 			// For some reason, automated scripts are being able to find out about a new Jurassic Ninja site before
 			// the person that launched it reaches the site, thus the site is locked for them.
-			debug( '%s: Stopping pings to Ping-O-Mattic', $domain );
+			debug( '%s: Stopping pings to Ping-O-Mattic', $app->domain );
 			stop_pingomatic();
 
-			debug( '%s: Adding Companion Plugin for Auto Login', $domain );
-			add_auto_login( $password, $username );
+			debug( '%s: Adding Companion Plugin for Auto Login', $app->domain );
+			add_auto_login( $app->password, $app->username );
 
-			add_features_after_auto_login( $app, $features, $domain );
+			add_features_after_auto_login( $app, $features, $app->domain );
 
-			debug( '%s: Adding features', $domain );
+			debug( '%s: Adding features', $app->domain );
 
 			// Run command via SSH
 			// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
-			run_commands_for_features( $username, $password, $domain );
+			run_commands_for_features( $app->username, $app->password, $app->domain );
 			$end_time = microtime( true );
 			$diff = round( $end_time - $start_time );
 			$minutes = floor( $diff / 60 ); //only minutes
 			$seconds = $diff % 60;//remaining seconds, using modulo operator
-			debug( "Finished launching %s. Took %02d:%02d.\n", $domain, $minutes, $seconds );
+			debug( "Finished launching %s. Took %02d:%02d.\n", $app->domain, $minutes, $seconds );
 		}
 		return $app;
 	} catch ( \Exception $e ) {
-		debug( '%s: Error [%s]: %s', $domain, $e->getCode(), $e->getMessage() );
+		debug( '%s: Error [%s]: %s', $app->domain, $e->getCode(), $e->getMessage() );
 		return null;
 	}
-
 }
 
 /**
