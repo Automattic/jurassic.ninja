@@ -151,22 +151,34 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 		$subdomain = '';
 		$domain = '';
 
-		debug( 'Launching %s with features: %s', $domain, implode( ', ', array_keys( array_filter( $features ) ) ) );
+
 
 		$app = null;
+		// if ( $spare ) {
+		// 	$app = create_php_app( $php_version, $features, $spare );
 
-		$app = get_unused_site( $php_version );
+		// } else {
+		// 	$app = get_spare_site( $php_version );
+		// 	$username = $app->username;
+		// 	$password = $app->password;
+		// 	$domain = $app->domain;
+		// 	$subdomain = $app->subdomain;
+		// 	debug( print_r( $app, true ) );
+		// }
+		$app = $spare ? false : get_spare_site( $php_version );
 		if ( $app ) {
 			$username = $app->username;
 			$password = $app->password;
 			$domain = $app->domain;
 			$subdomain = $app->subdomain;
+			debug( print_r( $app, true ) );
 		} else {
 			$app = create_php_app( $php_version, $features, $spare );
 			$username = $app->username;
 			$password = $app->password;
 			$domain = $app->domain;
 			$subdomain = $app->subdomain;
+			debug( 'Launching %s with features: %s', $domain, implode( ', ', array_keys( array_filter( $features ) ) ) );
 		}
 
 		if ( ! $spare ) {
@@ -443,18 +455,32 @@ function add_features_after_auto_login( &$app, $features, $domain ) {
 	// phpcs:enable
 }
 
-function get_unused_site( $php_version ) {
-	return false;
-	$unused = db()->get_results( 'select * from unused_sites where app_id LIMIT 1', \ARRAY_A );
+function get_spare_site( $php_version ) {
+	$unused = db()->get_results( 'select * from unused_sites LIMIT 1', \ARRAY_A );
 	$unused = count( $unused ) ? $unused[0] : false;
-	$app = provisioner()->get_app( $unused['id'] );
+	if ( ! $unused ) {
+		debug( "Couldn't find an unused site" );
+		return false;
+	}
+	$app = provisioner()->get_app( $unused['app_id'] );
+	if ( is_wp_error( $app ) ) {
+		throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
+		debug( 'Problem fetching app info for app with id %s: %s', $unused['app_id'],  $app->get_error_message() );
+		return false;
+	}
+	$app->username = $unused['username'];
+	$app->domain = $unused['domain'];
+	$app->subdomain = explode( '.', $unused['domain'])[0];
+	$app->password = $unused['password'];
+	$app->dbname = $app->name . '-wp-blah';
+	$app->dbusername = $app->name;
+	$app->dbpassword = $unused['password'];
+	db()->delete( 'unused_sites', array( 'id' => $unused['id'] ) );
 	// provisioner()->update_app( $unused['id'], null, [ $domain ] );
 	return $app;
-	debug( print_r( $app, true ) );
-	return false;
 }
 
-function create_php_app( $php_version, $features, $unused = false ) {
+function create_php_app( $php_version, $features, $spare = false ) {
 	$subdomain = '';
 	// phpcs:disable WordPress.WP.DeprecatedFunctions.generate_random_passwordFound
 	$password = generate_random_password();
@@ -471,7 +497,7 @@ function create_php_app( $php_version, $features, $unused = false ) {
 		// or default to the classic My WordPress Site
 	$domain = sprintf( '%s.%s', $subdomain, settings( 'domain' ) );
 
-	// if ( $unused ) {
+	// if ( $spare ) {
 	// 	$domain = sprintf( '%s.spare', $user->name );
 	// }
 	debug( 'Creating sysuser for %s', $domain );
@@ -494,19 +520,21 @@ function create_php_app( $php_version, $features, $unused = false ) {
 	if ( is_wp_error( $db ) ) {
 		throw new \Exception( 'Error creating database for app: ' . $app->get_error_message() );
 	}
-	log_new_unused_site( $app, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
+	if ( $spare ) {
+		log_new_unused_site( $app, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
+	}
 	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
 	do_action_ref_array( 'jurassic_ninja_add_features_after_create_app', [ &$app, $features, $domain ] );
 	// phpcs:enable
 
 	debug( 'Finished creating PHP app %s', $domain );
-	$app->username = $user->name;
-	$app->domain = $domain;
-	$app->subdomain = $subdomain;
-	$app->password = $password;
-	$app->dbname = $dbname;
-	$app->dbusername = $dbusername;
-	$app->dbpassword = $dbpassword;
+		$app->username = $user->name;
+		$app->domain = $domain;
+		$app->subdomain = $subdomain;
+		$app->password = $password;
+		$app->dbname = $dbname;
+		$app->dbusername = $dbusername;
+		$app->dbpassword = $dbpassword;
 	return $app;
 }
 
