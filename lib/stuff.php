@@ -151,8 +151,6 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 		$subdomain = '';
 		$domain = '';
 
-
-
 		$app = null;
 		// if ( $spare ) {
 		// 	$app = create_php_app( $php_version, $features, $spare );
@@ -380,11 +378,18 @@ function generate_random_password() {
  *
  * @return string A slugified subdomain.
  */
-function generate_random_subdomain() {
+function generate_random_subdomain( $features ) {
 	$generator = new CustomNameGenerator();
-	$name = $generator->getName( settings( 'use_alliterations_for_subdomain', true ) );
-
-	$slug = create_slug( $name );
+	$slug = '-';
+	$collision_attempts = 10;
+	do {
+		$name = $generator->getName( settings( 'use_alliterations_for_subdomain', true ) );
+		$slug = create_slug( $name );
+		// Add moar randomness to shortlived sites
+		if ( $features['shortlife'] ) {
+			$slug = sprintf( '%s-%s', $slug, rand( 2, 500 ) );
+		}
+	} while ( subdomain_is_used( $slug ) && $collision_attempts-- > 0 );
 	return $slug;
 }
 
@@ -464,13 +469,12 @@ function get_spare_site( $php_version ) {
 	}
 	$app = provisioner()->get_app( $unused['app_id'] );
 	if ( is_wp_error( $app ) ) {
-		throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
-		debug( 'Problem fetching app info for app with id %s: %s', $unused['app_id'],  $app->get_error_message() );
+		debug( 'Problem fetching app info for app with id %s: %s', $unused['app_id'], $app->get_error_message() );
 		return false;
 	}
 	$app->username = $unused['username'];
 	$app->domain = $unused['domain'];
-	$app->subdomain = explode( '.', $unused['domain'])[0];
+	$app->subdomain = explode( '.', $unused['domain'] )[0];
 	$app->password = $unused['password'];
 	$app->dbname = $app->name . '-wp-blah';
 	$app->dbusername = $app->name;
@@ -485,14 +489,7 @@ function create_php_app( $php_version, $features, $spare = false ) {
 	// phpcs:disable WordPress.WP.DeprecatedFunctions.generate_random_passwordFound
 	$password = generate_random_password();
 	// phpcs:enable
-	$collision_attempts = 10;
-	do {
-		$subdomain = generate_random_subdomain();
-		// Add moar randomness to shortlived sites
-		if ( $features['shortlife'] ) {
-			$subdomain = sprintf( '%s-%s', $subdomain, rand( 2, 500 ) );
-		}
-	} while ( subdomain_is_used( $subdomain ) && $collision_attempts-- > 0 );
+	$subdomain = generate_random_subdomain( $features );
 		// title-case the subdomain
 		// or default to the classic My WordPress Site
 	$domain = sprintf( '%s.%s', $subdomain, settings( 'domain' ) );
@@ -776,5 +773,6 @@ function sites_to_be_purged() {
 function subdomain_is_used( $subdomain ) {
 	$domain = sprintf( '%s.%s', $subdomain, settings( 'domain' ) );
 	$results = db()->get_results( "select * from sites where domain='$domain' limit 1", \ARRAY_A );
-	return count( $results ) !== 0;
+	$results2 = db()->get_results( "select * from unused_sites where domain='$domain' limit 1", \ARRAY_A );
+	return count( $results ) !== 0 && count( $results2 ) !== 0;
 }
