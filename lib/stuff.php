@@ -591,12 +591,14 @@ function log_purged_site( $data ) {
 function maintain_spare_sites_pool() {
 	$count = db()->get_var( 'select COUNT(*) from unused_sites' );
 	$min_spare_sites = settings( 'min_spare_sites' );
-	debug( 'Checking spare sites pool.' );
-	if ( $min_spare_sites - $count ) {
+	debug( 'Checking spare sites pool' );
+	if (  (	$min_spare_sites - $count > 0 ) ) {
 		debug( 'Launching %s sites', $min_spare_sites - $count );
-	}
-	while ( $count++ < $min_spare_sites ) {
-		launch_wordpress( 'default', [ 'ssl' => true ], true );
+		while ( $count++ < $min_spare_sites ) {
+			launch_wordpress( 'default', [ 'ssl' => true ], true );
+		}
+	} else {
+		debug( 'No need to launch more spare sites' );
 	}
 	return $count;
 }
