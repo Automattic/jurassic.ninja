@@ -158,6 +158,18 @@ class ServerPilotProvisioner {
 	 * @return [type]         [description]
 	 */
 	public function enable_ssl( $appid ) {
+
+		try {
+			$response = $this->add_ssl_certificate( $appid );
+
+			$response = $this->force_ssl_redirection( $appid );
+			return $response;
+		} catch ( \ServerPilotException $e ) {
+			return new \WP_Error( $e->getCode(), $e->getMessage() );
+		}
+	}
+
+	private function add_ssl_certificate( $appid ) {
 		$private_key = settings( 'ssl_private_key' );
 		$certificate = settings( 'ssl_certificate' );
 		$ca_certificates = settings( 'ssl_ca_certificates', null );
@@ -169,28 +181,25 @@ class ServerPilotProvisioner {
 		if ( ! $ca_certificates ) {
 			debug( 'No CA certificates configured in settings. This may take a little bit longer to launch' );
 		}
+		// Add certificate
+		debug( 'Adding SSL certificate for app %s', $appid );
+		$response = $this->serverpilot_instance->ssl_add( $appid, $private_key, $certificate, $ca_certificates );
+		/**
+		 * NOTE: Here it would make sense to wait for this action to finish.
+		 * IRL: It talkes tooooo long before the action is in a success state AND
+		 * without the wait, the SSL provisioning still works fine.
+		 * Tested a few sites and nothing broke.
+		 * Leaving it commented in case something breaks eventually.
+		 */
+		// $this->wait_for_serverpilot_action( $data->actionid );
+		return $response;
+	}
 
-		try {
-			// Add certificate
-			debug( 'Adding SSL certificate' );
-			$data = $this->serverpilot_instance->ssl_add( $appid, $private_key, $certificate, $ca_certificates );
-			/**
-			 * NOTE: Here it would make sense to wait for this action to finish.
-			 * IRL: It talkes tooooo long before the action is in a success state AND
-			 * without the wait, the SSL provisioning still works fine.
-			 * Tested a few sites and nothing broke.
-			 * Leaving it commented in case something breaks eventually.
-			 */
-			// $this->wait_for_serverpilot_action( $data->actionid );
-
-			// Enable redirection from https to http
-			debug( 'Enabling forced SSL redirection' );
-			$data = $this->serverpilot_instance->ssl_force( $appid, true );
-			// $this->wait_for_serverpilot_action( $data->actionid );
-			return $data;
-		} catch ( \ServerPilotException $e ) {
-			return new \WP_Error( $e->getCode(), $e->getMessage() );
-		}
+	private function force_ssl_redirection( $appid ) {
+		debug( 'Enabling forced SSL redirection for app %s', $appid );
+		$response = $this->serverpilot_instance->ssl_force( $appid, true );
+		// $this->wait_for_serverpilot_action( $response->actionid );
+		return $response;
 	}
 
 	public function get_app( $appid ) {
