@@ -590,7 +590,7 @@ function log_purged_site( $data ) {
 
 function maintain_spare_sites_pool() {
 	$count = db()->get_var( 'select COUNT(*) from unused_sites' );
-	$min_spare_sites = settings( 'min_spare_sites', 20 );
+	$min_spare_sites = settings( 'min_spare_sites' );
 	debug( 'Checking spare sites pool.' );
 	if ( $min_spare_sites - $count ) {
 		debug( 'Launching %s sites', $min_spare_sites - $count );
