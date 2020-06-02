@@ -172,6 +172,7 @@ class ServerPilotProvisioner {
 
 		try {
 			// Add certificate
+			debug( 'Adding SSL certificate' );
 			$data = $this->serverpilot_instance->ssl_add( $appid, $private_key, $certificate, $ca_certificates );
 			/**
 			 * NOTE: Here it would make sense to wait for this action to finish.
@@ -183,8 +184,9 @@ class ServerPilotProvisioner {
 			// $this->wait_for_serverpilot_action( $data->actionid );
 
 			// Enable redirection from https to http
+			debug( 'Enabling forced SSL redirection' );
 			$data = $this->serverpilot_instance->ssl_force( $appid, true );
-			$this->wait_for_serverpilot_action( $data->actionid );
+			// $this->wait_for_serverpilot_action( $data->actionid );
 			return $data;
 		} catch ( \ServerPilotException $e ) {
 			return new \WP_Error( $e->getCode(), $e->getMessage() );
