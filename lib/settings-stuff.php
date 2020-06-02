@@ -157,6 +157,13 @@ function add_settings_page() {
 							'choices' => available_php_versions(),
 							'text' => 'Sites will be launched with this PHP version by default',
 						),
+						'min_spare_sites' => array(
+							'id' => 'min_spare_sites',
+							'title' => 'Minimum number of spare sites',
+							'value' => '10',
+							'placeholder' => '10',
+							'text' => 'This number of PHP environments will be launched beforehand to speed up site launching',
+						),
 						'use_subdomain_based_wordpress_title' => array(
 							'id' => 'use_subdomain_based_wordpress_title',
 							'title' => __( 'Base the site titles on their subdomain', 'jurassic-ninja' ),

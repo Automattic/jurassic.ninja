@@ -588,6 +588,19 @@ function log_purged_site( $data ) {
 	};
 }
 
+function maintain_spare_sites_pool() {
+	$count = db()->get_var( 'select COUNT(*) from unused_sites' );
+	$min_spare_sites = settings( 'min_spare_sites', 20 );
+	debug( 'Checking spare sites pool.' );
+	if ( $min_spare_sites - $count ) {
+		debug( 'Launching %s sites', $min_spare_sites - $count );
+	}
+	while ( $count++ < $min_spare_sites ) {
+		launch_wordpress( 'default', [ 'ssl' => true ], true );
+	}
+	return $count;
+}
+
 /**
  * Returns all of the sites managed and created by this instance of Jurassic Ninja
  * @return Array The list of sites

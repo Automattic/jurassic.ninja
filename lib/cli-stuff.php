@@ -31,7 +31,7 @@ class JN_CLI_Command extends \WP_CLI_Command {
 		}
 	}
 
-	/**
+   /**
 	* Run the purge job.
 	*/
 	public function purge( $args ) {
@@ -45,6 +45,18 @@ class JN_CLI_Command extends \WP_CLI_Command {
 
 		} catch ( \Exception $e ) {
 			\WP_CLI::line( sprintf( 'Error purging Jurassic Ninja sites' ) );
+		}
+	}
+
+   /**
+	* Refresh the spare sites pooll.
+	*/
+	public function pool( $args ) {
+		try {
+			maintain_spare_sites_pool();
+			\WP_CLI::line( sprintf( "Spare sites pool was refreshed" ) );
+		} catch ( \Exception $e ) {
+			\WP_CLI::line( sprintf( 'Error refreshing the spare sites pool' ) );
 		}
 	}
 }
