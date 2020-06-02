@@ -166,7 +166,7 @@ class ServerPilotProvisioner {
 		return $response;
 	}
 
-	private function add_ssl_certificate( $appid ) {
+	public function add_ssl_certificate( $appid ) {
 		$private_key = settings( 'ssl_private_key' );
 		$certificate = settings( 'ssl_certificate' );
 		$ca_certificates = settings( 'ssl_ca_certificates', null );
@@ -195,7 +195,7 @@ class ServerPilotProvisioner {
 		}
 	}
 
-	private function force_ssl_redirection( $appid ) {
+	public function force_ssl_redirection( $appid ) {
 		try {
 			debug( 'Enabling forced SSL redirection for app %s', $appid );
 			$response = $this->serverpilot_instance->ssl_force( $appid, true );
