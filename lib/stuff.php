@@ -446,7 +446,7 @@ function add_features_after_auto_login( &$app, $features, $domain ) {
 }
 
 function get_spare_site( $php_version ) {
-	$unused = db()->get_results( 'select * from unused_sites LIMIT 1', \ARRAY_A );
+	$unused = db()->get_results( 'select * from spare_sites LIMIT 1', \ARRAY_A );
 	$unused = count( $unused ) ? $unused[0] : false;
 	if ( ! $unused ) {
 		debug( "Couldn't find an unused site" );
@@ -464,7 +464,7 @@ function get_spare_site( $php_version ) {
 	$app->dbname = $app->name . '-wp-blah';
 	$app->dbusername = $app->name;
 	$app->dbpassword = $unused['password'];
-	db()->delete( 'unused_sites', array( 'id' => $unused['id'] ) );
+	db()->delete( 'spare_sites', array( 'id' => $unused['id'] ) );
 	// provisioner()->update_app( $unused['id'], null, [ $domain ] );
 	return $app;
 }
@@ -527,7 +527,7 @@ function create_php_app( $php_version, $features, $spare = false ) {
  */
 function log_new_unused_site( $app, $password, $shortlived = false, $launched_by = null ) {
 	$launched_by = $launched_by ? $launched_by->user_login : '';
-	db()->insert( 'unused_sites',
+	db()->insert( 'spare_sites',
 		[
 			'app_id' => $app->id,
 			'username' => $app->name,
@@ -589,7 +589,7 @@ function log_purged_site( $data ) {
 }
 
 function maintain_spare_sites_pool() {
-	$count = db()->get_var( 'select COUNT(*) from unused_sites' );
+	$count = db()->get_var( 'select COUNT(*) from spare_sites' );
 	$min_spare_sites = settings( 'min_spare_sites' );
 	debug( 'Checking spare sites pool' );
 	if (  (	$min_spare_sites - $count > 0 ) ) {
@@ -773,6 +773,6 @@ function sites_to_be_purged() {
 function subdomain_is_used( $subdomain ) {
 	$domain = sprintf( '%s.%s', $subdomain, settings( 'domain' ) );
 	$results = db()->get_results( "select * from sites where domain='$domain' limit 1", \ARRAY_A );
-	$results2 = db()->get_results( "select * from unused_sites where domain='$domain' limit 1", \ARRAY_A );
+	$results2 = db()->get_results( "select * from spare_sites where domain='$domain' limit 1", \ARRAY_A );
 	return count( $results ) !== 0 && count( $results2 ) !== 0;
 }

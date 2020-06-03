@@ -54,7 +54,7 @@ function jurassic_ninja_create_table() {
 		PRIMARY KEY  (id)
 	) $charset_collate;";
 
-	$sql3 = "CREATE TABLE unused_sites (
+	$sql3 = "CREATE TABLE spare_sites (
 		`id` INT NOT NULL AUTO_INCREMENT,
 		username text not null,
 		password text not null,
