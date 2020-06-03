@@ -32,7 +32,8 @@ class ServerPilotProvisioner {
 
 	public function create_app( $user, $php_version, $domain, $features ) {
 		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
-		$domain_arg = ( isset( $features['subdomain_multisite'] ) && $features['subdomain_multisite'] ) ? array( $domain, '*.' . $domain ) : array( $domain );
+		// Doing this for all sites doesn't hurt.
+		$domain_arg = array( $domain, '*.' . $domain );
 		// Mitigate ungraceful PHP-FPM restart for shortlived sites by randomizing PHP version
 		// PHP does not support graceful "restart" so every php-pool gets closed
 		// each time ServerPilot needs to SIGUSR1 php for reloading configuration
