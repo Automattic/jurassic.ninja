@@ -23,6 +23,7 @@ add_action( 'jurassic_ninja_init', function() {
 		// wildcard certificates don't support multiple levels of subdomains
 		// and this can result in awful experience.
 		// Need to explore a little bit better
+
 		if ( $features['ssl'] && ! ( isset( $features['subdomain_multisite'] ) && $features['subdomain_multisite'] ) ) {
 			$features = array_merge( $defaults, $features );
 			if ( $features['auto_ssl'] ) {
@@ -41,11 +42,17 @@ add_action( 'jurassic_ninja_init', function() {
 		}
 	}, 10, 3 );
 
-	add_filter( 'jurassic_ninja_rest_feature_defaults', function( $defaults ) {
-		return array_merge( $defaults, [
+	add_filter( 'jurassic_ninja_rest_feature_defaults', function( $rest_default_features ) use ( $defaults ) {
+		return array_merge( $defaults, $rest_default_features, [
 			'ssl' => (bool) settings( 'ssl_use_custom_certificate', false ),
 		] );
 	} );
+
+	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) {
+		return array_merge( $features, [
+			'ssl' => $features['ssl'] && ( isset( $json_params['ssl'] ) ? $json_params['ssl'] : true ),
+		] );
+	}, 10, 2 );
 
 	add_filter( 'jurassic_ninja_created_site_url', function( $domain, $features ) {
 		// See note in launch_wordpress() about why we can't launch subdomain_multisite with ssl.
