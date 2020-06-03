@@ -153,7 +153,9 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 			$app = create_php_app( $php_version, $features, true );
 		} else {
 			debug( 'Launching site with features: %s', implode( ', ', array_keys( array_filter( $features ) ) ) );
-			$app = get_spare_site( $php_version );
+			if ( settings( 'use_spare_sites', false ) ) {
+				$app = get_spare_site( $php_version );
+			}
 			if ( ! $app ) {
 				$app = create_php_app( $php_version, $features, true );
 			}

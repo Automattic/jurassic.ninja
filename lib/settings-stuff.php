@@ -157,6 +157,13 @@ function add_settings_page() {
 							'choices' => available_php_versions(),
 							'text' => 'Sites will be launched with this PHP version by default',
 						),
+						'use_spare_sites' => array(
+							'id' => 'use_spare_sites',
+							'type' => 'checkbox',
+							'title' => 'Use a pool of spare sites to speed up launching',
+							'checked' => false,
+							'text' => 'Some sites will be pre-launched and only set up when a site is requested',
+						),
 						'min_spare_sites' => array(
 							'id' => 'min_spare_sites',
 							'title' => 'Minimum number of spare sites',
