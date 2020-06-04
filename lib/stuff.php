@@ -223,11 +223,8 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 			// Run command via SSH
 			// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
 			run_commands_for_features( $app->username, $app->password, $app->domain );
-			$end_time = microtime( true );
-			$diff = round( $end_time - $start_time );
-			$minutes = floor( $diff / 60 ); //only minutes
-			$seconds = $diff % 60;//remaining seconds, using modulo operator
-			debug( "Finished launching %s. Took %02d:%02d.\n", $app->domain, $minutes, $seconds );
+			$diff = round( microtime( true ) - $start_time );
+			debug( "Finished launching %s. Took %02d:%02d.\n", $app->domain, floor( $diff / 60 ), $diff % 60 );
 		}
 		return $app;
 	} catch ( \Exception $e ) {
@@ -481,6 +478,7 @@ function get_spare_site( $php_version ) {
 }
 
 function create_php_app( $php_version, $features, $spare = false ) {
+	$start_time = microtime( true );
 	$subdomain = '';
 	// phpcs:disable WordPress.WP.DeprecatedFunctions.generate_random_passwordFound
 	$password = generate_random_password();
@@ -519,8 +517,8 @@ function create_php_app( $php_version, $features, $spare = false ) {
 	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
 	do_action_ref_array( 'jurassic_ninja_add_features_after_create_app', [ &$app, $features, $domain ] );
 	// phpcs:enable
-
-	debug( 'Finished creating PHP app %s', $domain );
+	$diff = round( microtime( true ) - $start_time );
+	debug( 'Finished creating PHP app %s. Took %02d:%02d.\n', $domain, floor( $diff / 60 ), $diff % 60 );
 		$app->username = $user->name;
 		$app->domain = $domain;
 		$app->subdomain = $subdomain;
