@@ -604,10 +604,8 @@ function maintain_spare_sites_pool() {
 	$min_spare_sites = settings( 'min_spare_sites' );
 	debug( 'Checking spare sites pool' );
 	if (  (	$min_spare_sites - $count > 0 ) ) {
-		debug( 'Launching %s sites', $min_spare_sites - $count );
-		while ( $count++ < $min_spare_sites ) {
-			launch_wordpress( 'default', [], true );
-		}
+		debug( 'Launching a spare site' );
+		launch_wordpress( 'php7.0', [], true );
 	} else {
 		debug( 'No need to launch more spare sites' );
 	}
