@@ -462,6 +462,10 @@ function get_spare_site( $php_version ) {
 	$app = provisioner()->get_app( $unused['app_id'] );
 	if ( is_wp_error( $app ) ) {
 		debug( 'Problem fetching app info for app with id %s: %s', $unused['app_id'], $app->get_error_message() );
+		if ( 404 === $app->get_error_code() ) {
+			debug( 'Deleting rogue spare site with app id %s', $unused['app_id'] );
+			db()->delete( 'spare_sites', array( 'id' => $unused['id'] ) );
+		}
 		return false;
 	}
 	$app->username = $unused['username'];
