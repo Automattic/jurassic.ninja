@@ -20,7 +20,15 @@ if ( ! class_exists( 'CustomNameGenerator' ) ) {
 function debug() {
 	if ( defined( 'WP_DEBUG' ) && WP_DEBUG && settings( 'log_debug_messages', false ) ) {
 		// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_error_log
-		error_log( call_user_func_array( 'sprintf', func_get_args() ) );
+		$args = array_map(
+			function ( $item ) {
+				if ( gettype( $item ) === 'array' || gettype( $item ) === 'object' ) {
+					return print_r( $item, true );
+				}
+				return $item;
+			}
+		, func_get_args() );
+		error_log( call_user_func_array( 'sprintf', $args ) );
 		// phpcs:enable
 	}
 }
@@ -150,7 +158,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 		$app = null;
 		if ( $spare ) {
 			debug( 'Launching spare site' );
-			$app = create_php_app( $php_version, $features, true );
+			$app = create_php_app( 'php7.0', $features, true );
 		} else {
 			debug( 'Launching site with features: %s', implode( ', ', array_keys( array_filter( $features ) ) ) );
 			if ( settings( 'use_spare_sites', false ) ) {
@@ -467,7 +475,8 @@ function get_spare_site( $php_version ) {
 	$app->dbusername = $app->name;
 	$app->dbpassword = $unused['password'];
 	db()->delete( 'spare_sites', array( 'id' => $unused['id'] ) );
-	// provisioner()->update_app( $unused['id'], null, [ $domain ] );
+	debug( $app, true );
+	provisioner()->update_app( $unused['id'], $php_version, null );
 	return $app;
 }
 
