@@ -453,7 +453,11 @@ function add_features_after_auto_login( &$app, $features, $domain ) {
 }
 
 function get_spare_site( $php_version ) {
-	$unused = db()->get_results( 'select * from spare_sites LIMIT 1', \ARRAY_A );
+	// phpcs:disable WordPress.WP.DeprecatedFunctions.generate_random_passwordFound
+	$lock = generate_random_password();
+	// phpcs:enable
+	$unused = db()->query( sprintf( "update spare_sites set locked_by='%s' where locked_by = '' limit 1", $lock ) );
+	$unused = db()->get_results( sprintf( "select * from spare_sites where locked_by = '%s' limit 1", $lock ), \ARRAY_A );
 	$unused = count( $unused ) ? $unused[0] : false;
 	if ( ! $unused ) {
 		debug( "Couldn't find an unused site" );

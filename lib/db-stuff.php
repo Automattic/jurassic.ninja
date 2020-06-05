@@ -29,7 +29,7 @@ function jurassic_ninja_create_table() {
 
 	$charset_collate = $wpdb->get_charset_collate();
 
-	$sql = "CREATE TABLE sites (
+	$sites_sql = "CREATE TABLE sites (
 		`id` INT NOT NULL AUTO_INCREMENT,
 		username text not null,
 		password text not null,
@@ -42,7 +42,7 @@ function jurassic_ninja_create_table() {
 		PRIMARY KEY  (id)
 	) $charset_collate;";
 
-	$sql2 = "CREATE TABLE purged (
+	$purged_sites_sql = "CREATE TABLE purged (
 		`id` INT NOT NULL AUTO_INCREMENT,
 		username text not null,
 		domain text not null,
@@ -54,13 +54,14 @@ function jurassic_ninja_create_table() {
 		PRIMARY KEY  (id)
 	) $charset_collate;";
 
-	$sql3 = "CREATE TABLE spare_sites (
+	$spare_sites_sql = "CREATE TABLE spare_sites (
 		`id` INT NOT NULL AUTO_INCREMENT,
 		username text not null,
 		password text not null,
 		domain text not null,
 		created datetime,
 		app_id text not null,
+		locked_by text not null,
 		PRIMARY KEY  (id)
 	) $charset_collate;";
 
@@ -70,9 +71,9 @@ function jurassic_ninja_create_table() {
 
 	try {
 		// phpcs:disable Generic.PHP.NoSilencedErrors.Discouraged
-		@dbDelta( $sql );
-		@dbDelta( $sql2 );
-		@dbDelta( $sql3 );
+		@dbDelta( $sites_sql );
+		@dbDelta( $purged_sites_sql );
+		@dbDelta( $spare_sites_sql );
 		// phpcs:enable
 
 	} catch ( \Exception $e ) {
