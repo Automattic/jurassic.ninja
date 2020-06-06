@@ -654,7 +654,7 @@ function mark_site_as_checked_in( $domain ) {
  * @return [type] [description]
  */
 function purge_sites() {
-	$max_sites = 10;
+	$max_sites = 1;
 	$sites = sites_to_be_purged();
 	// Purge $max_sites at most so the purge task does not interfere
 	// with sites creation given that ServerPilot runs tasks in series.

@@ -41,7 +41,7 @@ class JN_CLI_Command extends \WP_CLI_Command {
 		try {
 			$purged = purge_sites();
 			if ( is_array( $purged ) && count( $purged ) ) {
-				\WP_CLI::line( sprintf( 'Purged %s Jurassic Ninja site(s).', count( $purged ) ) );
+				\WP_CLI::line( sprintf( 'Purged one Jurassic Ninja site.', count( $purged ) ) );
 			} else {
 				\WP_CLI::line( sprintf( "There weren't any sites to purge" ) );
 			}
