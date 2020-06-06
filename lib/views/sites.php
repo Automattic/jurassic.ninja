@@ -110,15 +110,6 @@ printf( esc_html__( 'There are %s spare sites right now.', 'jurassic-ninja' ), c
 	<tbody>
 <?php
 foreach ( $db_spare_sites as $site ) {
-	// $domain = figure_out_main_domain( $site->domains );
-	// $in_logs = array_key_exists( $domain, $db_sites_indexed );
-	// $db_id = $in_logs ? $db_sites_indexed[ $domain ]['id'] : '';
-	// $created = $in_logs ? $db_sites_indexed[ $domain ]['created'] : '';
-	// $sysusername = $in_logs ? $db_sites_indexed[ $domain ]['username'] : '';
-	// $last_logged_in = $in_logs ? $db_sites_indexed[ $domain ]['last_logged_in'] : '';
-	// $checked_in = $in_logs ? $db_sites_indexed[ $domain ]['checked_in'] : '';
-	// $launched_by = $in_logs ? $db_sites_indexed[ $domain ]['launched_by'] : '';
-	// $is_shortlived_site = $in_logs ? $db_sites_indexed[ $domain ]['shortlived'] : false;
 	?>
 	<tr class="active">
 		<td class="column-columnname"><?php echo esc_html( $site['id'] ); ?></td>
