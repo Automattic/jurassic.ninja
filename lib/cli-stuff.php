@@ -19,7 +19,7 @@ class JN_CLI_Command extends \WP_CLI_Command {
 				\WP_CLI::line( 'Launching a spare site' );
 			}
 			$app = launch_wordpress( 'default', [], true );
-			\WP_CLI::line( sprintf( 'Launched spare site', $app->domains[0] ) );
+			\WP_CLI::line( sprintf( 'Launched spare site', figure_out_main_domain( $app->domains) ) );
 			return;
 		}
 		try {
@@ -27,7 +27,7 @@ class JN_CLI_Command extends \WP_CLI_Command {
 			if ( !$app ) {
 				throw new \Exception();
 			}
-			\WP_CLI::line( sprintf( 'Launched %s', $app->domains[0] ) );
+			\WP_CLI::line( sprintf( 'Launched %s', figure_out_main_domain( $app->domains) ) );
 
 		} catch ( \Exception $e ) {
 			\WP_CLI::line( sprintf( 'Error launching site' ) );
