@@ -52,7 +52,7 @@ class JN_CLI_Command extends \WP_CLI_Command {
 	}
 
    /**
-	* Refresh the spare sites pooll.
+	* Refresh the spare sites pool.
 	*/
 	public function pool( $args ) {
 		try {
@@ -60,6 +60,32 @@ class JN_CLI_Command extends \WP_CLI_Command {
 			\WP_CLI::line( sprintf( "Spare sites pool was refreshed" ) );
 		} catch ( \Exception $e ) {
 			\WP_CLI::line( sprintf( 'Error refreshing the spare sites pool' ) );
+		}
+	}
+
+   /**
+	* Get unhandled sysusers
+	*/
+	public function users( $args ) {
+		try {
+			$users = provisioner()->sysuser_list();
+			$apps = provisioner()->get_app_list();
+			$this_server_id = settings( 'serverpilot_server_id' );
+			// Only check sysusers from this server.
+			$users_with_apps = array_column( array_filter( $apps, function( $app ) use( $this_server_id ) {
+				return $app->serverid == $this_server_id;
+			} ), 'sysuserid' );
+
+			foreach( $users as $user ) {
+				\WP_CLI::line( sprintf( "%s\t%s\thttps://manage.serverpilot.io/servers/%s/users/%s",
+					$user->name,
+					in_array( $user->id, $users_with_apps ) ? 'Has apps' : 'Does not have any apps' ,
+					settings( 'serverpilot_server_id' ),
+					$user->id
+				) );
+			}
+		} catch ( \Exception $e ) {
+			\WP_CLI::line( sprintf( 'Error getting sysuser list' ) );
 		}
 	}
 }
