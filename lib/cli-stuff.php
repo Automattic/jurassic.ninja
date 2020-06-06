@@ -88,6 +88,25 @@ class JN_CLI_Command extends \WP_CLI_Command {
 			\WP_CLI::line( sprintf( 'Error getting sysuser list' ) );
 		}
 	}
+
+   /**
+	* Get experied sites
+	*/
+	public function expired( $args ) {
+		try {
+			$sites = sites_to_be_purged();
+			$this_server_id = settings( 'serverpilot_server_id' );
+			// Only check sysusers from this server.
+			foreach( $sites as $app ) {
+				\WP_CLI::line( sprintf( "%s\t%s",
+					$app['username'],
+					$app['domain']
+				) );
+			}
+		} catch ( \Exception $e ) {
+			\WP_CLI::line( sprintf( 'Error getting expired sites list' ) );
+		}
+	}
 }
 
 \WP_CLI::add_command( 'jn', 'jn\JN_CLI_Command' );
