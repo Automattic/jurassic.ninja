@@ -29,7 +29,7 @@ $db_sites_indexed = array_combine( $just_site_domains, $db_sites );
  *
  * @param array $apps Apps returned by ServerPilot's API
  */
-$serverpilot_apps = apply_filters( 'jurassic_ninja_serverpilot_apps_list', get_sp_app_list() );
+$serverpilot_apps = apply_filters( 'jurassic_ninja_serverpilot_apps_list', provisioner()->get_app_list() );
 
 ?>
 <p>
@@ -47,6 +47,7 @@ $serverpilot_apps = apply_filters( 'jurassic_ninja_serverpilot_apps_list', get_s
 			<th class="manage-column column-columnname"><?php echo esc_html__( 'Is shortlived site', 'jurassic-ninja' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html__( 'Created on', 'jurassic-ninja' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html__( 'Checked in on', 'jurassic-ninja' ); ?> </th>
+			<th class="manage-column column-columnname"><?php echo esc_html__( 'Launched by', 'jurassic-ninja' ); ?> </th>
 			<th class="manage-column column-columnname"><?php echo esc_html__( 'Last logged in on', 'jurassic-ninja' ); ?> </th>
 		</tr>
 	</thead>
@@ -60,6 +61,7 @@ foreach ( $serverpilot_apps as $site ) {
 	$sysusername = $in_logs ? $db_sites_indexed[ $domain ]['username'] : '';
 	$last_logged_in = $in_logs ? $db_sites_indexed[ $domain ]['last_logged_in'] : '';
 	$checked_in = $in_logs ? $db_sites_indexed[ $domain ]['checked_in'] : '';
+	$launched_by = $in_logs ? $db_sites_indexed[ $domain ]['launched_by'] : '';
 	$is_shortlived_site = $in_logs ? $db_sites_indexed[ $domain ]['shortlived'] : false;
 	?>
 	<tr class="active">
@@ -68,10 +70,11 @@ foreach ( $serverpilot_apps as $site ) {
 			<a target="_blank" href="<?php echo 'http://' . esc_attr( $domain ); ?>" rel="noopener nofollow"<strong><?php echo esc_html( $domain ); ?></strong></a>
 		</td>
 		<td class="column-columnname"><a rel="noreferrer noopener" target="_blank" href="<?php echo esc_attr( "https://manage.serverpilot.io/#sysusers/$sysusername" ); ?>"><?php esc_html( $sysusername ); ?></a></td>
-		<td class="column-columnname"><?php echo $in_logs ? esc_html__( 'Yes', 'jurassic-ninja' ) : esc_html__( 'No', 'jurassic-ninja' ); ?></td>
+		<td class="column-columnname"><?php echo $in_logs ? esc_html__( 'Yes', 'jurassic-ninja' ) : esc_html__( 'Unmanaged', 'jurassic-ninja' ); ?></td>
 		<td class="column-columnname"><?php echo $in_logs && $is_shortlived_site ? esc_html__( 'Yes', 'jurassic-ninja' ) : esc_html__( 'No', 'jurassic-ninja' ); ?></td>
 		<td class="column-columnname"><?php echo $in_logs ? esc_html( mysql2date( 'l, F j - g:i a', get_date_from_gmt( $created ) ) ) : ''; ?></td>
 		<td class="column-columnname"><?php echo $in_logs && $checked_in ? esc_html( mysql2date( 'l, F j - g:i a', get_date_from_gmt( $checked_in ) ) ) : ''; ?></td>
+		<td class="column-columnname"><?php echo $in_logs && $launched_by ? esc_html( $launched_by ) : 'anonymous'; ?></td>
 		<td class="column-columnname"><?php echo $in_logs && $last_logged_in ? esc_html( mysql2date( 'l, F j - g:i a', get_date_from_gmt( $last_logged_in ) ) ) : ''; ?></td>
 	</tr>
 	<?php

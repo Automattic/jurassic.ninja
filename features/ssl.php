@@ -8,39 +8,51 @@ add_action( 'jurassic_ninja_init', function() {
 		'ssl' => false,
 	];
 
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app, $features, $domain ) use ( $defaults ) {
+	add_action( 'jurassic_ninja_add_features_after_create_app', function( &$app, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
-		// Currently not used but the code works.
 		if ( $features['auto_ssl'] ) {
-			enable_sp_auto_ssl( $app->data->id );
+			// Currently not a feature of Jurassic Ninja but the code works.
+			provisioner()->enable_auto_ssl( $app->id );
+		} else {
+			$response = provisioner()->add_ssl_certificate( $app->id );
 		}
+	}, 10, 3 );
+
+	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
 		// We can't easily enable SSL for subodmains because
 		// wildcard certificates don't support multiple levels of subdomains
 		// and this can result in awful experience.
-		// Need to explorer a little bit better
-		if ( $features['ssl'] && ! $features['subdomain_multisite'] ) {
+		// Need to explore a little bit better
+
+		if ( $features['ssl'] && ! ( isset( $features['subdomain_multisite'] ) && $features['subdomain_multisite'] ) ) {
+			$features = array_merge( $defaults, $features );
 			if ( $features['auto_ssl'] ) {
-				debug( 'Both ssl and auto_ssl features were requested. Ignoring ssl and launching with auto_ssl' );
-			} else {
-				debug( '%s: Enabling custom SSL', $domain );
-				$response = enable_sp_ssl( $app->data->id );
-				if ( is_wp_error( $response ) ) {
-					debug( 'Error enabling SSL for %s. Check the next log line for a dump of the WP_Error', $domain );
-					// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_print_r
-					debug( print_r( $response, true ) );
-					// phpcs:enable
-					throw new \Exception( 'Error enabling SSL: ' . $response->get_error_message() );
-				}
-				debug( '%s: Setting home and siteurl options', $domain );
-				set_home_and_site_url( $domain );
+				debug( 'Both ssl and auto_ssl features were requested. Ignoring ssl and launching with custom SSL' );
 			}
+			debug( '%s: Enabling custom SSL', $domain );
+
+			$response = provisioner()->force_ssl_redirection( $app->id );
+
+			if ( is_wp_error( $response ) ) {
+				throw new \Exception( 'Error enabling SSL: ' . $response->get_error_message() );
+			}
+
+			debug( '%s: Setting home and siteurl options to account for SSL', $domain );
+			set_home_and_site_url( $domain );
 		}
 	}, 10, 3 );
-	add_filter( 'jurassic_ninja_rest_feature_defaults', function( $defaults ) {
-		return array_merge( $defaults, [
+
+	add_filter( 'jurassic_ninja_rest_feature_defaults', function( $rest_default_features ) use ( $defaults ) {
+		return array_merge( $defaults, $rest_default_features, [
 			'ssl' => (bool) settings( 'ssl_use_custom_certificate', false ),
 		] );
 	} );
+
+	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) {
+		return array_merge( $features, [
+			'ssl' => $features['ssl'] && ( isset( $json_params['ssl'] ) ? $json_params['ssl'] : true ),
+		] );
+	}, 10, 2 );
 
 	add_filter( 'jurassic_ninja_created_site_url', function( $domain, $features ) {
 		// See note in launch_wordpress() about why we can't launch subdomain_multisite with ssl.

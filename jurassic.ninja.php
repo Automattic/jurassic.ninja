@@ -3,7 +3,7 @@
 /*
  * Plugin Name: Jurassic Ninja
  * Description: Launch ephemeral instances of WordPress + Jetpack using ServerPilot and an Ubuntu Box.
- * Version: 4.19.3
+ * Version: 5.0
  * Author: Automattic
  **/
 
@@ -31,6 +31,10 @@ function init() {
 	require_once __DIR__ . '/lib/db-stuff.php';
 	require_once __DIR__ . '/lib/settings-stuff.php';
 	require_once __DIR__ . '/lib/stuff.php';
+
+	if ( is_cli_running() ) {
+		require_once __DIR__ . '/lib/cli-stuff.php';
+	}
 
 	/**
 	 * Done before adding settings page or anything else related to Jurassic Ninja Admin specifics.
@@ -65,6 +69,10 @@ function init() {
 	do_action( 'jurassic_ninja_init' );
 	// Yeah create two tables for tracking the launched sites.
 	create_tables( __FILE__ );
+}
+
+function is_cli_running() {
+	return defined( 'WP_CLI' ) && WP_CLI;
 }
 
 /**

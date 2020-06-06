@@ -13,48 +13,253 @@ if ( ! defined( '\\ABSPATH' ) ) {
 	exit;
 }
 
-$serverpilot_instance = null;
+class ServerPilotProvisioner {
+	private $serverpilot_instance = null;
 
-add_action( 'jurassic_ninja_init', function() {
-	add_action( 'jurassic_ninja_create_app', function( &$app, $user, $php_version, $domain, $wordpress_options, $features ) {
+	/**
+	 * Returns a ServerPilot instance
+	 * @return [type] [description]
+	 */
+	public function __construct() {
+		if ( ! $this->serverpilot_instance ) {
+			try {
+				$this->serverpilot_instance = new \ServerPilot( settings( 'serverpilot' ) );
+			} catch ( \ServerPilotException $e ) {
+				push_error( new \WP_error( $e->getCode(), $e->getMessage() ) );
+			}
+		}
+	}
+
+	public function create_app( $user, $php_version, $domain, $features ) {
 		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
-		$domain_arg = ( isset( $features['subdomain_multisite'] ) && $features['subdomain_multisite'] ) ? array( $domain, '*.' . $domain ) : array( $domain );
+		// Doing this for all sites doesn't hurt.
+		$domain_arg = array( $domain, '*.' . $domain );
 		// Mitigate ungraceful PHP-FPM restart for shortlived sites by randomizing PHP version
 		// PHP does not support graceful "restart" so every php-pool gets closed
 		// each time ServerPilot needs to SIGUSR1 php for reloading configuration
-		$shortlife_php_versions_alternatives = [
-			'php7.3',
-			'php7.2',
-			'php7.0',
-			'php5.6',
-		];
+		$shortlife_php_versions_alternatives = array_keys( available_php_versions() );
 		if ( $features['shortlife'] && 'default' === $php_version ) {
-			$php_version = $shortlife_php_versions_alternatives[ array_rand( $shortlife_php_versions_alternatives ) ];
+			$php_version = sprintf( 'php%s', $shortlife_php_versions_alternatives[ array_rand( $shortlife_php_versions_alternatives ) ] );
 		}
 		if ( ! $features['shortlife'] && 'default' === $php_version ) {
-			$php_version = 'php7.3';
+			$php_version = sprintf( 'php%s', settings( 'default_php_version' ) );
 		}
 
 		debug( 'Launching %s on PHP version: %s', $domain, $php_version );
-		$app = create_sp_app( $user->data->name, $user->data->id, $php_version, $domain_arg, $wordpress_options );
-	}, 10, 6 );
-	add_action( 'jurassic_ninja_create_sysuser', function( &$return, $username, $password ) {
 		try {
-			$return = create_sp_sysuser( $username, $password );
-		} catch ( \Exception $e ) {
-			$return = new \WP_Error( $e->getCode(), $e->getMessage() );
+			$app = $this->serverpilot_instance->app_create( $user->name, $user->id, $php_version, $domain_arg, null );
+			$this->wait_for_serverpilot_action( $app->actionid );
+			return $app->data;
+		} catch ( \ServerPilotException $e ) {
+			return new \WP_Error( $e->getCode(), $e->getMessage() );
 		}
-	}, 10, 3 );
+	}
 
-	add_filter( 'jurassic_ninja_sysuser_list', function( $users ) {
-		$return = array_merge( $users, get_sp_sysuser_list() );
-		return $return;
-	} );
-	add_filter( 'jurassic_ninja_delete_site', function( &$return, $user ) {
-		$return = delete_sp_sysuser( $user->id );
-		return $return;
-	}, 10, 2 );
-} );
+	public function create_sysuser( $username, $password ) {
+		try {
+			$response = $this->serverpilot_instance->sysuser_create( settings( 'serverpilot_server_id' ), $username, $password );
+			$this->wait_for_serverpilot_action( $response->actionid );
+			return $response->data;
+		} catch ( \Exception $e ) {
+			return new \WP_Error( $e->getCode(), $e->getMessage() );
+		}
+	}
+
+	/**
+	 * Creates a mysql database using ServerPilot's API
+	 * @param  String $apid      The id of the app to attach this database.
+	 * @param  String $name      The name of the Database.
+	 * @param  String $username  The username that will be allowed to connect to this database
+	 * @param  String $password  The password for $username.
+	 * @return Object            An object with the new app data.
+	 */
+	public function create_database( $appid, $name, $username, $password ) {
+		try {
+			$response = $this->serverpilot_instance->database_create( $appid, $name, $username, $password );
+			$this->wait_for_serverpilot_action( $response->actionid );
+			return $response->data;
+		} catch ( \ServerPilotException $e ) {
+			return new \WP_Error( $e->getCode(), $e->getMessage() );
+		}
+	}
+
+
+
+
+	/**
+	 * Returns an array of system users as reported by ServerPilot's API
+	 * @return Array The PHP users that ServerPilot knows about.
+	 */
+	public function get_sysuser_list() {
+		try {
+			return $this->serverpilot_instance->sysuser_list()->data;
+		} catch ( \ServerPilotException $e ) {
+			return new \WP_Error( $e->getCode(), $e->getMessage() );
+		}
+	}
+
+	public function sysuser_list() {
+		$system_users = [];
+		try {
+			$system_users = $this->serverpilot_instance->sysuser_list()->data;
+		} catch ( \ServerPilotException $e ) {
+			$system_users = new \WP_Error( $e->getCode(), $e->getMessage() );
+		}
+		/**
+		 * Filters the array of users listed by ServerPilot
+		 *
+		 * @param array $users The users returend by serverpilot
+		 */
+		$system_users = apply_filters( 'jurassic_ninja_sysuser_list', $system_users );
+		if ( is_wp_error( $system_users ) ) {
+			debug( 'There was an error fetching users list for purging: (%s) - %s',
+				$system_users->get_error_code(),
+				$system_users->get_error_message()
+			);
+			return $system_users;
+		}
+		return $system_users;
+	}
+
+	public function delete_site( $userid ) {
+		try {
+			// For ServerPilot we can just delete the sysuser and it will clean
+			// also its databases and sites
+			return $this->serverpilot_instance->sysuser_delete( $userid );
+		} catch ( \ServerPilotException $e ) {
+			return new \WP_Error( $e->getCode(), $e->getMessage() );
+		}
+	}
+
+
+	/**
+	 * Tries to enable auto SSL on a ServerPilot app
+	 * This is currently not working so well due to the amount
+	 * of instances created by ServerPilot and the throttling mechanism
+	 * enforced by Let's Encrypt.
+	 *
+	 * @param  string $appid The ServerPilot id for the app
+	 * @return [type]         [description]
+	 */
+	public function enable_auto_ssl( $appid ) {
+		try {
+			$response = $this->serverpilot_instance->ssl_auto( $appid );
+			$this->wait_for_serverpilot_action( $response->actionid );
+			return $response;
+		} catch ( \ServerPilotException $e ) {
+			return new \WP_Error( $e->getCode(), $e->getMessage() );
+		}
+	}
+
+	/**
+	 * Enable  SSL on a ServerPilot app according to the configured certificate
+	 * in Jurassic Ninja settings.
+	 *
+	 * @param  string $app_id The ServerPilot id for the app
+	 * @return [type]         [description]
+	 */
+	public function enable_ssl( $appid ) {
+		$response = $this->add_ssl_certificate( $appid );
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+		$response = $this->force_ssl_redirection( $appid );
+		return $response;
+	}
+
+	public function add_ssl_certificate( $appid ) {
+		$private_key = settings( 'ssl_private_key' );
+		$certificate = settings( 'ssl_certificate' );
+		$ca_certificates = settings( 'ssl_ca_certificates', null );
+		try {
+			if ( ! $private_key || ! $certificate ) {
+				return new \WP_Error( 'ssl_settings_not_present', __( 'Certificate or Private key are not configured', 'jurassic-ninja' ) );
+			}
+
+			if ( ! $ca_certificates ) {
+				debug( 'No CA certificates configured in settings. This may take a little bit longer to launch' );
+			}
+			// Add certificate
+			debug( 'Adding SSL certificate for app %s', $appid );
+			$response = $this->serverpilot_instance->ssl_add( $appid, $private_key, $certificate, $ca_certificates );
+			/**
+			 * NOTE: Here it would make sense to wait for this action to finish.
+			 * IRL: It talkes tooooo long before the action is in a success state AND
+			 * without the wait, the SSL provisioning still works fine.
+			 * Tested a few sites and nothing broke.
+			 * Leaving it commented in case something breaks eventually.
+			 */
+			// $this->wait_for_serverpilot_action( $data->actionid );
+			return $response;
+		} catch ( \ServerPilotException $e ) {
+			return new \WP_Error( $e->getCode(), $e->getMessage() );
+		}
+	}
+
+	public function force_ssl_redirection( $appid ) {
+		try {
+			debug( 'Enabling forced SSL redirection for app %s', $appid );
+			$response = $this->serverpilot_instance->ssl_force( $appid, true );
+			return $response;
+		} catch ( \ServerPilotException $e ) {
+			return new \WP_Error( $e->getCode(), $e->getMessage() );
+		}
+		// $this->wait_for_serverpilot_action( $response->actionid );
+	}
+
+	public function get_app( $appid ) {
+		try {
+				return $this->serverpilot_instance->app_info( $appid )->data;
+		} catch ( \ServerPilotException $e ) {
+				return new \WP_Error( $e->getCode(), $e->getMessage() );
+		}
+	}
+
+	/**
+	 * Returns an array of apps as reported by ServerPilot's API
+	 * @return Array The PHP apps that ServerPilot knows about.
+	 */
+	public function get_app_list() {
+		try {
+			return $this->serverpilot_instance->app_list()->data;
+		} catch ( \ServerPilotException $e ) {
+			return new \WP_Error( $e->getCode(), $e->getMessage() );
+		}
+	}
+
+	public function update_app( $appid, $php_version = null, $domains = null ) {
+		try {
+			$response = $this->serverpilot_instance->app_update( $appid, $php_version, $domains );
+			$this->wait_for_serverpilot_action( $response->actionid );
+			return $response->data;
+		} catch ( \ServerPilotException $e ) {
+			return new \WP_Error( $e->getCode(), $e->getMessage() );
+		}
+	}
+
+	public function update_sysuser( $sysuserid, $password ) {
+		try {
+			return $this->serverpilot_instance->sysuser_update( $sysuserid, $password );
+		} catch ( \ServerPilotException $e ) {
+			return new \WP_Error( $e->getCode(), $e->getMessage() );
+		}
+	}
+
+
+
+	/**
+	 * Locks the process by looping until ServerPilots says the action is completed
+	 * @param  string $action_id The ServerPilot Id for an action
+	 * @return string            The status of the action
+	 */
+	public function wait_for_serverpilot_action( $action_id ) {
+		do {
+			sleep( 1 );
+			$status = $this->serverpilot_instance->action_info( $action_id );
+		} while ( 'open' === $status->data->status );
+		return $status;
+	}
+}
 
 add_action( 'jurassic_ninja_admin_init', function() {
 	add_filter( 'jurassic_ninja_settings_options_page', function( $options_page ) {
@@ -84,173 +289,3 @@ add_action( 'jurassic_ninja_admin_init', function() {
 	}, 5 );
 } );
 
-/**
- * Returns a ServerPilot instance
- * @return [type] [description]
- */
-function sp() {
-	global $serverpilot_instance;
-	if ( ! $serverpilot_instance ) {
-		try {
-			$serverpilot_instance = new \ServerPilot( settings( 'serverpilot' ) );
-		} catch ( \ServerPilotException $e ) {
-			push_error( new \WP_error( $e->getCode(), $e->getMessage() ) );
-		}
-	}
-	return $serverpilot_instance;
-}
-
-/**
- * Creates a PHP app using ServerPilot's API
- * @param  String $name          The nickname of the App
- * @param  String $sysuserid     The System User that will "own" this App
- * @param  String $php_version   The PHP version for an App. Choose among php5.4, php5.5, php5.6, php7.0, php 7.2, or php 7.3
- * @param  Array  $domains       An array of domains that will be used in the webserver's configuration
- * @param  Array  $wordpress     An array containing the following keys: site_title , admin_user , admin_password , and admin_email
- * @return Object                An object with the new app data.
- */
-function create_sp_app( $name, $sysuserid, $php_version, $domains, $wordpress ) {
-	try {
-		$app = sp()->app_create( $name, $sysuserid, $php_version, $domains, $wordpress );
-		wait_for_serverpilot_action( $app->actionid );
-		return $app;
-	} catch ( \ServerPilotException $e ) {
-		return new \WP_Error( $e->getCode(), $e->getMessage() );
-	}
-}
-
-/**
- * Creates a system user using ServerPilot's API
- * @param  String $username The username
- * @param  String $password The password
- * @return Object           An object with the new user data.
- */
-function create_sp_sysuser( $username, $password ) {
-	try {
-		$user = sp()->sysuser_create( settings( 'serverpilot_server_id' ), $username, $password );
-		wait_for_serverpilot_action( $user->actionid );
-		return $user;
-	} catch ( \ServerPilotException $e ) {
-		return new \WP_Error( $e->getCode(), $e->getMessage() );
-	}
-}
-
-/**
- * Deletes a system user on the managed ServerPilot.
- * This deletes also all of the databases and WordPress instances of the user
- * @param  String $id The ServerPilot identifier for this user
- * @return [type]     [description]
- */
-function delete_sp_sysuser( $id ) {
-	try {
-		return sp()->sysuser_delete( $id );
-	} catch ( \ServerPilotException $e ) {
-		return new \WP_Error( $e->getCode(), $e->getMessage() );
-	}
-}
-
-/**
- * Tries to enable auto SSL on a ServerPilot app
- * This is currently not working so well due to the amount
- * of instances created by ServerPilot and the throttling mechanism
- * enforced by Let's Encrypt.
- *
- * @param  string $app_id The ServerPilot id for the app
- * @return [type]         [description]
- */
-function enable_sp_auto_ssl( $app_id ) {
-	try {
-		$data = sp()->ssl_auto( $app_id );
-		wait_for_serverpilot_action( $data->actionid );
-		return $data;
-	} catch ( \ServerPilotException $e ) {
-		return new \WP_Error( $e->getCode(), $e->getMessage() );
-	}
-}
-
-/**
- * Enable  SSL on a ServerPilot app according to the configured certificate
- * in Jurassic Ninja settings.
- *
- * @param  string $app_id The ServerPilot id for the app
- * @return [type]         [description]
- */
-function enable_sp_ssl( $app_id ) {
-	$private_key = settings( 'ssl_private_key' );
-	$certificate = settings( 'ssl_certificate' );
-	$ca_certificates = settings( 'ssl_ca_certificates', null );
-
-	if ( ! $private_key || ! $certificate ) {
-		return new \WP_Error( 'ssl_settings_not_present', __( 'Certificate or Private key are not configured', 'jurassic-ninja' ) );
-	}
-
-	if ( ! $ca_certificates ) {
-		debug( 'No CA certificates configured in settings. This may take a little bit longer to launch' );
-	}
-
-	try {
-		// Add certificate
-		$data = sp()->ssl_add( $app_id, $private_key, $certificate, $ca_certificates );
-		/**
-		 * NOTE: Here it would make sense to wait for this action to finish.
-		 * IRL: It talkes tooooo long before the action is in a success state AND
-		 * without the wait, the SSL provisioning still works fine.
-		 * Tested a few sites and nothing broke.
-		 * Leaving it commented in case something breaks eventually.
-		 */
-		// wait_for_serverpilot_action( $data->actionid );
-
-		// Enable redirection from https to http
-		$data = sp()->ssl_force( $app_id, true );
-		wait_for_serverpilot_action( $data->actionid );
-		return $data;
-	} catch ( \ServerPilotException $e ) {
-		return new \WP_Error( $e->getCode(), $e->getMessage() );
-	}
-}
-
-/**
- * Returns an array of apps as reported by ServerPilot's API
- * @return Array The PHP apps that ServerPilot knows about.
- */
-function get_sp_app_list() {
-	try {
-		return sp()->app_list()->data;
-	} catch ( \ServerPilotException $e ) {
-		return new \WP_Error( $e->getCode(), $e->getMessage() );
-	}
-}
-
-/**
- * Returns an array of system users as reported by ServerPilot's API
- * @return Array The PHP users that ServerPilot knows about.
- */
-function get_sp_sysuser_list() {
-	try {
-		return sp()->sysuser_list()->data;
-	} catch ( \ServerPilotException $e ) {
-		return new \WP_Error( $e->getCode(), $e->getMessage() );
-	}
-}
-
-function update_sp_sysuser( $sysuserid, $password ) {
-	try {
-		return sp()->sysuser_update( $sysuserid, $password );
-	} catch ( \ServerPilotException $e ) {
-		return new \WP_Error( $e->getCode(), $e->getMessage() );
-	}
-}
-
-/**
- * Locks the process by looping until ServerPilots says the action is completed
- * @param  string $action_id The ServerPilot Id for an action
- * @return string            The status of the action
- */
-function wait_for_serverpilot_action( $action_id ) {
-	$sp = sp();
-	do {
-		sleep( 1 );
-		$status = $sp->action_info( $action_id );
-	} while ( 'open' === $status->data->status );
-	return $status;
-}

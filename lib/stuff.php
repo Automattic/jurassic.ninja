@@ -20,7 +20,15 @@ if ( ! class_exists( 'CustomNameGenerator' ) ) {
 function debug() {
 	if ( defined( 'WP_DEBUG' ) && WP_DEBUG && settings( 'log_debug_messages', false ) ) {
 		// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_error_log
-		error_log( call_user_func_array( 'sprintf', func_get_args() ) );
+		$args = array_map(
+			function ( $item ) {
+				if ( gettype( $item ) === 'array' || gettype( $item ) === 'object' ) {
+					return print_r( $item, true );
+				}
+				return $item;
+			}
+		, func_get_args() );
+		error_log( call_user_func_array( 'sprintf', $args ) );
 		// phpcs:enable
 	}
 }
@@ -127,10 +135,12 @@ function require_feature_files() {
  *         boolean wp-log-viewer         Should we add WP Log Viewer plugin to the site?
  * @return Array|Null                    null or the app data as returned by ServerPilot's API on creation.
  */
-function launch_wordpress( $php_version = 'default', $requested_features = [] ) {
+function launch_wordpress( $php_version = 'default', $requested_features = [], $spare = false ) {
 	$default_features = [
 		'shortlife' => false,
 	];
+	$start_time = microtime( true );
+
 	$features = array_merge( $default_features, $requested_features );
 	/**
 	 * Fired before launching a site, and as soon as we merge feature defaults and requested features
@@ -145,153 +155,84 @@ function launch_wordpress( $php_version = 'default', $requested_features = [] ) 
 	do_action( 'jurassic_ninja_do_feature_conditions', $features );
 
 	try {
-		// phpcs:disable WordPress.WP.DeprecatedFunctions.generate_random_passwordFound
-		$password = generate_random_password();
-		// phpcs:enable
-		$subdomain = '';
-		$collision_attempts = 10;
-		do {
-			$subdomain = generate_random_subdomain();
-			// Add moar randomness to shortlived sites
-			if ( $features['shortlife'] ) {
-				$subdomain = sprintf( '%s-%s', $subdomain, rand( 2, 500 ) );
-			}
-		} while ( subdomain_is_used( $subdomain ) && $collision_attempts-- > 0 );
-			// title-case the subdomain
-			// or default to the classic My WordPress Site
-		$site_title = settings( 'use_subdomain_based_wordpress_title', false ) ?
-			ucwords( str_replace( '-', ' ', $subdomain ) ) :
-			'My WordPress Site';
-		/**
-		 * Filters the WordPress options for setting up the site
-		 *
-		 * @since 3.0
-		 *
-		 * @param array $wordpress_options {
-		 *           An array of properties used for setting up the WordPress site for the first time.
-		 *           @type string site_title               The title of the site we're creating.
-		 *           @type string admin_user               The username for the admin account.
-		 *           @type string admin_password           The password or the admin account.
-		 *           @type string admin_email              The email address for the admin account.
-		 * }
-		 */
-		$wordpress_options = apply_filters( 'jurassic_ninja_wordpress_options', array(
-			'site_title' => $site_title,
-			'admin_user' => 'demo',
-			'admin_password' => $password,
-			'admin_email' => settings( 'default_admin_email_address' ),
-		) );
-		$domain = sprintf( '%s.%s', $subdomain, settings( 'domain' ) );
-
-		debug( 'Launching %s with features: %s', $domain, implode( ', ', array_keys( array_filter( $features ) ) ) );
-
-		debug( 'Creating sysuser for %s', $domain );
-
-		$user = generate_new_user( $password );
-
-		debug( 'Creating app for %s under sysuser %s', $domain, $user->data->name );
-
 		$app = null;
-		// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
-		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
-		/**
-		 * Fired for the purpose of launching a site.
-		 *
-		 * Allows to be hooked so to implement a real site launcher function
-		 *
-		 * @since 3.0
-		 *
-		 * @param array $args {
-		 *     All we need to describe a php app with WordPress
-		 *
-		 *     @type object $app                 Passed by reference. This object should contain the resulting data after creating a PHP app.
-		 *     @type object $user                An object that is the result of creating a new system user under which the app will run.
-		 *     @type string $php_version         The PHP version we're going to use.
-		 *     @type string $domain              The domain under which this app will be running.
-		 *     @type array  $wordpress_options {
-		 *           An array of properties used for setting up the WordPress site for the first time.
-		 *           @type string site_title               The title of the site we're creating.
-		 *           @type string admin_user               The username for the admin account.
-		 *           @type string admin_password           The password or the admin account.
-		 *           @type string admin_email              The email address for the admin account.
-		 *     }
-		 *     $type array $features             The list of features we're going to add to the WordPress installation.
-		 * }
-		 *
-		 */
-		do_action_ref_array( 'jurassic_ninja_create_app', [ &$app, $user, $php_version, $domain, $wordpress_options, $features ] );
-		// phpcs:enable
+		if ( $spare ) {
+			debug( 'Launching spare site' );
+			$app = create_php_app( 'php7.0', $features, true );
+		} else {
+			debug( 'Launching site with features: %s', implode( ', ', array_keys( array_filter( $features ) ) ) );
+			if ( settings( 'use_spare_sites', false ) ) {
+				$app = get_spare_site( $php_version );
+			}
+			if ( ! $app  && settings( 'launch_site_if_no_spare_available', true )  ) {
+				$app = create_php_app( $php_version, $features, true );
+			} else if ( ! $app ) {
+				throw new \Exception( "Couldn't get a spare site" );
+			}
+		//}
+		// $app = $spare ? false : get_spare_site( $php_version );
+		// if ( $app ) {
+		// } else {
+		// 	$app = create_php_app( $php_version, $features, $spare );
+		// 	debug( 'Launching %s with features: %s', $app->domain, implode( ', ', array_keys( array_filter( $features ) ) ) );
+		// }
 
-		if ( is_wp_error( $app ) ) {
-			throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
+		//if ( ! $spare ) {
+			$site_title = settings( 'use_subdomain_based_wordpress_title', false ) ?
+			ucwords( str_replace( '-', ' ', $app->subdomain ) ) :
+			'My WordPress Site';
+			/**
+			 * Filters the WordPress options for setting up the site
+			 *
+			 * @since 3.0
+			 *
+			 * @param array $wordpress_options {
+			 *           An array of properties used for setting up the WordPress site for the first time.
+			 *           @type string site_title               The title of the site we're creating.
+			 *           @type string admin_user               The username for the admin account.
+			 *           @type string admin_password           The password or the admin account.
+			 *           @type string admin_email              The email address for the admin account.
+			 * }
+			 */
+			$wordpress_options = apply_filters( 'jurassic_ninja_wordpress_options', array(
+				'site_title' => $site_title,
+				'admin_user' => 'demo',
+				'admin_password' => $app->password,
+				'admin_email' => settings( 'default_admin_email_address' ),
+			) );
+			install_wordpress_with_cli( $app->domain, $wordpress_options, $app->dbname, $app->dbusername, $app->dbpassword );
+
+			log_new_site( $app, $app->password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
+
+			add_features_before_auto_login( $app, $features, $app->domain );
+
+			debug( '%s: Adding .htaccess file', $app->domain );
+			add_htaccess();
+
+			// 2020-01-17
+			// For some reason, automated scripts are being able to find out about a new Jurassic Ninja site before
+			// the person that launched it reaches the site, thus the site is locked for them.
+			debug( '%s: Stopping pings to Ping-O-Mattic', $app->domain );
+			stop_pingomatic();
+
+			debug( '%s: Adding Companion Plugin for Auto Login', $app->domain );
+			add_auto_login( $app->password, $app->username );
+
+			add_features_after_auto_login( $app, $features, $app->domain );
+
+			debug( '%s: Adding features', $app->domain );
+
+			// Run command via SSH
+			// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
+			run_commands_for_features( $app->username, $app->password, $app->domain );
+			$diff = round( microtime( true ) - $start_time );
+			debug( "Finished launching %s. Took %02d:%02d.\n", $app->domain, floor( $diff / 60 ), $diff % 60 );
 		}
-		log_new_site( $app->data, $features['shortlife'] );
-
-		// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
-		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
-		/**
-		 * Allows the enqueueing of commands for features with each launched site.
-		 *
-		 * This fires before adding the auto login features
-		 *
-		 * @since 3.0
-		 *
-		 * @param array $args {
-		 *     All we need to describe a php app with WordPress
-		 *
-		 *     @type object $app                 Passed by reference. This object contains the resulting data after creating a PHP app.
-		 *     $type array $features             The list of features we're going to add to the WordPress installation.
-		 *     @type string $domain              The domain under which this app will be running.
-		 * }
-		 *
-		 */
-		do_action_ref_array( 'jurassic_ninja_add_features_before_auto_login', [ &$app, $features, $domain ] );
-		// phpcs:enable
-
-		debug( '%s: Adding .htaccess file', $domain );
-		add_htaccess();
-		// 2020-01-17
-		// For some reason, automated scripts are being able to find out about a new Jurassic Ninja site before
-		// the person that launched it reaches the site, thus the site is locked for them.
-		debug( '%s: Stopping pings to Ping-O-Mattic', $domain );
-		stop_pingomatic();
-
-		debug( '%s: Adding Companion Plugin for Auto Login', $domain );
-		add_auto_login( $password, $user->data->name );
-
-		// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
-		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
-		/**
-		 * Allows the enqueueing of commands for features with each launched site.
-		 *
-		 * This fires after adding the auto login features
-		 *
-		 * @since 3.0
-		 *
-		 * @param array $args {
-		 *     All we need to describe a php app with WordPress
-		 *
-		 *     @type object $app                 Passed by reference. This object contains the resulting data after creating a PHP app.
-		 *     $type array $features             The list of features we're going to add to the WordPress installation.
-		 *     @type string $domain              The domain under which this app will be running.
-		 * }
-		 *
-		 */
-		do_action_ref_array( 'jurassic_ninja_add_features_after_auto_login', [ &$app, $features, $domain ] );
-		// phpcs:enable
-
-		// Runs the command via SSH
-		// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
-		debug( '%s: Adding features', $domain );
-		run_commands_for_features( $user->data->name, $password, $domain );
-
-		debug( 'Finished launching %s', $domain );
-		return $app->data;
+		return $app;
 	} catch ( \Exception $e ) {
-		debug( '%s: Error [%s]: %s', $domain, $e->getCode(), $e->getMessage() );
+		debug( '%s: Error [%s]: %s', isset( $app->domain ) ? $app->domain : 'NO DOMAIN', $e->getCode(), $e->getMessage() );
 		return null;
 	}
-
 }
 
 /**
@@ -353,6 +294,34 @@ function figure_out_main_domain( $domains ) {
 }
 
 /**
+ * Downloads WordPress, creates a wp-config.php file and installs WordPress admin user.
+ *
+ * @param  [type] $domain            The domain name that will be configured for the site.
+ * @param  [type] $wordpress_options WordPress options for the admin user and site. Resembling ServerPilot's parameter for creating an app
+ * @param  [type] $dbname            The database name this WordPress will connect to.
+ * @param  [type] $dbusername        The database username this WordPress will use.
+ * @param  [type] $dbpassword        The database password this WordPress will use.
+ */
+function install_wordpress_with_cli( $domain, $wordpress_options, $dbname, $dbusername, $dbpassword ) {
+	$cmd = sprintf(
+		'wp core download'
+		. ' && wp config create --dbname="%s" --dbuser="%s" --dbpass="%s"'
+		. ' && wp core install --url="%s" --title="%s" --admin_user="%s" --admin_password="%s" --admin_email="%s"',
+		$dbname,
+		$dbusername,
+		$dbpassword,
+		$domain,
+		$wordpress_options['site_title'],
+		$wordpress_options['admin_user'],
+		$wordpress_options['admin_password'],
+		$wordpress_options['admin_email']
+	);
+	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
+		return "$s && $cmd";
+	} );
+}
+
+/**
  * Generates a new username with a pseudo random name on the managed server.
  * @param  string $password The password to be assigned for the user
  * @return [type]           [description]
@@ -360,30 +329,29 @@ function figure_out_main_domain( $domains ) {
 function generate_new_user( $password ) {
 	$username = generate_random_username();
 	$return = null;
-	// Here PHP Codesniffer parses &$return as if it were a deprecated pass-by-reference but it is not
-	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
-	/**
-	 * Fired for hooking and actually creating a system user
-	 *
-	 * This fires before launching a site
-	 *
-	 * @since 3.0
-	 *
-	 * @param array $args {
-	 *     All we need to describe a system user
-	 *
-	 *     @type object $return              Passed by reference. This object should container the resulting data after creating a system user.
-	 *     @type string $username            The username.
-	 *     @type string $password            The password for the user.
-	 * }
-	 *
-	 */
-	do_action_ref_array( 'jurassic_ninja_create_sysuser', [ &$return, $username, $password ] );
-	// phpcs:enable
+	$return = provisioner()->create_sysuser( $username, $password );
+
 	if ( is_wp_error( $return ) ) {
 		throw new \Exception( 'Error creating sysuser: ' . $return->get_error_message() );
 	}
 	return $return;
+}
+
+/**
+ * Returns a ServerPilot instance
+ * @return [type] [description]
+ */
+function provisioner() {
+	static $jurassic_ninja_provisioner;
+	if ( ! $jurassic_ninja_provisioner ) {
+		try {
+			$provisioner_class = apply_filters( 'jurassic_ninja_provisioner_class', '\jn\ServerPilotProvisioner' );
+			$jurassic_ninja_provisioner = new $provisioner_class();
+		} catch ( \ServerPilotException $e ) {
+			push_error( new \WP_error( $e->getCode(), $e->getMessage() ) );
+		}
+	}
+	return $jurassic_ninja_provisioner;
 }
 
 /**
@@ -404,11 +372,18 @@ function generate_random_password() {
  *
  * @return string A slugified subdomain.
  */
-function generate_random_subdomain() {
+function generate_random_subdomain( $features ) {
 	$generator = new CustomNameGenerator();
-	$name = $generator->getName( settings( 'use_alliterations_for_subdomain', true ) );
-
-	$slug = create_slug( $name );
+	$slug = '-';
+	$collision_attempts = 10;
+	do {
+		$name = $generator->getName( settings( 'use_alliterations_for_subdomain', true ) );
+		$slug = create_slug( $name );
+		// Add moar randomness to shortlived sites
+		if ( $features['shortlife'] ) {
+			$slug = sprintf( '%s-%s', $slug, rand( 2, 500 ) );
+		}
+	} while ( subdomain_is_used( $slug ) && $collision_attempts-- > 0 );
 	return $slug;
 }
 
@@ -433,18 +408,174 @@ function l( $stuff ) {
 	// phpcs:enable
 }
 
+function add_features_before_auto_login( &$app, $features, $domain ) {
+	// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
+	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
+	/**
+	 * Allows the enqueueing of commands for features with each launched site.
+	 *
+	 * This fires before adding the auto login features
+	 *
+	 * @since 3.0
+	 *
+	 * @param array $args {
+	 *     All we need to describe a php app with WordPress
+	 *
+	 *     @type object $app                 Passed by reference. This object contains the resulting data after creating a PHP app.
+	 *     $type array $features             The list of features we're going to add to the WordPress installation.
+	 *     @type string $domain              The domain under which this app will be running.
+	 * }
+	 *
+	 */
+	do_action_ref_array( 'jurassic_ninja_add_features_before_auto_login', [ &$app, $features, $domain ] );
+	// phpcs:enable
+}
+
+function add_features_after_auto_login( &$app, $features, $domain ) {
+	// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
+	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
+	/**
+	 * Allows the enqueueing of commands for features with each launched site.
+	 *
+	 * This fires after adding the auto login features
+	 *
+	 * @since 3.0
+	 *
+	 * @param array $args {
+	 *     All we need to describe a php app with WordPress
+	 *
+	 *     @type object $app                 Passed by reference. This object contains the resulting data after creating a PHP app.
+	 *     $type array $features             The list of features we're going to add to the WordPress installation.
+	 *     @type string $domain              The domain under which this app will be running.
+	 * }
+	 *
+	 */
+	do_action_ref_array( 'jurassic_ninja_add_features_after_auto_login', [ &$app, $features, $domain ] );
+	// phpcs:enable
+}
+
+function get_spare_site( $php_version ) {
+	// phpcs:disable WordPress.WP.DeprecatedFunctions.generate_random_passwordFound
+	$lock = generate_random_password();
+	// phpcs:enable
+	$unused = db()->query( sprintf( "update spare_sites set locked_by='%s' where locked_by = '' limit 1", $lock ) );
+	$unused = db()->get_results( sprintf( "select * from spare_sites where locked_by = '%s' limit 1", $lock ), \ARRAY_A );
+	$unused = count( $unused ) ? $unused[0] : false;
+	if ( ! $unused ) {
+		debug( "Couldn't find an unused site" );
+		return false;
+	}
+	$app = provisioner()->get_app( $unused['app_id'] );
+	if ( is_wp_error( $app ) ) {
+		debug( 'Problem fetching app info for app with id %s: %s', $unused['app_id'], $app->get_error_message() );
+		if ( 404 === $app->get_error_code() ) {
+			debug( 'Deleting rogue spare site with app id %s', $unused['app_id'] );
+			db()->delete( 'spare_sites', array( 'id' => $unused['id'] ) );
+		}
+		return false;
+	}
+	$app->username = $unused['username'];
+	$app->domain = $unused['domain'];
+	$app->subdomain = explode( '.', $unused['domain'] )[0];
+	$app->password = $unused['password'];
+	$app->dbname = $app->name . '-wp-blah';
+	$app->dbusername = $app->name;
+	$app->dbpassword = $unused['password'];
+	db()->delete( 'spare_sites', array( 'id' => $unused['id'] ) );
+
+	provisioner()->update_app( $unused['id'], $php_version, null );
+	return $app;
+}
+
+function create_php_app( $php_version, $features, $spare = false ) {
+	$start_time = microtime( true );
+	$subdomain = '';
+	// phpcs:disable WordPress.WP.DeprecatedFunctions.generate_random_passwordFound
+	$password = generate_random_password();
+	// phpcs:enable
+	$subdomain = generate_random_subdomain( $features );
+		// title-case the subdomain
+		// or default to the classic My WordPress Site
+	$domain = sprintf( '%s.%s', $subdomain, settings( 'domain' ) );
+
+	// if ( $spare ) {
+	// 	$domain = sprintf( '%s.spare', $user->name );
+	// }
+	debug( 'Creating sysuser for %s', $domain );
+
+	$user = generate_new_user( $password );
+
+	debug( 'Creating app for %s under sysuser %s', $domain, $user->name );
+	$app = provisioner()->create_app( $user, $php_version, $domain, $features );
+
+	// phpcs:enable
+	if ( is_wp_error( $app ) ) {
+		throw new \Exception( 'Error creating app: ' . $app->get_error_message() );
+	}
+	// Reuse these credentials for the database, for now...
+	$dbname = $app->name . '-wp-blah';
+	$dbusername = $app->name;
+	$dbpassword = $password;
+	$db = provisioner()->create_database( $app->id, $dbname, $dbusername, $dbpassword );
+
+	if ( is_wp_error( $db ) ) {
+		throw new \Exception( 'Error creating database for app: ' . $app->get_error_message() );
+	}
+	if ( $spare ) {
+		log_new_unused_site( $app, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
+	}
+	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
+	do_action_ref_array( 'jurassic_ninja_add_features_after_create_app', [ &$app, $features, $domain ] );
+	// phpcs:enable
+	$diff = round( microtime( true ) - $start_time );
+	debug( 'Finished creating PHP app %s. Took %02d:%02d.\n', $domain, floor( $diff / 60 ), $diff % 60 );
+		$app->username = $user->name;
+		$app->domain = $domain;
+		$app->subdomain = $subdomain;
+		$app->password = $password;
+		$app->dbname = $dbname;
+		$app->dbusername = $dbusername;
+		$app->dbpassword = $dbpassword;
+	return $app;
+}
+
 /**
  * Stores a record for a freshly created site
- * @param  Array $data Site data as returned by ServerPilot's API on creation
+ * @param  Array $app Site data as returned by ServerPilot's API on creation
  * @return [type]       [description]
  */
-function log_new_site( $data, $shortlived = false ) {
+function log_new_unused_site( $app, $password, $shortlived = false, $launched_by = null ) {
+	$launched_by = $launched_by ? $launched_by->user_login : '';
+	db()->insert( 'spare_sites',
+		[
+			'app_id' => $app->id,
+			'username' => $app->name,
+			'password' => $password,
+			'domain' => figure_out_main_domain( $app->domains ),
+			'created' => current_time( 'mysql', 1 ),
+		]
+	);
+	if ( db()->last_error ) {
+		l( db()->last_error );
+	};
+}
+
+/**
+ * Stores a record for a launched site
+ * @param  Array $app Site data as returned by ServerPilot's API on creation
+ * @return [type]       [description]
+ */
+function log_new_site( $app, $password, $shortlived = false, $launched_by = null ) {
+	$launched_by = $launched_by ? $launched_by->user_login : ( is_cli_running() ? 'cli' : '' );
+
 	db()->insert( 'sites',
 		[
-			'username' => $data->name,
-			'domain' => figure_out_main_domain( $data->domains ),
+			'username' => $app->name,
+			'password' => $password,
+			'domain' => figure_out_main_domain( $app->domains ),
 			'created' => current_time( 'mysql', 1 ),
 			'shortlived' => $shortlived,
+			'launched_by' => $launched_by,
 		]
 	);
 	if ( db()->last_error ) {
@@ -465,6 +596,7 @@ function log_purged_site( $data ) {
 		'last_logged_in' => $data['last_logged_in'],
 		'checked_in' => $data['checked_in'],
 		'shortlived' => $data['shortlived'],
+		'launched_by' => $data['launched_by'],
 	] );
 	db()->delete( 'sites', [
 		'username' => $data['username'],
@@ -473,6 +605,19 @@ function log_purged_site( $data ) {
 	if ( db()->last_error ) {
 		l( db()->last_error );
 	};
+}
+
+function maintain_spare_sites_pool() {
+	$count = db()->get_var( 'select COUNT(*) from spare_sites' );
+	$min_spare_sites = settings( 'min_spare_sites' );
+	debug( 'Checking spare sites pool' );
+	if (  (	$min_spare_sites - $count > 0 ) ) {
+		debug( 'Launching a spare site' );
+		launch_wordpress( 'php7.0', [], true );
+	} else {
+		debug( 'No need to launch more spare sites' );
+	}
+	return $count;
 }
 
 /**
@@ -514,19 +659,8 @@ function purge_sites() {
 	// Purge $max_sites at most so the purge task does not interfere
 	// with sites creation given that ServerPilot runs tasks in series.
 	$sites = array_slice( $sites, 0, $max_sites );
-	/**
-	 * Filters the array of users listed by ServerPilot
-	 *
-	 * @param array $users The users returend by serverpilot
-	 */
-	$system_users = apply_filters( 'jurassic_ninja_sysuser_list', [] );
-	if ( is_wp_error( $system_users ) ) {
-		debug( 'There was an error fetching users list for purging: (%s) - %s',
-			$system_users->get_error_code(),
-			$system_users->get_error_message()
-		);
-		return $system_users;
-	}
+	$system_users = provisioner()->sysuser_list();
+
 	$site_users = array_map(
 		function ( $site ) {
 			return $site['username'];
@@ -536,25 +670,12 @@ function purge_sites() {
 	$purge = array_filter( $system_users, function ( $user ) use ( $site_users ) {
 			return in_array( $user->name, $site_users, true );
 	} );
+	debug( 'Purging Jurassic Ninja sites' );
 	foreach ( $purge as $user ) {
 		$return = null;
-		// Here PHP Codesniffer parses &$return as if it were a deprecated pass-by-reference but it is not
-		// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
-		/**
-		 * Fired for hooking a function that actually deletes a site
-		 *
-		 * @since 3.0
-		 *
-		 * @param array $args {
-		 *     All we need to delete a site
-		 *
-		 *     @type object $return     Passed by reference. This object contains the resulting data after deleting a PHP app.
-		 *     @type object $user       An object that represents system user under which the app will run.
-		 * }
-		 *
-		 */
-		do_action_ref_array( 'jurassic_ninja_delete_site', [ &$return, $user ] );
-		// phpcs:enable
+
+		$return = provisioner()->delete_site( $user->id );
+
 		if ( is_wp_error( $return ) ) {
 			debug( 'There was an error purging site for user %s: (%s) - %s',
 				$user->id,
@@ -566,12 +687,14 @@ function purge_sites() {
 	foreach ( $sites as $site ) {
 		log_purged_site( $site );
 	}
-	return array_map(
+	$purged = array_map(
 		function ( $site ) {
 			return $site['domain'];
 		},
 		$sites
 	);
+	return $purged;
+
 }
 
 /**
@@ -667,5 +790,6 @@ function sites_to_be_purged() {
 function subdomain_is_used( $subdomain ) {
 	$domain = sprintf( '%s.%s', $subdomain, settings( 'domain' ) );
 	$results = db()->get_results( "select * from sites where domain='$domain' limit 1", \ARRAY_A );
-	return count( $results ) !== 0;
+	$results2 = db()->get_results( "select * from spare_sites where domain='$domain' limit 1", \ARRAY_A );
+	return count( $results ) !== 0 && count( $results2 ) !== 0;
 }

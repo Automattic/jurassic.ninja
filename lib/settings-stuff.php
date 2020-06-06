@@ -8,6 +8,16 @@ if ( ! defined( '\\ABSPATH' ) ) {
 
 define( 'SETTINGS_KEY', 'jurassic-ninja-settings' );
 
+function available_php_versions() {
+	return [
+		'7.4' => __( '7.4', 'jurassic-ninja' ),
+		'7.3' => __( '7.3', 'jurassic-ninja' ),
+		'7.2' => __( '7.2', 'jurassic-ninja' ),
+		'7.0' => __( '7.0', 'jurassic-ninja' ),
+		'5.6' => __( '5.6', 'jurassic-ninja' ),
+	];
+}
+
 /**
  * Access a plugin option
  * @param  String $key The particular option we want to access
@@ -66,7 +76,7 @@ function settings_problems() {
 	// 	&& settings( 'serverpilot_server_id' );
 	// if ( $serverpilot_settings_set ) {
 	// 	try {
-	// 		sp()->server_info( settings( 'serverpilot_server_id' ) );
+	// 		$provisioner->serverpilot_instance->server_info( settings( 'serverpilot_server_id' ) );
 	// 	} catch ( \ServerPilotException $e ) {
 	// 		$unconfigured[] = __( 'valid ServerPilot Id, Key and Server Id for a paid plan', 'jurassic-ninja' );
 	// 	}
@@ -138,6 +148,35 @@ function add_settings_page() {
 							'text' => __( 'Default interval for considering a site to be expired if the admin never visited wp-admin. Expressed in MySQL interval format.', 'jurassic-ninja' ),
 							'placeholder' => 'INTERVAL 2 HOUR',
 							'value' => 'INTERVAL 2 HOUR',
+						),
+						'default_php_version' => array(
+							'id' => 'default_php_version',
+							'title' => 'Default PHP version for launched sites',
+							'type' => 'select',
+							'value' => '7.4',
+							'choices' => available_php_versions(),
+							'text' => 'Sites will be launched with this PHP version by default',
+						),
+						'use_spare_sites' => array(
+							'id' => 'use_spare_sites',
+							'type' => 'checkbox',
+							'title' => 'Use a pool of spare sites to speed up launching',
+							'checked' => false,
+							'text' => 'Some sites will be pre-launched and only set up when a site is requested',
+						),
+						'launch_site_if_no_spare_available' => array(
+							'type' => 'checkbox',
+							'id' => 'launch_site_if_no_spare_available',
+							'title' => 'Launch sites if no spare available',
+							'checked' => true,
+								'text' => 'If unchecked it will fail if there are no spare sites available',
+						),
+						'min_spare_sites' => array(
+							'id' => 'min_spare_sites',
+							'title' => 'Minimum number of spare sites',
+							'value' => '10',
+							'placeholder' => '10',
+							'text' => 'This number of PHP environments will be launched beforehand to speed up site launching',
 						),
 						'use_subdomain_based_wordpress_title' => array(
 							'id' => 'use_subdomain_based_wordpress_title',
