@@ -34,6 +34,16 @@ function init() {
 
 function launchSite( $, features, resetSpinner = false ) {
 	$( function() {
+		let countdownBase = 17 + Math.floor( Math.random() * 10 );
+		let countdown = countdownBase;
+		const $seconds = $( '#countdown' );
+		const countdownInterval = setInterval( () => {
+			if ( --countdown <= 0) {
+				$seconds.text( `Well... that's taking a bit more than expected ${ countdownBase - countdown }s...` );
+				return;
+			}
+			$seconds.text( `${ countdown }s...` );
+		}, 1000);
 		startSpinner();
 
 		if ( resetSpinner ) {
@@ -47,12 +57,16 @@ function launchSite( $, features, resetSpinner = false ) {
 				$( '#progress' ).html( `<a href="${ response.data.url }">${ successMessage }</a>` );
 				stopSpinner();
 				favicon_update_colour( 'green' );
+				$seconds.text( `Took ${ countdownBase - countdown }s...` );
+				clearInterval( countdownInterval );
 			} )
 			.catch( err => {
 				var errorMessage = $( '#progress' ).data().errorMessage;
 				$( '#progress' ).text( `${ errorMessage } (${ err.message }).` );
 				stopSpinner( true );
 				favicon_update_colour( 'red' );
+				$seconds.hide();
+				clearInterval( countdownInterval );
 			} );
 	} );
 }
@@ -167,6 +181,9 @@ function jurassicNinjaApi() {
 		}
 		if ( response.status === 401 ) {
 			throw new Error( 'Launching sites is currently restricted to authenticated users' );
+		}
+		if ( response.status === 429 ) {
+			throw new Error( 'Jurassic Ninja is a bit overloaded right now. Try again in a few minutes' );
 		}
 		// 400 status are custom WP_Error when features are requested in a bad way
 		// so we still parse the json there.
