@@ -47,7 +47,7 @@ define( 'REGULAR_SITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubusercontent.co
 /**
  * Force the site to log the creator in on the first time they visit the site
  * Installs and activates the Jurassic Ninja companion plugin on the site.
- * @param string $password System password for ssh.
+	 * @param string $password System password for ssh.
  */
 function add_auto_login( $password, $sysuser ) {
 	$companion_api_base_url = rest_url( REST_API_NAMESPACE );
@@ -164,20 +164,12 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 			if ( settings( 'use_spare_sites', false ) ) {
 				$app = get_spare_site( $php_version );
 			}
-			if ( ! $app  && settings( 'launch_site_if_no_spare_available', true )  ) {
+			if ( ! $app && settings( 'launch_site_if_no_spare_available' ) ) {
 				$app = create_php_app( $php_version, $features, true );
-			} else if ( ! $app ) {
-				throw new \Exception( "Couldn't get a spare site" );
+			} elseif ( ! $app ) {
+				throw new \Exception( 'could_not_get_spare_site', 2 );
 			}
-		//}
-		// $app = $spare ? false : get_spare_site( $php_version );
-		// if ( $app ) {
-		// } else {
-		// 	$app = create_php_app( $php_version, $features, $spare );
-		// 	debug( 'Launching %s with features: %s', $app->domain, implode( ', ', array_keys( array_filter( $features ) ) ) );
-		// }
 
-		//if ( ! $spare ) {
 			$site_title = settings( 'use_subdomain_based_wordpress_title', false ) ?
 			ucwords( str_replace( '-', ' ', $app->subdomain ) ) :
 			'My WordPress Site';
@@ -231,7 +223,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 		return $app;
 	} catch ( \Exception $e ) {
 		debug( '%s: Error [%s]: %s', isset( $app->domain ) ? $app->domain : 'NO DOMAIN', $e->getCode(), $e->getMessage() );
-		return null;
+		return new \WP_Error( ( string ) $e->getCode(), $e->getMessage() );
 	}
 }
 

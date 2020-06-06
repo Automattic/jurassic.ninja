@@ -48,12 +48,19 @@ function add_rest_api_endpoints() {
 		}
 
 		$data = launch_wordpress( $features['php_version'], $features );
-		if ( null === $data ) {
+		if ( is_wp_error( $data ) ) {
+			$status = 500;
+			debug( $data );
+			debug( 'error_msg %s', $data->get_error_message() );
+			debug( $data->get_error_message() );
+			if ( 'could_not_get_spare_site' === $data->get_error_message() ) {
+				$status = 429;
+			}
 			return new \WP_Error(
 				'failed_to_launch_site',
 				esc_html__( 'There was an error launching the site.', 'jurassic-ninja' ),
 				[
-					'status' => 500,
+					'status' => $status,
 				]
 			);
 		}

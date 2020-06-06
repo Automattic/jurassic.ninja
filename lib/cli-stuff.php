@@ -14,17 +14,19 @@ class JN_CLI_Command extends \WP_CLI_Command {
 	* Launch a spare site.
 	*/
 	public function launch( $args ) {
-		if ( count( $args ) ) {
-			if ( $args[0] === 'spare' ) {
-				\WP_CLI::line( 'Launching a spare site' );
-			}
+		if ( count( $args ) && $args[0] === 'spare' ) {
+			\WP_CLI::line( 'Launching a spare site' );
+
 			$app = launch_wordpress( 'default', [], true );
-			\WP_CLI::line( sprintf( 'Launched spare site', figure_out_main_domain( $app->domains) ) );
+			if ( is_wp_error( $app ) ) {
+				throw new \Exception();
+			}
+			\WP_CLI::line( sprintf( 'Launched spare site %s', figure_out_main_domain( $app->domains) ) );
 			return;
 		}
 		try {
 			$app = launch_wordpress( 'default', [ 'ssl' => true ] );
-			if ( !$app ) {
+			if ( is_wp_error( $app ) ) {
 				throw new \Exception();
 			}
 			\WP_CLI::line( sprintf( 'Launched %s', figure_out_main_domain( $app->domains) ) );
