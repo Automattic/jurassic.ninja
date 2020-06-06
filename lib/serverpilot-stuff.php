@@ -125,7 +125,9 @@ class ServerPilotProvisioner {
 		try {
 			// For ServerPilot we can just delete the sysuser and it will clean
 			// also its databases and sites
-			return $this->serverpilot_instance->sysuser_delete( $userid );
+			$response = $this->serverpilot_instance->sysuser_delete( $userid );
+			$this->wait_for_serverpilot_action( $response->actionid );
+			return $response;
 		} catch ( \ServerPilotException $e ) {
 			return new \WP_Error( $e->getCode(), $e->getMessage() );
 		}
