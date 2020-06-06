@@ -229,6 +229,7 @@ class ServerPilotProvisioner {
 
 	public function update_app( $appid, $php_version = null, $domains = null ) {
 		try {
+			$php_version = 'default' === $php_version ? 'php' . array_keys( available_php_versions() )[0] : $php_version;
 			$response = $this->serverpilot_instance->app_update( $appid, $php_version, $domains );
 			$this->wait_for_serverpilot_action( $response->actionid );
 			return $response->data;

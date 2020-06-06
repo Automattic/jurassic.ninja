@@ -483,7 +483,7 @@ function get_spare_site( $php_version ) {
 	$app->dbpassword = $unused['password'];
 	db()->delete( 'spare_sites', array( 'id' => $unused['id'] ) );
 
-	provisioner()->update_app( $unused['id'], $php_version, null );
+	provisioner()->update_app( $app->id, $php_version, null );
 	return $app;
 }
 
