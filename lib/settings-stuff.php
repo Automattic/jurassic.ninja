@@ -164,6 +164,13 @@ function add_settings_page() {
 							'checked' => false,
 							'text' => 'Some sites will be pre-launched and only set up when a site is requested',
 						),
+						'launch_site_if_no_spare_available' => array(
+							'type' => 'checkbox',
+							'id' => 'launch_site_if_no_spare_available',
+							'title' => 'Launch sites if no spare available',
+							'checked' => true,
+								'text' => 'If unchecked it will fail if there are no spare sites available',
+						),
 						'min_spare_sites' => array(
 							'id' => 'min_spare_sites',
 							'title' => 'Minimum number of spare sites',

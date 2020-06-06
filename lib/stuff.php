@@ -164,8 +164,10 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 			if ( settings( 'use_spare_sites', false ) ) {
 				$app = get_spare_site( $php_version );
 			}
-			if ( ! $app ) {
+			if ( ! $app  && settings( 'launch_site_if_no_spare_available', true )  ) {
 				$app = create_php_app( $php_version, $features, true );
+			} else if ( ! $app ) {
+				throw new \Exception( "Couldn't get a spare site" );
 			}
 		//}
 		// $app = $spare ? false : get_spare_site( $php_version );
@@ -228,7 +230,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 		}
 		return $app;
 	} catch ( \Exception $e ) {
-		debug( '%s: Error [%s]: %s', $app->domain, $e->getCode(), $e->getMessage() );
+		debug( '%s: Error [%s]: %s', isset( $app->domain ) ? $app->domain : 'NO DOMAIN', $e->getCode(), $e->getMessage() );
 		return null;
 	}
 }

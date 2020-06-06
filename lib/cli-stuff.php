@@ -24,6 +24,9 @@ class JN_CLI_Command extends \WP_CLI_Command {
 		}
 		try {
 			$app = launch_wordpress( 'default', [ 'ssl' => true ] );
+			if ( !$app ) {
+				throw new \Exception();
+			}
 			\WP_CLI::line( sprintf( 'Launched %s', $app->domains[0] ) );
 
 		} catch ( \Exception $e ) {

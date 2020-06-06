@@ -289,4 +289,3 @@ add_action( 'jurassic_ninja_admin_init', function() {
 	}, 5 );
 } );
 
-
