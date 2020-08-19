@@ -88,7 +88,6 @@ coral
 cormorant
 corncrake
 cottonmouth
-cougar
 cow
 cowfish
 coyote
@@ -161,7 +160,6 @@ fox
 frigate
 frog
 frogmouth
-fruit
 fungus
 funnel
 fur
@@ -439,12 +437,10 @@ sawfish
 scallop
 scarab
 scarlet
-schneiders
 scorpion
 sea
 seahorse
 seal
-secretary
 serval
 shad
 shark
@@ -490,7 +486,6 @@ stork
 storm
 sturgeon
 sugar
-sumatran
 swamp
 swan
 swift
@@ -547,7 +542,6 @@ whale
 whimbrel
 whippet
 whitefish
-widow
 wildcat
 wildebeest
 wildfowl
