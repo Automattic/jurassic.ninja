@@ -127,7 +127,6 @@ dragon
 dragonfly
 dromedary
 duck
-duck-billed
 ducks
 dwarf
 dwelling
@@ -193,7 +192,7 @@ gibbon
 giraffe
 goat
 goats
-gold,
+gold
 goldfish
 goose
 gopher
@@ -346,7 +345,6 @@ mosquito
 moth
 mountain
 mouse
-mouse-eared
 mud
 mule
 musk
@@ -439,7 +437,6 @@ raven
 rays
 recluse
 red
-red-backed
 reef
 reindeer
 reptile
@@ -454,7 +451,6 @@ rockhopper
 rodent
 rook
 rooster
-rough-toothed
 roundworm
 sable
 sac
@@ -481,7 +477,6 @@ shad
 shark
 shearwater
 sheep
-short-tailed
 shrew
 shrike
 shrimp
@@ -511,7 +506,6 @@ spider
 spiders
 spinner
 spoonbill
-spot-nosed
 squid
 squirrel
 stag
@@ -585,7 +579,6 @@ whale
 whales
 whimbrel
 whippet
-white-clawed
 whitefish
 widow
 wildcat
@@ -607,7 +600,5 @@ xenomorph
 xerinae
 yacare
 yak
-yellow-crowned
-yellow-eyed
 zebra
 zebras

@@ -89,7 +89,6 @@ blind
 blonde
 bloody
 blue
-blue-eyed
 blushing
 boiling
 bold
@@ -702,7 +701,6 @@ occupational
 odd
 official
 old
-old-fashioned
 olympic
 only
 open
@@ -1145,7 +1143,6 @@ white
 whole
 wicked
 wide
-wide-eyed
 widespread
 wild
 willing
