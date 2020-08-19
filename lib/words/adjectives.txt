@@ -279,7 +279,9 @@ dutch
 dying
 dynamic
 eager
+eared
 early
+eastern
 easy
 economic
 educational
@@ -345,9 +347,11 @@ extra
 extraordinary
 extreme
 exuberant
+eyed
 faint
 fair
 faithful
+false
 familiar
 famous
 fancy
@@ -366,6 +370,7 @@ filthy
 final
 financial
 fine
+finned
 firm
 fiscal
 fit
@@ -373,11 +378,13 @@ fixed
 flaky
 flat
 flexible
+flightless
 fluffy
 fluttering
 flying
 following
 fond
+footed
 foreign
 formal
 formidable
@@ -430,6 +437,7 @@ grand
 grateful
 greasy
 great
+greater
 green
 grey
 grieving
@@ -445,6 +453,7 @@ handsome
 happy
 hard
 harsh
+hazel
 head
 healthy
 heavy
@@ -456,6 +465,7 @@ hilarious
 hissing
 historic
 historical
+hoary
 hollow
 holy
 homeless
@@ -463,6 +473,7 @@ homely
 hon
 honest
 horizontal
+horned
 horrible
 hostile
 hot
@@ -539,6 +550,7 @@ jolly
 joyous
 judicial
 juicy
+jumping
 junior
 just
 keen
@@ -548,6 +560,7 @@ known
 large
 late
 latin
+laughing
 lazy
 leading
 left
@@ -579,8 +592,10 @@ lost
 loud
 lovely
 low
+lowland
 loyal
 lucky
+magellanic
 magenta
 magic
 magnetic
@@ -590,6 +605,7 @@ major
 mammoth
 managerial
 managing
+maned
 manual
 many
 marginal
@@ -598,11 +614,13 @@ marked
 married
 marvellous
 marxist
+masked
 mass
 massive
 mathematical
 mature
 maximum
+mealy
 mean
 meaningful
 mechanical
@@ -654,6 +672,7 @@ near
 nearby
 neat
 necessary
+necked
 negative
 neighbouring
 nervous
@@ -707,7 +726,9 @@ overwhelming
 painful
 pale
 panicky
+pantropical
 parallel
+parasitic
 parental
 parliamentary
 partial
@@ -733,6 +754,7 @@ plastic
 pleasant
 pleased
 poised
+polar
 polish
 polite
 political
@@ -743,6 +765,7 @@ possible
 potential
 powerful
 practical
+praying
 precious
 precise
 preferred
@@ -895,12 +918,15 @@ significant
 silent
 silky
 silly
+silver
+silvery
 similar
 simple
 single
 skilled
 skinny
 sleepy
+slender
 slight
 slim
 slimy
@@ -916,6 +942,7 @@ soft
 solar
 sole
 solid
+solitary
 sophisticated
 sore
 sorry
@@ -929,6 +956,7 @@ spatial
 special
 specific
 specified
+spectacled
 spectacular
 spicy
 spiritual
@@ -936,7 +964,9 @@ splendid
 spontaneous
 sporting
 spotless
+spotted
 spotty
+spurred
 square
 squealing
 stable
@@ -950,6 +980,7 @@ steep
 sticky
 stiff
 still
+stingless
 stingy
 stormy
 straight
@@ -989,6 +1020,7 @@ swift
 symbolic
 sympathetic
 systematic
+tailed
 talented
 tall
 tame
@@ -996,6 +1028,7 @@ tan
 tart
 tasteless
 tasty
+tawny
 technical
 technological
 teenage
@@ -1016,6 +1049,7 @@ thoughtless
 thundering
 tight
 tiny
+tipped
 tired
 top
 total
@@ -1095,6 +1129,7 @@ wandering
 warm
 wasteful
 watery
+waved
 weak
 wealthy
 weary
@@ -1103,6 +1138,7 @@ weekly
 weird
 welcome
 well
+western
 wet
 whispering
 white
