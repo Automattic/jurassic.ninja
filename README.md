@@ -7,7 +7,7 @@ A frontend to launching ephemeral WordPress instances that auto-destroy after so
 ### Requirements
 
 * An [ubuntu box managed by ServerPilot](https://serverpilot.io/community/articles/connect-a-digitalocean-server.html).
-* A [ServerPilot plan](https://serverpilot.io/community/articles/how-to-upgrade-your-account.html). One of the paid plans. Coach plan is OK. This is to take advantage of multiple sysusers management.
+* A [ServerPilot plan](https://serverpilot.io/community/articles/how-to-upgrade-your-account.html). One of the paid plans. Economy plan is OK. This is to take advantage of multiple sysusers management.
 * [sshpass](https://linux.die.net/man/1/sshpass) installed on the box. (Just `apt-get install sshpass` after you have the Ubuntu box set up).
 * **Have a domain name you fully control**.
     * Add a wildcard A record for every subdomain under that domain, pointing to the box's IP addresss.
