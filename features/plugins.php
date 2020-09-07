@@ -11,20 +11,21 @@ namespace jn;
 
 add_action( 'jurassic_ninja_init', function() {
 	$whitelist = [
-		'classic-editor' => 'Classic Editor',
-		'code-snippets' => 'Code Snippets',
-		'config-constants' => 'Config Constants',
-		'crowdsignal' => 'Crowdsignal',
-		'gutenberg' => 'Gutenberg',
-		'jetpack' => 'Jetpack',
-		'vaultpress' => 'VaultPress',
-		'woocommerce' => 'WooCommerce',
+		'amp'                   => 'AMP',
+		'classic-editor'        => 'Classic Editor',
+		'code-snippets'         => 'Code Snippets',
+		'config-constants'      => 'Config Constants',
+		'crowdsignal'           => 'Crowdsignal',
+		'gutenberg'             => 'Gutenberg',
+		'jetpack'               => 'Jetpack',
+		'vaultpress'            => 'VaultPress',
+		'woocommerce'           => 'WooCommerce',
 		'wordpress-beta-tester' => 'WordPress Beta Tester Plugin',
-		'wp-downgrade' => 'WP Downgrade',
-		'wp-job-manager' => 'WP Job Manager',
-		'wp-log-viewer' => 'WP Log Viewer',
-		'wp-rollback' => 'WP Rollback',
-		'wp-super-cache' => 'WP Super Cache',
+		'wp-downgrade'          => 'WP Downgrade',
+		'wp-job-manager'        => 'WP Job Manager',
+		'wp-log-viewer'         => 'WP Log Viewer',
+		'wp-rollback'           => 'WP Rollback',
+		'wp-super-cache'        => 'WP Super Cache',
 	];
 	// Set all defaults to false.
 	// Will probably add a filter here.
