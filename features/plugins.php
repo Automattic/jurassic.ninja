@@ -12,7 +12,7 @@ namespace jn;
 add_action( 'jurassic_ninja_init', function() {
 	$whitelist = [
 		'amp'                   => 'AMP',
-        'zero-bs-crm'           => 'Jetpack CRM',
+		'zero-bs-crm'           => 'Jetpack CRM',
 		'classic-editor'        => 'Classic Editor',
 		'code-snippets'         => 'Code Snippets',
 		'config-constants'      => 'Config Constants',
