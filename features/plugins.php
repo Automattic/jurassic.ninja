@@ -92,6 +92,12 @@ add_action( 'jurassic_ninja_admin_init', function() {
 				'type' => 'checkbox',
 				'checked' => true,
 			],
+			'jetpack_licensing_api_oauth2_token' => [
+				'id' => 'jetpack_licensing_api_oauth2_token',
+				'title' => __( 'Jetpack Licensing API OAuth2 Token', 'jurassic-ninja' ),
+				'text' => __( 'Licensing API OAuth2 token to provision Jetpack products with. Leave blank to disable.', 'jurassic-ninja' ),
+				'sanitize' => false,
+			],
 			'add_gutenberg_by_default' => [
 				'id' => 'add_gutenberg_by_default',
 				'title' => __( 'Add Gutenberg to every launched WordPress', 'jurassic-ninja' ),
