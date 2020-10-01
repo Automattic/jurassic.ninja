@@ -71,7 +71,21 @@ function collectFeaturesFromFormInputs() {
 	const features_in_text_inputs = reduce.call( text_inputs, function( acc, el ) {
 		return Object.assign( {}, acc, { [ jQuery( el ).data( 'feature' ) ] : jQuery( el ).val() } );
 	}, {} );
-	return Object.assign( features, features_in_selects, features_in_text_inputs );
+	const features_in_jetpack_products_inputs = {
+		'jetpack-products': reduce.call(
+			jQuery( 'input[data-feature="jetpack-products"]' ),
+			function( acc, el ) {
+				const $this = jQuery(el);
+				const value = !$this.is( '[type="checkbox"]' ) || $this.is( ':checked' )
+					? $this.val()
+					: '';
+
+				return acc.concat( value.split( ',' ).filter( Boolean ) );
+			},
+			[]
+		),
+	}
+	return Object.assign( features, features_in_selects, features_in_text_inputs, features_in_jetpack_products_inputs );
 }
 
 function collectFeaturesFromQueryString() {
@@ -293,17 +307,29 @@ function hookAvailableLanguages() {
 	} );
 }
 
+function toggleJetpackProducts() {
+	const $jetpack_toggle = jQuery( '[data-feature=jetpack]' );
+	const $jetpack_products = jQuery( '.jn-jetpack-products-list' );
+	$jetpack_products.toggle( $jetpack_toggle.is( ':checked' ) );
+}
+
 function hookJetpackBranches() {
-	const $search_input = jQuery('#jetpack_branch');
+	const $jetpack_toggle = jQuery( '[data-feature=jetpack]' );
 	const $jetpack_beta_toggle = jQuery( '[data-feature=jetpack-beta]' );
+	const $search_input = jQuery('#jetpack_branch');
 	const search_results = document.getElementById('jetpack_branches');
+
+	$jetpack_toggle.change( toggleJetpackProducts );
+	toggleJetpackProducts();
+
 	$jetpack_beta_toggle.change( () => {
 		if ( $jetpack_beta_toggle.is( ':checked' ) ) {
 			$search_input.attr( 'disabled', false );
 		} else {
 			$search_input.attr( 'disabled', true );
 		}
-	} )
+	} );
+
 	getAvailableJetpackBetaBranches()
 		.then( list => {
 			availableJetpackBetaBranches = list;

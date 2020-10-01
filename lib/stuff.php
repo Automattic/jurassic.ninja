@@ -99,6 +99,7 @@ function require_feature_files() {
 		'/features/multisite.php',
 		'/features/ssl.php',
 		'/features/plugins.php',
+		'/features/jetpack-licensing.php',
 		'/features/jetpack-beta.php',
 		'/features/wc-smooth-generator.php',
 		'/features/woocommerce-beta-tester.php',
