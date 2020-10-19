@@ -266,7 +266,7 @@ add_action( 'jurassic_ninja_admin_init', function() {
 	add_filter( 'jurassic_ninja_settings_options_page', function( $options_page ) {
 		$settings = [
 			'title' => __( 'ServerPilot Configuration', 'jurassic-ninja' ),
-			'text' => '<p>' . __( 'Configure ServerPilot client Id and Key. This need to be one of the paid plans. At least a Coach Plan', 'jurassic-ninja' ) . '</p>',
+			'text' => '<p>' . __( 'Configure ServerPilot client Id and Key. This need to be one of the paid plans. At least an Economy Plan', 'jurassic-ninja' ) . '</p>',
 			'fields' => array(
 				'serverpilot_server_id' => array(
 					'id' => 'serverpilot_server_id',
