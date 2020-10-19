@@ -666,19 +666,36 @@ function purge_sites() {
 	// with sites creation given that ServerPilot runs tasks in series.
 	$sites = array_slice( $sites, 0, $max_sites );
 	$system_users = provisioner()->sysuser_list();
+	$site_users = wp_list_pluck( $sites, 'username' );
+	$purge = [];
 
-	$site_users = array_map(
-		function ( $site ) {
-			return $site['username'];
-		},
-		$sites
-	);
-	$purge = array_filter( $system_users, function ( $user ) use ( $site_users ) {
-			return in_array( $user->name, $site_users, true );
-	} );
+	foreach ( $system_users as $user ) {
+		$user_sites = array_filter(
+			$sites,
+			function ( $site ) use ( $user ) {
+				return $user->name === $site['username'];
+			}
+		);
+		$user_sites = array_values( $user_sites );
+
+		if ( empty( $user_sites ) ) {
+			continue;
+		}
+
+		$purge[] = [
+			// A user is created for every site.
+			'site' => $user_sites[0],
+			'user' => $user,
+		];
+	}
+
 	debug( 'Purging Jurassic Ninja sites' );
-	foreach ( $purge as $user ) {
+	foreach ( $purge as $data ) {
+		$site = $data['site'];
+		$user = $data['user'];
 		$return = null;
+
+		do_action( 'jurassic_ninja_purge_site', $site, $user );
 
 		$return = provisioner()->delete_site( $user->id );
 
@@ -731,7 +748,7 @@ function run_command_on_behalf( $user, $password, $cmd ) {
 			"Commands didn't run OK"
 		);
 	}
-	return null;
+	return $output;
 }
 
 /**
