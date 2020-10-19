@@ -110,14 +110,104 @@ function issue_licenses( $products ) {
 			]
 		);
 
-		foreach ( $failed as $failure ) {
-			$error->add( $failure->get_error_code(), $failure->get_error_message(), $failure->get_error_data() );
+		foreach ( $failed as $index => $failure ) {
+			$error->add( "issue_license_error_$index", $failure->get_error_code() . ': ' . $failure->get_error_message(), $failure->get_error_data() );
 		}
 
 		return $error;
 	}
 
 	return $issued;
+}
+
+/**
+ * Revoke a license.
+ *
+ * @param string $license_key License to revoke.
+ * @return string|WP_Error The revoked license key or a WP_Error instance on failure.
+ */
+function revoke_license( $license_key ) {
+	$response = wp_remote_post(
+		add_query_arg(
+			[ 'license_key' => $license_key ],
+			'https://public-api.wordpress.com/wpcom/v2/jetpack-licensing/license'
+		),
+		[
+			'method'  => 'DELETE',
+			'headers' => [
+				'Authorization' => 'Bearer ' . oauth2_token(),
+			],
+		]
+	);
+
+	$status = wp_remote_retrieve_response_code( $response );
+	$body   = wp_remote_retrieve_body( $response );
+
+	if ( 200 !== $status ) {
+		return new WP_Error(
+			'revoke_license_request_failed',
+			// Translators: %s = error message returned by an API
+			sprintf( __( 'Revoke license request failed with: %s', 'jurassic-ninja' ), $body ),
+			[
+				'status' => $status,
+			]
+		);
+	}
+
+	$license = json_decode( $body );
+
+	if ( ! isset( $license->license_key ) ) {
+		return new WP_Error(
+			'invalid_license_response',
+			// Translators: %s = invalid response returned by an API
+			sprintf( __( 'Invalid license response received: %s', 'jurassic-ninja' ), $body ),
+			[
+				'status' => 500,
+			]
+		);
+	}
+
+	return json_decode( $body )->license_key;
+}
+
+/**
+ * Revoke multiple licenses.
+ *
+ * @param string[] $license_keys License keys to revoke.
+ * @return string[]|WP_Error The revoked license keys or a WP_Error instance if any revoke request fails.
+ */
+function revoke_licenses( $license_keys ) {
+	$revoked = [];
+	$failed  = [];
+
+	foreach ( $license_keys as $license_key ) {
+		$license_key = revoke_license( $license_key );
+
+		if ( ! is_wp_error( $license_key ) ) {
+			$revoked[] = $license_key;
+		} else {
+			$failed[] = $license_key;
+		}
+	}
+
+	if ( ! empty( $failed ) ) {
+		$error = new WP_Error(
+			'failed_to_revoke_jetpack_licenses',
+			// Translators: %d = number of license issue failures
+			sprintf( __( 'Failed to revoke %d Jetpack license(s). Refer to the console for more information.', 'jurassic-ninja' ), count( $failed ) ),
+			[
+				'status' => 400,
+			]
+		);
+
+		foreach ( $failed as $index => $failure ) {
+			$error->add( "revoke_license_error_$index", $failure->get_error_code() . ': ' . $failure->get_error_message(), $failure->get_error_data() );
+		}
+
+		return $error;
+	}
+
+	return $revoked;
 }
 
 /**
@@ -151,6 +241,48 @@ add_action( 'jurassic_ninja_rest_create_request_features', function ( $features,
 	return $features;
 }, 10, 2 );
 
+/**
+ * Hook into site purging to revoke any issued Jetpack licenses.
+ */
+add_action( 'jurassic_ninja_purge_site', function ( $site, $user ) {
+	$command = "cd ~/apps/{$user->name}/public && wp option get jetpack_licenses --format=json";
+
+	debug( '%s: Running commands %s', $user->id, $command );
+	$return = run_command_on_behalf( $site['username'], $site['password'], $command );
+
+	if ( is_wp_error( $return ) ) {
+		debug( 'There was an error fetching Jetpack licenses for user %s: (%s) - %s',
+			$user->id,
+			$return->get_error_code(),
+			$return->get_error_message()
+		);
+		return;
+	}
+
+	$licenses = json_decode( trim( implode( "\n", $return ) ) );
+
+	if ( empty( $licenses ) ) {
+		// No licenses to revoke.
+		return;
+	}
+
+	debug( '%s: Revoking Jetpack licenses %s', $user->id, implode( ',', $licenses ) );
+	$revoked = revoke_licenses( $licenses );
+
+	if ( is_wp_error( $revoked ) ) {
+		foreach ( $revoked->get_error_codes() as $code ) {
+			debug( 'There was an error revoking Jetpack licenses for user %s: (%s) - %s',
+				$user->id,
+				$code,
+				$revoked->get_error_message( $code )
+			);
+		}
+	}
+}, 10, 2 );
+
+/**
+ * Register a shortcode which renders Jetpack Licensing controls suitable for SpecialOps usage.
+ */
 add_shortcode( 'jn_jetpack_products_list', function () {
 	$products = [
 		'personal'                => 'Personal',
