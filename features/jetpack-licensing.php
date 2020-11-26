@@ -57,78 +57,15 @@ function fetch_product_families() {
  * @return array The available products.
  */
 function get_product_families() {
-	$cache_key = 'jurassic_ninja:jetpack_licensing_products';
-	$cache     = get_transient( $cache_key );
-
-	if ( $cache ) {
-		return $cache;
-	}
-
-	$families = fetch_product_families();
+	$option_key = 'jurassic_ninja_jetpack_licensing_products';
+	$families   = fetch_product_families();
 
 	if ( is_wp_error( $families ) || empty( $families ) ) {
-		// Fallback to a hardcoded list in case communication with the API fails.
-		return [
-			(object) [
-				'name' => 'Jetpack Scan',
-				'slug' => 'jetpack-scan',
-				'products' => [
-					(object) [
-						'name' => 'Jetpack Scan Daily',
-						'slug' => 'jetpack-scan',
-					],
-				],
-			],
-			(object) [
-				'name' => 'Jetpack Backup',
-				'slug' => 'jetpack-backup',
-				'products' => [
-					(object) [
-						'name' => 'Jetpack Backup (Daily)',
-						'slug' => 'jetpack-backup-daily',
-					],
-					(object) [
-						'name' => 'Jetpack Backup (Real-time)',
-						'slug' => 'jetpack-backup-realtime',
-					],
-				],
-			],
-			(object) [
-				'name' => 'Jetpack Anti Spam',
-				'slug' => 'jetpack-anti-spam',
-				'products' => [
-					(object) [
-						'name' => 'Jetpack Anti-Spam',
-						'slug' => 'jetpack-anti-spam',
-					],
-				],
-			],
-			(object) [
-				'name' => 'Jetpack Plans',
-				'slug' => 'jetpack-plans',
-				'products' => [
-					(object) [
-						'name' => 'Jetpack Free',
-						'slug' => 'free',
-					],
-					(object) [
-						'name' => 'Jetpack Personal',
-						'slug' => 'personal',
-					],
-					(object) [
-						'name' => 'Jetpack Premium',
-						'slug' => 'premium',
-					],
-					(object) [
-						'name' => 'Jetpack Professional',
-						'slug' => 'professional',
-					],
-				],
-			],
-		];
+		// Fallback to the last successful fetch result.
+		return get_option( $option_key );
 	}
 
-	set_transient( $cache_key, $families, 60 * 60 * 24 );
+	update_option( $option_key, $families );
 
 	return $families;
 }
