@@ -36,6 +36,7 @@ Recommended `/specialops` page content:
 <option value="php7.2">PHP 7.2</option>
 <option value="php7.3">PHP 7.3</option>
 <option selected="selected" value="php7.4">PHP 7.4</option>
+<option value="php8.0">PHP 8.0</option>
 </select></div>
 </li>
 <li style="min-width: 30%;">
