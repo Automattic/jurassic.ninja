@@ -23,7 +23,6 @@ function create_tables( $plugin_file ) {
 	register_activation_hook( $plugin_file, 'jn\jurassic_ninja_create_table' );
 }
 
-
 function jurassic_ninja_create_table() {
 	global $wpdb;
 

@@ -4,7 +4,6 @@
  * The thing is that ServerPilot PHP just throws if there's an error
  * so the wrappers defined here try/catch every call and return WP_Errors if The
  * library throws an exception
- *
  */
 
 namespace jn;
@@ -18,6 +17,7 @@ class ServerPilotProvisioner {
 
 	/**
 	 * Returns a ServerPilot instance
+	 *
 	 * @return [type] [description]
 	 */
 	public function __construct() {
@@ -67,6 +67,7 @@ class ServerPilotProvisioner {
 
 	/**
 	 * Creates a mysql database using ServerPilot's API
+	 *
 	 * @param  String $apid      The id of the app to attach this database.
 	 * @param  String $name      The name of the Database.
 	 * @param  String $username  The username that will be allowed to connect to this database
@@ -83,11 +84,9 @@ class ServerPilotProvisioner {
 		}
 	}
 
-
-
-
 	/**
 	 * Returns an array of system users as reported by ServerPilot's API
+	 *
 	 * @return Array The PHP users that ServerPilot knows about.
 	 */
 	public function get_sysuser_list() {
@@ -99,7 +98,7 @@ class ServerPilotProvisioner {
 	}
 
 	public function sysuser_list() {
-		$system_users = [];
+		$system_users = array();
 		try {
 			$system_users = $this->serverpilot_instance->sysuser_list()->data;
 		} catch ( \ServerPilotException $e ) {
@@ -112,7 +111,8 @@ class ServerPilotProvisioner {
 		 */
 		$system_users = apply_filters( 'jurassic_ninja_sysuser_list', $system_users );
 		if ( is_wp_error( $system_users ) ) {
-			debug( 'There was an error fetching users list for purging: (%s) - %s',
+			debug(
+				'There was an error fetching users list for purging: (%s) - %s',
 				$system_users->get_error_code(),
 				$system_users->get_error_message()
 			);
@@ -130,7 +130,6 @@ class ServerPilotProvisioner {
 			return new \WP_Error( $e->getCode(), $e->getMessage() );
 		}
 	}
-
 
 	/**
 	 * Tries to enable auto SSL on a ServerPilot app
@@ -217,6 +216,7 @@ class ServerPilotProvisioner {
 
 	/**
 	 * Returns an array of apps as reported by ServerPilot's API
+	 *
 	 * @return Array The PHP apps that ServerPilot knows about.
 	 */
 	public function get_app_list() {
@@ -246,10 +246,9 @@ class ServerPilotProvisioner {
 		}
 	}
 
-
-
 	/**
 	 * Locks the process by looping until ServerPilots says the action is completed
+	 *
 	 * @param  string $action_id The ServerPilot Id for an action
 	 * @return string            The status of the action
 	 */
@@ -262,31 +261,38 @@ class ServerPilotProvisioner {
 	}
 }
 
-add_action( 'jurassic_ninja_admin_init', function() {
-	add_filter( 'jurassic_ninja_settings_options_page', function( $options_page ) {
-		$settings = [
-			'title' => __( 'ServerPilot Configuration', 'jurassic-ninja' ),
-			'text' => '<p>' . __( 'Configure ServerPilot client Id and Key. This need to be one of the paid plans. At least an Economy Plan', 'jurassic-ninja' ) . '</p>',
-			'fields' => array(
-				'serverpilot_server_id' => array(
-					'id' => 'serverpilot_server_id',
-					'title' => __( 'ServerPilot Server Id', 'jurassic-ninja' ),
-					'text' => __( 'A ServerPilot Server Id.', 'jurassic-ninja' ),
-				),
-				'serverpilot_client_id' => array(
-					'id' => 'serverpilot_client_id',
-					'title' => __( 'ServerPilot Client Id', 'jurassic-ninja' ),
-					'text' => __( 'A ServerPilot Client id.', 'jurassic-ninja' ),
-				),
-				'serverpilot_client_key' => array(
-					'id' => 'serverpilot_client_key',
-					'title' => __( 'ServerPilot Key', 'jurassic-ninja' ),
-					'text' => __( 'A ServerPilot Client key.', 'jurassic-ninja' ),
-				),
-			),
-		];
-		$options_page[ SETTINGS_KEY ]['sections']['serverpilot'] = $settings;
-		return $options_page;
-	}, 5 );
-} );
+add_action(
+	'jurassic_ninja_admin_init',
+	function () {
+		add_filter(
+			'jurassic_ninja_settings_options_page',
+			function ( $options_page ) {
+				$settings = array(
+					'title' => __( 'ServerPilot Configuration', 'jurassic-ninja' ),
+					'text' => '<p>' . __( 'Configure ServerPilot client Id and Key. This need to be one of the paid plans. At least an Economy Plan', 'jurassic-ninja' ) . '</p>',
+					'fields' => array(
+						'serverpilot_server_id' => array(
+							'id' => 'serverpilot_server_id',
+							'title' => __( 'ServerPilot Server Id', 'jurassic-ninja' ),
+							'text' => __( 'A ServerPilot Server Id.', 'jurassic-ninja' ),
+						),
+						'serverpilot_client_id' => array(
+							'id' => 'serverpilot_client_id',
+							'title' => __( 'ServerPilot Client Id', 'jurassic-ninja' ),
+							'text' => __( 'A ServerPilot Client id.', 'jurassic-ninja' ),
+						),
+						'serverpilot_client_key' => array(
+							'id' => 'serverpilot_client_key',
+							'title' => __( 'ServerPilot Key', 'jurassic-ninja' ),
+							'text' => __( 'A ServerPilot Client key.', 'jurassic-ninja' ),
+						),
+					),
+				);
+				$options_page[ SETTINGS_KEY ]['sections']['serverpilot'] = $settings;
+				return $options_page;
+			},
+			5
+		);
+	}
+);
 

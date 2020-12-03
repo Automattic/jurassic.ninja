@@ -12,6 +12,7 @@ require_once __DIR__ . '/settings-stuff.php';
 /**
  * Used by the main plugin file to register a cron job
  * for purging sites.
+ *
  * @param  string $plugin_file Nothing super useful. the plugin path
  */
 function add_cron_job( $plugin_file ) {
@@ -33,6 +34,7 @@ function add_cron_job( $plugin_file ) {
 
 /**
  * Attempts to purge sites calculated as ready to be purged
+ *
  * @return [type] [description]
  */
 function jurassic_ninja_purge_cron_task() {
@@ -40,7 +42,8 @@ function jurassic_ninja_purge_cron_task() {
 		debug( 'Running sites purge cron task for Jurassic Ninja' );
 		$return = purge_sites();
 		if ( is_wp_error( $return ) ) {
-			debug( 'There was an error purging sites: (%s) - %s',
+			debug(
+				'There was an error purging sites: (%s) - %s',
 				$return->get_error_code(),
 				$return->get_error_message()
 			);
@@ -59,10 +62,10 @@ function jurassic_ninja_cron_task_deactivation() {
 }
 
 function add_cron_recurrence_interval( $schedules ) {
-	$schedules['every_fifteen_minutes'] = [
+	$schedules['every_fifteen_minutes'] = array(
 		'interval'  => 15 * \MINUTE_IN_SECONDS,
 		'display'   => __( 'Every 15 Minutes', 'jurassic-ninja' ),
-	];
+	);
 
 	return $schedules;
 }

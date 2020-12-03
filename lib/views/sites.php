@@ -54,7 +54,7 @@ $serverpilot_apps = apply_filters( 'jurassic_ninja_serverpilot_apps_list', provi
 	</thead>
 	<tbody>
 <?php
-$unmanaged = [];
+$unmanaged = array();
 foreach ( $serverpilot_apps as $site ) {
 	$domain = figure_out_main_domain( $site->domains );
 	$in_logs = array_key_exists( $domain, $db_sites_indexed );

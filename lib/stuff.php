@@ -26,8 +26,9 @@ function debug() {
 					return print_r( $item, true );
 				}
 				return $item;
-			}
-		, func_get_args() );
+			},
+			func_get_args()
+		);
 		error_log( call_user_func_array( 'sprintf', $args ) );
 		// phpcs:enable
 	}
@@ -47,6 +48,7 @@ define( 'REGULAR_SITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubusercontent.co
 /**
  * Force the site to log the creator in on the first time they visit the site
  * Installs and activates the Jurassic Ninja companion plugin on the site.
+ *
  * @param string $password System password for ssh.
  */
 function add_auto_login( $password, $sysuser ) {
@@ -57,34 +59,41 @@ function add_auto_login( $password, $sysuser ) {
 		. " && wp option add jurassic_ninja_admin_password '$password'"
 		. " && wp option add companion_api_base_url '$companion_api_base_url'"
 		. " && wp plugin install --force $companion_plugin_url --activate";
-	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
-		return "$s && $cmd";
-	} );
+	add_filter(
+		'jurassic_ninja_feature_command',
+		function ( $s ) use ( $cmd ) {
+			return "$s && $cmd";
+		}
+	);
 }
 
 /**
  * Makes sure the site has an .htaccess file
- *
  */
 function add_htaccess() {
 	$file_url = REGULAR_SITE_HTACCESS_TEMPLATE_URL;
 	$cmd = "wget '$file_url' -O .htaccess"
 		. " && wp rewrite structure '/%year%/%monthnum%/%day%/%postname%/'"
 		. ' && wp rewrite flush';
-	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
-		return "$s && $cmd";
-	} );
+	add_filter(
+		'jurassic_ninja_feature_command',
+		function ( $s ) use ( $cmd ) {
+			return "$s && $cmd";
+		}
+	);
 }
 
 /**
  * Makes sure the site does not report new posts to Ping-O-Matic
- *
  */
 function stop_pingomatic() {
 	$cmd = 'wp option update ping_sites ""';
-	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
-		return "$s && $cmd";
-	} );
+	add_filter(
+		'jurassic_ninja_feature_command',
+		function ( $s ) use ( $cmd ) {
+			return "$s && $cmd";
+		}
+	);
 }
 
 /**
@@ -93,7 +102,7 @@ function stop_pingomatic() {
  * @return [type] [description]
  */
 function require_feature_files() {
-	$available_features = [
+	$available_features = array(
 		'/features/logged-in-user-email-address.php',
 		'/features/content.php',
 		'/features/multisite.php',
@@ -111,7 +120,7 @@ function require_feature_files() {
 		'/features/gutenberg-master.php',
 		'/features/gutenberg-nightly.php',
 		'/features/wordpress-4.php',
-	];
+	);
 
 	$available_features = apply_filters( 'jurassic_ninja_available_features', $available_features );
 	foreach ( $available_features as $feature_file ) {
@@ -122,26 +131,27 @@ function require_feature_files() {
 
 /**
  * Launches a new WordPress instance on the managed server
- * @param  String  $php_version          The PHP version to run the app on.
- * @param  Array   $features             Array of features to enable
- *         boolean config-constants      Should we add the Config Constants plugin to the site?
- *         boolean auto_ssl              Should we add Let's Encrypt-based SSL for the site?
- *         boolean ssl                   Should we add the configured SSL certificate for the site?
- *         boolean gutenberg             Should we add Gutenberg to the site?
- *         boolean jetpack               Should we add Jetpack to the site?
- *         boolean jetpack-beta          Should we add Jetpack Beta Tester plugin to the site?
- *         boolean subdir_multisite      Should we enable subdir-based multisite on the site?
- *         boolean subdir_multisite      Should we enable subdomain-based multisite on the site?
- *         boolean woocommerce           Should we add WooCommerce plugin to the site?
- *         boolean wordpress-beta-tester Should we add Jetpack Beta Tester plugin to the site?
- *         boolean wp-debug-log          Should we set WP_DEBUG and WP_DEBUG log to true ?
- *         boolean wp-log-viewer         Should we add WP Log Viewer plugin to the site?
+ *
+ * @param  String $php_version          The PHP version to run the app on.
+ * @param  Array  $features             Array of features to enable
+ *        boolean config-constants      Should we add the Config Constants plugin to the site?
+ *        boolean auto_ssl              Should we add Let's Encrypt-based SSL for the site?
+ *        boolean ssl                   Should we add the configured SSL certificate for the site?
+ *        boolean gutenberg             Should we add Gutenberg to the site?
+ *        boolean jetpack               Should we add Jetpack to the site?
+ *        boolean jetpack-beta          Should we add Jetpack Beta Tester plugin to the site?
+ *        boolean subdir_multisite      Should we enable subdir-based multisite on the site?
+ *        boolean subdir_multisite      Should we enable subdomain-based multisite on the site?
+ *        boolean woocommerce           Should we add WooCommerce plugin to the site?
+ *        boolean wordpress-beta-tester Should we add Jetpack Beta Tester plugin to the site?
+ *        boolean wp-debug-log          Should we set WP_DEBUG and WP_DEBUG log to true ?
+ *        boolean wp-log-viewer         Should we add WP Log Viewer plugin to the site?
  * @return Array|Null                    null or the app data as returned by ServerPilot's API on creation.
  */
-function launch_wordpress( $php_version = 'default', $requested_features = [], $spare = false ) {
-	$default_features = [
+function launch_wordpress( $php_version = 'default', $requested_features = array(), $spare = false ) {
+	$default_features = array(
 		'shortlife' => false,
-	];
+	);
 	$start_time = microtime( true );
 
 	$features = array_merge( $default_features, $requested_features );
@@ -153,7 +163,6 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 	 * @since 3.0
 	 *
 	 * @param array $features defaults and requested features merged.
-	 *
 	 */
 	do_action( 'jurassic_ninja_do_feature_conditions', $features );
 
@@ -167,20 +176,20 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 			if ( settings( 'use_spare_sites', false ) ) {
 				$app = get_spare_site( $php_version );
 			}
-			if ( ! $app  && settings( 'launch_site_if_no_spare_available', true )  ) {
+			if ( ! $app && settings( 'launch_site_if_no_spare_available', true ) ) {
 				$app = create_php_app( $php_version, $features, true );
-			} else if ( ! $app ) {
+			} elseif ( ! $app ) {
 				throw new \Exception( "Couldn't get a spare site" );
 			}
-		//}
-		// $app = $spare ? false : get_spare_site( $php_version );
-		// if ( $app ) {
-		// } else {
-		// 	$app = create_php_app( $php_version, $features, $spare );
-		// 	debug( 'Launching %s with features: %s', $app->domain, implode( ', ', array_keys( array_filter( $features ) ) ) );
-		// }
+			// }
+			// $app = $spare ? false : get_spare_site( $php_version );
+			// if ( $app ) {
+			// } else {
+			// $app = create_php_app( $php_version, $features, $spare );
+			// debug( 'Launching %s with features: %s', $app->domain, implode( ', ', array_keys( array_filter( $features ) ) ) );
+			// }
 
-		//if ( ! $spare ) {
+			// if ( ! $spare ) {
 			$site_title = settings( 'use_subdomain_based_wordpress_title', false ) ?
 			ucwords( str_replace( '-', ' ', $app->subdomain ) ) :
 			'My WordPress Site';
@@ -197,12 +206,15 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 			 *           @type string admin_email              The email address for the admin account.
 			 * }
 			 */
-			$wordpress_options = apply_filters( 'jurassic_ninja_wordpress_options', array(
-				'site_title' => $site_title,
-				'admin_user' => 'demo',
-				'admin_password' => $app->password,
-				'admin_email' => settings( 'default_admin_email_address' ),
-			) );
+			$wordpress_options = apply_filters(
+				'jurassic_ninja_wordpress_options',
+				array(
+					'site_title' => $site_title,
+					'admin_user' => 'demo',
+					'admin_password' => $app->password,
+					'admin_email' => settings( 'default_admin_email_address' ),
+				)
+			);
 			install_wordpress_with_cli( $app->domain, $wordpress_options, $app->dbname, $app->dbusername, $app->dbpassword );
 
 			log_new_site( $app, $app->password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
@@ -240,6 +252,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = [], $
 
 /**
  * Create a slug from a string
+ *
  * @param  string $str       The string to slugify
  * @param  string $delimiter Character to use between words
  * @return string            Slugified version of the string.
@@ -251,6 +264,7 @@ function create_slug( $str, $delimiter = '-' ) {
 
 /**
  * Returns the list of sites that are calculated to have expired
+ *
  * @return Array List of sites
  */
 function expired_sites() {
@@ -266,16 +280,19 @@ function expired_sites() {
 
 /**
  * Extends the expiration date for a site
+ *
  * @param  string $domain The name of the site.
  * @return [type]         [description]
  */
 function extend_site_life( $domain ) {
-	db()->update( 'sites',
-		[
+	db()->update(
+		'sites',
+		array(
 			'last_logged_in' => current_time( 'mysql', 1 ),
-		], [
+		),
+		array(
 			'domain' => $domain,
-		]
+		)
 	);
 	if ( db()->last_error ) {
 		l( db()->last_error );
@@ -285,13 +302,17 @@ function extend_site_life( $domain ) {
 /**
  * Given an array of domains as ServerPilot returns in its API endpoint for an app
  * excludes, the wildcard entries from the array and returns it.
- * @param  Array  $domains The array of domains for an app as returned by ServerPilot's API
+ *
+ * @param  Array $domains The array of domains for an app as returned by ServerPilot's API
  * @return string          The main domain
  */
 function figure_out_main_domain( $domains ) {
-	$valid = array_filter( $domains, function ( $domain ) {
-		return false === strpos( $domain, '*.' );
-	} );
+	$valid = array_filter(
+		$domains,
+		function ( $domain ) {
+			return false === strpos( $domain, '*.' );
+		}
+	);
 	// reset() trick to get first item
 	return reset( $valid );
 }
@@ -319,13 +340,17 @@ function install_wordpress_with_cli( $domain, $wordpress_options, $dbname, $dbus
 		$wordpress_options['admin_password'],
 		$wordpress_options['admin_email']
 	);
-	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
-		return "$s && $cmd";
-	} );
+	add_filter(
+		'jurassic_ninja_feature_command',
+		function ( $s ) use ( $cmd ) {
+			return "$s && $cmd";
+		}
+	);
 }
 
 /**
  * Generates a new username with a pseudo random name on the managed server.
+ *
  * @param  string $password The password to be assigned for the user
  * @return [type]           [description]
  */
@@ -342,6 +367,7 @@ function generate_new_user( $password ) {
 
 /**
  * Returns a ServerPilot instance
+ *
  * @return [type] [description]
  */
 function provisioner() {
@@ -359,6 +385,7 @@ function provisioner() {
 
 /**
  * Generates a random string of 12 characters.
+ *
  * @return string A string with random characters to be used as password for the WordPress administrator
  */
 function generate_random_password() {
@@ -392,6 +419,7 @@ function generate_random_subdomain( $features ) {
 
 /**
  * Generates a random username starting with userxxxxx
+ *
  * @return string A random username
  */
 function generate_random_username() {
@@ -401,6 +429,7 @@ function generate_random_username() {
 
 /**
  * Attempts to log whatever it's feeded by using error_log and printf
+ *
  * @param  mixed $stuff  Whatever
  * @return [type]        [description]
  */
@@ -428,9 +457,8 @@ function add_features_before_auto_login( &$app, $features, $domain ) {
 	 *     $type array $features             The list of features we're going to add to the WordPress installation.
 	 *     @type string $domain              The domain under which this app will be running.
 	 * }
-	 *
 	 */
-	do_action_ref_array( 'jurassic_ninja_add_features_before_auto_login', [ &$app, $features, $domain ] );
+	do_action_ref_array( 'jurassic_ninja_add_features_before_auto_login', array( &$app, $features, $domain ) );
 	// phpcs:enable
 }
 
@@ -451,9 +479,8 @@ function add_features_after_auto_login( &$app, $features, $domain ) {
 	 *     $type array $features             The list of features we're going to add to the WordPress installation.
 	 *     @type string $domain              The domain under which this app will be running.
 	 * }
-	 *
 	 */
-	do_action_ref_array( 'jurassic_ninja_add_features_after_auto_login', [ &$app, $features, $domain ] );
+	do_action_ref_array( 'jurassic_ninja_add_features_after_auto_login', array( &$app, $features, $domain ) );
 	// phpcs:enable
 }
 
@@ -502,7 +529,7 @@ function create_php_app( $php_version, $features, $spare = false ) {
 	$domain = sprintf( '%s.%s', $subdomain, settings( 'domain' ) );
 
 	// if ( $spare ) {
-	// 	$domain = sprintf( '%s.spare', $user->name );
+	// $domain = sprintf( '%s.spare', $user->name );
 	// }
 	debug( 'Creating sysuser for %s', $domain );
 
@@ -528,7 +555,7 @@ function create_php_app( $php_version, $features, $spare = false ) {
 		log_new_unused_site( $app, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
 	}
 	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
-	do_action_ref_array( 'jurassic_ninja_add_features_after_create_app', [ &$app, $features, $domain ] );
+	do_action_ref_array( 'jurassic_ninja_add_features_after_create_app', array( &$app, $features, $domain ) );
 	// phpcs:enable
 	$diff = round( microtime( true ) - $start_time );
 	debug( 'Finished creating PHP app %s. Took %02d:%02d.\n', $domain, floor( $diff / 60 ), $diff % 60 );
@@ -544,19 +571,21 @@ function create_php_app( $php_version, $features, $spare = false ) {
 
 /**
  * Stores a record for a freshly created site
+ *
  * @param  Array $app Site data as returned by ServerPilot's API on creation
  * @return [type]       [description]
  */
 function log_new_unused_site( $app, $password, $shortlived = false, $launched_by = null ) {
 	$launched_by = $launched_by ? $launched_by->user_login : '';
-	db()->insert( 'spare_sites',
-		[
+	db()->insert(
+		'spare_sites',
+		array(
 			'app_id' => $app->id,
 			'username' => $app->name,
 			'password' => $password,
 			'domain' => figure_out_main_domain( $app->domains ),
 			'created' => current_time( 'mysql', 1 ),
-		]
+		)
 	);
 	if ( db()->last_error ) {
 		l( db()->last_error );
@@ -565,21 +594,23 @@ function log_new_unused_site( $app, $password, $shortlived = false, $launched_by
 
 /**
  * Stores a record for a launched site
+ *
  * @param  Array $app Site data as returned by ServerPilot's API on creation
  * @return [type]       [description]
  */
 function log_new_site( $app, $password, $shortlived = false, $launched_by = null ) {
 	$launched_by = $launched_by ? $launched_by->user_login : ( is_cli_running() ? 'cli' : '' );
 
-	db()->insert( 'sites',
-		[
+	db()->insert(
+		'sites',
+		array(
 			'username' => $app->name,
 			'password' => $password,
 			'domain' => figure_out_main_domain( $app->domains ),
 			'created' => current_time( 'mysql', 1 ),
 			'shortlived' => $shortlived,
 			'launched_by' => $launched_by,
-		]
+		)
 	);
 	if ( db()->last_error ) {
 		l( db()->last_error );
@@ -588,23 +619,30 @@ function log_new_site( $app, $password, $shortlived = false, $launched_by = null
 
 /**
  * Stores a record for a purged site
+ *
  * @param  Array $data Site data as returned by a query to the sites table
  * @return [type]       [description]
  */
 function log_purged_site( $data ) {
-	db()->insert( 'purged', [
-		'username' => $data['username'],
-		'domain' => $data['domain'],
-		'created' => $data['created'],
-		'last_logged_in' => $data['last_logged_in'],
-		'checked_in' => $data['checked_in'],
-		'shortlived' => $data['shortlived'],
-		'launched_by' => $data['launched_by'],
-	] );
-	db()->delete( 'sites', [
-		'username' => $data['username'],
-		'domain' => $data['domain'],
-	] );
+	db()->insert(
+		'purged',
+		array(
+			'username' => $data['username'],
+			'domain' => $data['domain'],
+			'created' => $data['created'],
+			'last_logged_in' => $data['last_logged_in'],
+			'checked_in' => $data['checked_in'],
+			'shortlived' => $data['shortlived'],
+			'launched_by' => $data['launched_by'],
+		)
+	);
+	db()->delete(
+		'sites',
+		array(
+			'username' => $data['username'],
+			'domain' => $data['domain'],
+		)
+	);
 	if ( db()->last_error ) {
 		l( db()->last_error );
 	};
@@ -614,9 +652,9 @@ function maintain_spare_sites_pool() {
 	$count = db()->get_var( 'select COUNT(*) from spare_sites' );
 	$min_spare_sites = settings( 'min_spare_sites' );
 	debug( 'Checking spare sites pool' );
-	if (  (	$min_spare_sites - $count > 0 ) ) {
+	if ( ( $min_spare_sites - $count > 0 ) ) {
 		debug( 'Launching a spare site' );
-		launch_wordpress( 'php7.0', [], true );
+		launch_wordpress( 'php7.0', array(), true );
 	} else {
 		debug( 'No need to launch more spare sites' );
 	}
@@ -625,6 +663,7 @@ function maintain_spare_sites_pool() {
 
 /**
  * Returns all of the sites managed and created by this instance of Jurassic Ninja
+ *
  * @return Array The list of sites
  */
 function managed_sites() {
@@ -638,16 +677,19 @@ function spare_sites() {
 /**
  * Updates the record for the site in the sites table indicating
  * that the creator has at least visited wp-admin once (the first time)
+ *
  * @param  string $domain The name of the site
  * @return [type]         [description]
  */
 function mark_site_as_checked_in( $domain ) {
-	db()->update( 'sites',
-		[
+	db()->update(
+		'sites',
+		array(
 			'checked_in' => current_time( 'mysql', 1 ),
-		], [
+		),
+		array(
 			'domain' => $domain,
-		]
+		)
 	);
 	if ( db()->last_error ) {
 		l( db()->last_error );
@@ -668,7 +710,7 @@ function purge_sites() {
 	$sites = array_slice( $sites, 0, $max_sites );
 	$system_users = provisioner()->sysuser_list();
 	$site_users = wp_list_pluck( $sites, 'username' );
-	$purge = [];
+	$purge = array();
 
 	foreach ( $system_users as $user ) {
 		$user_sites = array_filter(
@@ -683,11 +725,11 @@ function purge_sites() {
 			continue;
 		}
 
-		$purge[] = [
+		$purge[] = array(
 			// A user is created for every site.
 			'site' => $user_sites[0],
 			'user' => $user,
-		];
+		);
 	}
 
 	debug( 'Purging Jurassic Ninja sites' );
@@ -701,7 +743,8 @@ function purge_sites() {
 		$return = provisioner()->delete_site( $user->id );
 
 		if ( is_wp_error( $return ) ) {
-			debug( 'There was an error purging site for user %s: (%s) - %s',
+			debug(
+				'There was an error purging site for user %s: (%s) - %s',
 				$user->id,
 				$return->get_error_code(),
 				$return->get_error_message()
@@ -724,6 +767,7 @@ function purge_sites() {
 /**
  * Runs a command on the manager server using the username and password for
  * a freshly created system user.
+ *
  * @param string $user     System user for ssh.
  * @param string $password System password for ssh.
  * @param string $cmd      The command to run on the shell
@@ -740,7 +784,8 @@ function run_command_on_behalf( $user, $password, $cmd ) {
 	exec( $run, $output, $return_value );
 	// phpcs:enable
 	if ( 0 !== $return_value ) {
-		debug( 'Commands run finished with code %s and output: %s',
+		debug(
+			'Commands run finished with code %s and output: %s',
 			$return_value,
 			implode( ' -> ', $output )
 		);
@@ -755,6 +800,7 @@ function run_command_on_behalf( $user, $password, $cmd ) {
 /**
  * Runs a set of commands via ssh.
  * The command string is a result of applying filter `jurassic_ninja_feature_command`
+ *
  * @param  string $user     [description]
  * @param  string $password [description]
  * @param  string $domain   [description]
@@ -785,6 +831,7 @@ function run_commands_for_features( $user, $password, $domain ) {
 
 /**
  * Calculates and returns sites that the creator has never visited.
+ *
  * @return [type] [description]
  */
 function sites_never_checked_in() {
