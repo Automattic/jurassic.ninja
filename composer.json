@@ -4,14 +4,17 @@
 		"nubs/random-name-generator": "1.*"
 	},
 	"require-dev": {
-	       "dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
+		"automattic/jetpack-codesniffer": "^2.0",
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
 		"phpunit/phpunit": "^6.4",
-		"squizlabs/php_codesniffer": "*",
-		"automattic/jetpack-codesniffer": "^2.0"
+		"squizlabs/php_codesniffer": "*"
 	},
 	"scripts": {
 		"changelog": "git changelog  changelog.md",
 		"lint": "vendor/bin/phpcs",
 		"test": "vendor/bin/phpunit"
+	},
+	"config": {
+		"sort-packages": true
 	}
 }
