@@ -1,4 +1,9 @@
 <?php
+/**
+ * It's beta time!
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -7,9 +12,7 @@ add_action(
 	function () {
 		add_get_endpoint(
 			'available-jetpack-built-branches',
-			function ( $request ) {
-				$body = $request->get_json_params() ? $request->get_json_params() : array();
-
+			function () {
 				$manifest_url = 'https://betadownload.jetpack.me/jetpack-branches.json';
 				$manifest = json_decode( wp_remote_retrieve_body( wp_remote_get( $manifest_url ) ) );
 				$output = $manifest;
@@ -125,6 +128,8 @@ function add_jetpack_beta_plugin() {
 
 /**
  * Activates jetpack branch in Beta plugin
+ *
+ * @param string $branch_name Branch name.
  */
 function activate_jetpack_branch( $branch_name ) {
 	$cmd = "wp jetpack-beta branch activate $branch_name";
@@ -136,6 +141,13 @@ function activate_jetpack_branch( $branch_name ) {
 	);
 }
 
+/**
+ * Get URL for beta download.
+ *
+ * @param string $branch_name Branch name.
+ *
+ * @return string Download URL.
+ */
 function get_jetpack_beta_url( $branch_name ) {
 	$branch_name = str_replace( '/', '_', $branch_name );
 	$manifest_url = 'https://betadownload.jetpack.me/jetpack-branches.json';

@@ -1,4 +1,9 @@
 <?php
+/**
+ * REST API stuff.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -49,7 +54,7 @@ function add_rest_api_endpoints() {
 			 * @param array $json_params The body of the json request.
 			 */
 			$features = apply_filters( 'jurassic_ninja_rest_create_request_features', $features, $json_params );
-			// Check if any feature errored
+			// Check if any feature errored.
 			foreach ( $features as $feature ) {
 				if ( is_wp_error( $feature ) ) {
 					return $feature;
@@ -134,9 +139,9 @@ function add_rest_api_endpoints() {
  * Adds a callback to a REST endpoint for the POST method.
  * Depends on global constant REST_API_NAMESPACE.
  *
- * @param [type] $path                        New Path to add
+ * @param [type] $path                        New Path to add.
  * @param [type] $callback                    The function that will handle the request. Must return Array.
- * @param ?array $register_rest_route_options Either empty or a succesful object
+ * @param ?array $register_rest_route_options Either empty or a successful object.
  */
 function add_post_endpoint( $path, $callback, $register_rest_route_options = array() ) {
 	$namespace = REST_API_NAMESPACE;
@@ -154,9 +159,9 @@ function add_post_endpoint( $path, $callback, $register_rest_route_options = arr
  * Adds a callback to a REST endpoint for the GET method.
  * Depends on global constant REST_API_NAMESPACE.
  *
- * @param [type] $path                        New Path to add
+ * @param [type] $path                        New Path to add.
  * @param [type] $callback                    The function that will handle the request. Must return Array.
- * @param ?array $register_rest_route_options Either empty or a succesful object
+ * @param ?array $register_rest_route_options Either empty or a successful object.
  */
 function add_get_endpoint( $path, $callback, $register_rest_route_options = array() ) {
 	$namespace = REST_API_NAMESPACE;
@@ -173,13 +178,13 @@ function add_get_endpoint( $path, $callback, $register_rest_route_options = arra
  * Handy function to register a hook and create a REST API endpoint easily
  * Users register_rest_route()
  *
- * @param string   $namespace                   namespace for the endpoint
- * @param string   $path                        The endpoint's path
- * @param callable $callback                  The callback to use
- * @param [type]   $register_rest_route_options Extra optinos to register_rest_route
+ * @param string   $namespace                   namespace for the endpoint.
+ * @param string   $path                        The endpoint's path.
+ * @param callable $callback                  The callback to use.
+ * @param [type]   $register_rest_route_options Extra optinos to register_rest_route.
  */
 function add_endpoint( $namespace, $path, $callback, $register_rest_route_options ) {
-	// Wrap the $callback passed to catch every Exception that could be thrown in it
+	// Wrap the $callback passed to catch every Exception that could be thrown in it.
 	$wrapit = function ( \WP_REST_Request $request ) use ( $callback ) {
 		// We'll wrap whatever the $callback returns
 		// so we can report Exception errors in every response (third parameter).
@@ -221,6 +226,9 @@ function add_endpoint( $namespace, $path, $callback, $register_rest_route_option
 	);
 }
 
+/**
+ * Create feature endpoint.
+ */
 function create_endpoint_feature_defaults() {
 	$defaults = array(
 		'shortlife' => false,

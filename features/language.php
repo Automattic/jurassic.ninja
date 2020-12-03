@@ -1,4 +1,9 @@
 <?php
+/**
+ * Let's set a language!
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -50,6 +55,11 @@ add_action(
 	}
 );
 
+/**
+ * WP CLI commands to set the lang.
+ *
+ * @param string $code Lang code.
+ */
 function set_language( $code ) {
 	$cmd = "wp language core install $code"
 		. " && wp language core activate $code"

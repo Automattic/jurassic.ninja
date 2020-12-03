@@ -1,7 +1,10 @@
 <?php
 /**
- * This feature provides the ability to launch with latest stabel WordPress 4.
+ * This feature provides the ability to launch with latest stable WordPress 4.
+ *
+ * @package jurassic-ninja
  */
+
 namespace jn;
 
 add_action(
@@ -79,7 +82,7 @@ add_action(
  */
 function update_to_wordpress_4_latest() {
 	$wordpress_4_latest = settings( 'wordpress_4_latest', '4.9.8' );
-	// We need --force because this may be a downgrade
+	// We need --force because this may be a downgrade.
 	$cmd = "wp core update --version=$wordpress_4_latest --force && wp core update-db";
 	add_filter(
 		'jurassic_ninja_feature_command',

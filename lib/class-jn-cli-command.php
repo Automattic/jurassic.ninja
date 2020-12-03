@@ -1,4 +1,9 @@
 <?php
+/**
+ * WP CLI command.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -12,10 +17,14 @@ if ( ! defined( '\\ABSPATH' ) ) {
 class JN_CLI_Command extends \WP_CLI_Command {
 	/**
 	 * Launch a spare site.
+	 *
+	 * @param array $args WP CLI args.
+	 *
+	 * @throws \Exception If there's an error during launch.
 	 */
 	public function launch( $args ) {
 		if ( count( $args ) ) {
-			if ( $args[0] === 'spare' ) {
+			if ( 'spare' === $args[0] ) {
 				\WP_CLI::line( 'Launching a spare site' );
 			}
 			$app = launch_wordpress( 'default', array(), true );
@@ -37,7 +46,7 @@ class JN_CLI_Command extends \WP_CLI_Command {
 	/**
 	 * Run the purge job.
 	 */
-	public function purge( $args ) {
+	public function purge() {
 		try {
 			$purged = purge_sites();
 			if ( is_array( $purged ) && count( $purged ) ) {
@@ -53,7 +62,7 @@ class JN_CLI_Command extends \WP_CLI_Command {
 	/**
 	 * Refresh the spare sites pool.
 	 */
-	public function pool( $args ) {
+	public function pool() {
 		try {
 			maintain_spare_sites_pool();
 			\WP_CLI::line( sprintf( 'Spare sites pool was refreshed' ) );
@@ -65,7 +74,7 @@ class JN_CLI_Command extends \WP_CLI_Command {
 	/**
 	 * Get unhandled sysusers
 	 */
-	public function users( $args ) {
+	public function users() {
 		try {
 			$users = provisioner()->sysuser_list();
 			$apps = provisioner()->get_app_list();
@@ -75,7 +84,7 @@ class JN_CLI_Command extends \WP_CLI_Command {
 				array_filter(
 					$apps,
 					function ( $app ) use ( $this_server_id ) {
-						return $app->serverid == $this_server_id;
+						return $app->serverid == $this_server_id; // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
 					}
 				),
 				'sysuserid'
@@ -86,7 +95,7 @@ class JN_CLI_Command extends \WP_CLI_Command {
 					sprintf(
 						"%s\t%s\thttps://manage.serverpilot.io/servers/%s/users/%s",
 						$user->name,
-						in_array( $user->id, $users_with_apps ) ? 'Has apps' : 'Does not have any apps',
+						in_array( $user->id, $users_with_apps ) ? 'Has apps' : 'Does not have any apps', // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
 						settings( 'serverpilot_server_id' ),
 						$user->id
 					)
@@ -98,12 +107,11 @@ class JN_CLI_Command extends \WP_CLI_Command {
 	}
 
 	/**
-	 * Get experied sites
+	 * Get expired sites
 	 */
-	public function expired( $args ) {
+	public function expired() {
 		try {
 			$sites = sites_to_be_purged();
-			$this_server_id = settings( 'serverpilot_server_id' );
 			// Only check sysusers from this server.
 			foreach ( $sites as $app ) {
 				\WP_CLI::line(

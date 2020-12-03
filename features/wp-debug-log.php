@@ -1,4 +1,9 @@
 <?php
+/**
+ * WP Debug Log.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -48,6 +53,9 @@ add_action(
 	}
 );
 
+/**
+ * Sets the WP_DEBUG constants.
+ */
 function set_wp_debug_log() {
 	$cmd = 'wp config --type=constant set WP_DEBUG true'
 		. ' && wp config --type=constant set WP_DEBUG_LOG true'

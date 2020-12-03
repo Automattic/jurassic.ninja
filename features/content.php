@@ -1,4 +1,9 @@
 <?php
+/**
+ * Add default content.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -36,6 +41,9 @@ add_action(
 	}
 );
 
+/**
+ * Command to add content.
+ */
 function add_content() {
 	$cmd = 'wget https://github.com/manovotny/wptest/archive/master.zip'
 		. ' && unzip master.zip'

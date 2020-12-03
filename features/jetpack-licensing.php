@@ -1,4 +1,9 @@
 <?php
+/**
+ * JP Licensing.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -99,7 +104,7 @@ function issue_license( $product ) {
 	if ( 200 !== $status ) {
 		return new WP_Error(
 			'issue_license_request_failed',
-			// Translators: %s = error message returned by an API
+			// Translators: %s = error message returned by an API.
 			sprintf( __( 'Issue license request failed with: %s', 'jurassic-ninja' ), $body ),
 			array(
 				'status' => $status,
@@ -112,7 +117,7 @@ function issue_license( $product ) {
 	if ( ! isset( $license->license_key ) ) {
 		return new WP_Error(
 			'invalid_license_response',
-			// Translators: %s = invalid response returned by an API
+			// Translators: %s = invalid response returned by an API.
 			sprintf( __( 'Invalid license response received: %s', 'jurassic-ninja' ), $body ),
 			array(
 				'status' => 500,
@@ -146,7 +151,7 @@ function issue_licenses( $products ) {
 	if ( ! empty( $failed ) ) {
 		$error = new WP_Error(
 			'failed_to_issue_jetpack_licenses',
-			// Translators: %d = number of license issue failures
+			// Translators: %d = number of license issue failures.
 			sprintf( __( 'Failed to issue %d Jetpack license(s). Refer to the console for more information.', 'jurassic-ninja' ), count( $failed ) ),
 			array(
 				'status' => 400,
@@ -189,7 +194,7 @@ function revoke_license( $license_key ) {
 	if ( 200 !== $status ) {
 		return new WP_Error(
 			'revoke_license_request_failed',
-			// Translators: %s = error message returned by an API
+			// Translators: %s = error message returned by an API.
 			sprintf( __( 'Revoke license request failed with: %s', 'jurassic-ninja' ), $body ),
 			array(
 				'status' => $status,
@@ -202,7 +207,7 @@ function revoke_license( $license_key ) {
 	if ( ! isset( $license->license_key ) ) {
 		return new WP_Error(
 			'invalid_license_response',
-			// Translators: %s = invalid response returned by an API
+			// Translators: %s = invalid response returned by an API.
 			sprintf( __( 'Invalid license response received: %s', 'jurassic-ninja' ), $body ),
 			array(
 				'status' => 500,
@@ -236,7 +241,7 @@ function revoke_licenses( $license_keys ) {
 	if ( ! empty( $failed ) ) {
 		$error = new WP_Error(
 			'failed_to_revoke_jetpack_licenses',
-			// Translators: %d = number of license issue failures
+			// Translators: %d = number of license issue failures.
 			sprintf( __( 'Failed to revoke %d Jetpack license(s). Refer to the console for more information.', 'jurassic-ninja' ), count( $failed ) ),
 			array(
 				'status' => 400,

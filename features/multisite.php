@@ -1,4 +1,9 @@
 <?php
+/**
+ * Multisite.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -23,7 +28,7 @@ add_action(
 		add_filter(
 			'jurassic_ninja_rest_create_request_features',
 			function ( $features, $json_params ) {
-				// Check we're not asked for both multisite types
+				// Check we're not asked for both multisite types.
 				$error = null;
 				if (
 				isset( $json_params['subdir_multisite'] ) && $json_params['subdir_multisite'] &&
@@ -88,8 +93,7 @@ add_action(
 /**
  * Enables subdir-based multisite on a WordPress instance
  *
- * @param string $domain          The main domain for the site
- * @return [type]                   [description]
+ * @param string $domain          The main domain for the site.
  */
 function enable_subdir_multisite( $domain ) {
 	$file_url = SUBDIR_MULTISITE_HTACCESS_TEMPLATE_URL;
@@ -108,7 +112,6 @@ function enable_subdir_multisite( $domain ) {
  * Enables subdomain-based multisite on a WordPress instance
  *
  * @param string $domain          The main domain for the site.
- * @return [type]                   [description]
  */
 function enable_subdomain_multisite( $domain ) {
 	$file_url = SUBDOMAIN_MULTISITE_HTACCESS_TEMPLATE_URL;

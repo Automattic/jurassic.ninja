@@ -1,4 +1,9 @@
 <?php
+/**
+ * A lot of the big kickoff stuff.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -19,7 +24,7 @@ if ( ! class_exists( 'CustomNameGenerator' ) ) {
  */
 function debug() {
 	if ( defined( 'WP_DEBUG' ) && WP_DEBUG && settings( 'log_debug_messages', false ) ) {
-		// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		// phpcs:disable WordPress.PHP.DevelopmentFunctions
 		$args = array_map(
 			function ( $item ) {
 				if ( gettype( $item ) === 'array' || gettype( $item ) === 'object' ) {
@@ -36,7 +41,7 @@ function debug() {
 
 require_once __DIR__ . '/rest-api-stuff.php';
 require_feature_files();
-require_once __DIR__ . '/serverpilot-stuff.php';
+require_once __DIR__ . '/class-serverpilotprovisioner.php';
 
 define( 'REST_API_NAMESPACE', 'jurassic.ninja' );
 define( 'COMPANION_PLUGIN_URL', 'https://github.com/Automattic/companion/archive/master.zip' );
@@ -50,6 +55,7 @@ define( 'REGULAR_SITE_HTACCESS_TEMPLATE_URL', 'https://gist.githubusercontent.co
  * Installs and activates the Jurassic Ninja companion plugin on the site.
  *
  * @param string $password System password for ssh.
+ * @param string $sysuser User.
  */
 function add_auto_login( $password, $sysuser ) {
 	$companion_api_base_url = rest_url( REST_API_NAMESPACE );
@@ -98,8 +104,6 @@ function stop_pingomatic() {
 
 /**
  * Just loops through a filtered array of files inside the features directory and requires them
- *
- * @return [type] [description]
  */
 function require_feature_files() {
 	$available_features = array(
@@ -132,8 +136,8 @@ function require_feature_files() {
 /**
  * Launches a new WordPress instance on the managed server
  *
- * @param  String $php_version          The PHP version to run the app on.
- * @param  Array  $features             Array of features to enable
+ * @param  string $php_version          The PHP version to run the app on.
+ * @param  array  $requested_features   Array of features to enable.
  *        boolean config-constants      Should we add the Config Constants plugin to the site?
  *        boolean auto_ssl              Should we add Let's Encrypt-based SSL for the site?
  *        boolean ssl                   Should we add the configured SSL certificate for the site?
@@ -145,8 +149,12 @@ function require_feature_files() {
  *        boolean woocommerce           Should we add WooCommerce plugin to the site?
  *        boolean wordpress-beta-tester Should we add Jetpack Beta Tester plugin to the site?
  *        boolean wp-debug-log          Should we set WP_DEBUG and WP_DEBUG log to true ?
- *        boolean wp-log-viewer         Should we add WP Log Viewer plugin to the site?
- * @return Array|Null                    null or the app data as returned by ServerPilot's API on creation.
+ *        boolean wp-log-viewer         Should we add WP Log Viewer plugin to the site.
+ * @param bool   $spare Spare site.
+ *
+ * @throws \Exception Throws on any error launching WP.
+ *
+ * @return array|null                    null or the app data as returned by ServerPilot's API on creation.
  */
 function launch_wordpress( $php_version = 'default', $requested_features = array(), $spare = false ) {
 	$default_features = array(
@@ -181,6 +189,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = array
 			} elseif ( ! $app ) {
 				throw new \Exception( "Couldn't get a spare site" );
 			}
+			// phpcs:disable
 			// }
 			// $app = $spare ? false : get_spare_site( $php_version );
 			// if ( $app ) {
@@ -190,6 +199,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = array
 			// }
 
 			// if ( ! $spare ) {
+			// phpcs:enable
 			$site_title = settings( 'use_subdomain_based_wordpress_title', false ) ?
 			ucwords( str_replace( '-', ' ', $app->subdomain ) ) :
 			'My WordPress Site';
@@ -238,7 +248,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = array
 			debug( '%s: Adding features', $app->domain );
 
 			// Run command via SSH
-			// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter
+			// The commands to be run are the result of applying the `jurassic_ninja_feature_command` filter.
 			run_commands_for_features( $app->username, $app->password, $app->domain );
 			$diff = round( microtime( true ) - $start_time );
 			debug( "Finished launching %s. Took %02d:%02d.\n", $app->domain, floor( $diff / 60 ), $diff % 60 );
@@ -253,8 +263,8 @@ function launch_wordpress( $php_version = 'default', $requested_features = array
 /**
  * Create a slug from a string
  *
- * @param  string $str       The string to slugify
- * @param  string $delimiter Character to use between words
+ * @param  string $str       The string to slugify.
+ * @param  string $delimiter Character to use between words.
  * @return string            Slugified version of the string.
  */
 function create_slug( $str, $delimiter = '-' ) {
@@ -282,7 +292,6 @@ function expired_sites() {
  * Extends the expiration date for a site
  *
  * @param  string $domain The name of the site.
- * @return [type]         [description]
  */
 function extend_site_life( $domain ) {
 	db()->update(
@@ -303,7 +312,7 @@ function extend_site_life( $domain ) {
  * Given an array of domains as ServerPilot returns in its API endpoint for an app
  * excludes, the wildcard entries from the array and returns it.
  *
- * @param  Array $domains The array of domains for an app as returned by ServerPilot's API
+ * @param  array $domains The array of domains for an app as returned by ServerPilot's API.
  * @return string          The main domain
  */
 function figure_out_main_domain( $domains ) {
@@ -313,7 +322,7 @@ function figure_out_main_domain( $domains ) {
 			return false === strpos( $domain, '*.' );
 		}
 	);
-	// reset() trick to get first item
+	// reset() trick to get first item.
 	return reset( $valid );
 }
 
@@ -321,7 +330,7 @@ function figure_out_main_domain( $domains ) {
  * Downloads WordPress, creates a wp-config.php file and installs WordPress admin user.
  *
  * @param  [type] $domain            The domain name that will be configured for the site.
- * @param  [type] $wordpress_options WordPress options for the admin user and site. Resembling ServerPilot's parameter for creating an app
+ * @param  [type] $wordpress_options WordPress options for the admin user and site. Resembling ServerPilot's parameter for creating an app.
  * @param  [type] $dbname            The database name this WordPress will connect to.
  * @param  [type] $dbusername        The database username this WordPress will use.
  * @param  [type] $dbpassword        The database password this WordPress will use.
@@ -351,8 +360,9 @@ function install_wordpress_with_cli( $domain, $wordpress_options, $dbname, $dbus
 /**
  * Generates a new username with a pseudo random name on the managed server.
  *
- * @param  string $password The password to be assigned for the user
- * @return [type]           [description]
+ * @param  string $password The password to be assigned for the user.
+ *
+ * @throws \Exception If WP_Error from attempting to create user.
  */
 function generate_new_user( $password ) {
 	$username = generate_random_username();
@@ -366,9 +376,7 @@ function generate_new_user( $password ) {
 }
 
 /**
- * Returns a ServerPilot instance
- *
- * @return [type] [description]
+ * Returns a ServerPilot instance.
  */
 function provisioner() {
 	static $jurassic_ninja_provisioner;
@@ -400,6 +408,8 @@ function generate_random_password() {
  *      lib/words/nouns.txt
  * Tne return value is slugified.
  *
+ * @param array $features Array of features.
+ *
  * @return string A slugified subdomain.
  */
 function generate_random_subdomain( $features ) {
@@ -409,9 +419,9 @@ function generate_random_subdomain( $features ) {
 	do {
 		$name = $generator->getName( settings( 'use_alliterations_for_subdomain', true ) );
 		$slug = create_slug( $name );
-		// Add moar randomness to shortlived sites
+		// Add moar randomness to shortlived sites.
 		if ( $features['shortlife'] ) {
-			$slug = sprintf( '%s-%s', $slug, rand( 2, 500 ) );
+			$slug = sprintf( '%s-%s', $slug, wp_rand( 2, 500 ) );
 		}
 	} while ( subdomain_is_used( $slug ) && $collision_attempts-- > 0 );
 	return $slug;
@@ -430,8 +440,7 @@ function generate_random_username() {
 /**
  * Attempts to log whatever it's feeded by using error_log and printf
  *
- * @param  mixed $stuff  Whatever
- * @return [type]        [description]
+ * @param  mixed $stuff  Whatever.
  */
 function l( $stuff ) {
 	// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_error_log
@@ -440,8 +449,15 @@ function l( $stuff ) {
 	// phpcs:enable
 }
 
+/**
+ * Add features before login.
+ *
+ * @param object $app     Passed by reference. This object contains the resulting data after creating a PHP app.
+ * @param array  $features The list of features we're going to add to the WordPress installation.
+ * @param string $domain  The domain under which this app will be running.
+ */
 function add_features_before_auto_login( &$app, $features, $domain ) {
-	// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
+	// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not.
 	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
 	/**
 	 * Allows the enqueueing of commands for features with each launched site.
@@ -462,8 +478,15 @@ function add_features_before_auto_login( &$app, $features, $domain ) {
 	// phpcs:enable
 }
 
+/**
+ * Add features after auto login.
+ *
+ * @param object $app     Passed by reference. This object contains the resulting data after creating a PHP app.
+ * @param array  $features The list of features we're going to add to the WordPress installation.
+ * @param string $domain  The domain under which this app will be running.
+ */
 function add_features_after_auto_login( &$app, $features, $domain ) {
-	// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not
+	// Here PHP Codesniffer parses &$app as if it were a deprecated pass-by-reference but it is not.
 	// phpcs:disable PHPCompatibility.PHP.ForbiddenCallTimePassByReference.NotAllowed
 	/**
 	 * Allows the enqueueing of commands for features with each launched site.
@@ -484,6 +507,11 @@ function add_features_after_auto_login( &$app, $features, $domain ) {
 	// phpcs:enable
 }
 
+/**
+ * Get a spare site for a particular PHP version.
+ *
+ * @param string $php_version PHP Version.
+ */
 function get_spare_site( $php_version ) {
 	// phpcs:disable WordPress.WP.DeprecatedFunctions.generate_random_passwordFound
 	$lock = generate_random_password();
@@ -517,20 +545,32 @@ function get_spare_site( $php_version ) {
 	return $app;
 }
 
+/**
+ * Create PHP app.
+ *
+ * @param string $php_version PHP Version.
+ * @param array  $features Array of features.
+ * @param bool   $spare Spare or current site.
+ *
+ * @throws \Exception If WP_Errors are returned.
+ */
 function create_php_app( $php_version, $features, $spare = false ) {
 	$start_time = microtime( true );
-	$subdomain = '';
+	$subdomain  = '';
 	// phpcs:disable WordPress.WP.DeprecatedFunctions.generate_random_passwordFound
 	$password = generate_random_password();
 	// phpcs:enable
 	$subdomain = generate_random_subdomain( $features );
 		// title-case the subdomain
-		// or default to the classic My WordPress Site
+		// or default to the classic My WordPress Site.
 	$domain = sprintf( '%s.%s', $subdomain, settings( 'domain' ) );
 
+	// phpcs:disable
 	// if ( $spare ) {
 	// $domain = sprintf( '%s.spare', $user->name );
 	// }
+	// I'm not sure what the above is for.
+	// phpcs:enable
 	debug( 'Creating sysuser for %s', $domain );
 
 	$user = generate_new_user( $password );
@@ -572,8 +612,10 @@ function create_php_app( $php_version, $features, $spare = false ) {
 /**
  * Stores a record for a freshly created site
  *
- * @param  Array $app Site data as returned by ServerPilot's API on creation
- * @return [type]       [description]
+ * @param array  $app Site data as returned by ServerPilot's API on creation.
+ * @param string $password Password.
+ * @param bool   $shortlived Is the site shortlived.
+ * @param string $launched_by Site launcher user, if known.
  */
 function log_new_unused_site( $app, $password, $shortlived = false, $launched_by = null ) {
 	$launched_by = $launched_by ? $launched_by->user_login : '';
@@ -595,8 +637,10 @@ function log_new_unused_site( $app, $password, $shortlived = false, $launched_by
 /**
  * Stores a record for a launched site
  *
- * @param  Array $app Site data as returned by ServerPilot's API on creation
- * @return [type]       [description]
+ * @param array  $app Site data as returned by ServerPilot's API on creation.
+ * @param string $password Password.
+ * @param bool   $shortlived Is the site shortlived.
+ * @param string $launched_by Site launcher user, if known.
  */
 function log_new_site( $app, $password, $shortlived = false, $launched_by = null ) {
 	$launched_by = $launched_by ? $launched_by->user_login : ( is_cli_running() ? 'cli' : '' );
@@ -620,8 +664,7 @@ function log_new_site( $app, $password, $shortlived = false, $launched_by = null
 /**
  * Stores a record for a purged site
  *
- * @param  Array $data Site data as returned by a query to the sites table
- * @return [type]       [description]
+ * @param  array $data Site data as returned by a query to the sites table.
  */
 function log_purged_site( $data ) {
 	db()->insert(
@@ -648,6 +691,11 @@ function log_purged_site( $data ) {
 	};
 }
 
+/**
+ * Ensure there are enough space sites.
+ *
+ * @return int Number of spare sites.
+ */
 function maintain_spare_sites_pool() {
 	$count = db()->get_var( 'select COUNT(*) from spare_sites' );
 	$min_spare_sites = settings( 'min_spare_sites' );
@@ -664,12 +712,17 @@ function maintain_spare_sites_pool() {
 /**
  * Returns all of the sites managed and created by this instance of Jurassic Ninja
  *
- * @return Array The list of sites
+ * @return array The list of sites.
  */
 function managed_sites() {
 	return db()->get_results( 'select * from sites', \ARRAY_A );
 }
 
+/**
+ * Spare sites getter.
+ *
+ * @return array List of spare sites.
+ */
 function spare_sites() {
 	return db()->get_results( 'select * from spare_sites', \ARRAY_A );
 }
@@ -678,8 +731,7 @@ function spare_sites() {
  * Updates the record for the site in the sites table indicating
  * that the creator has at least visited wp-admin once (the first time)
  *
- * @param  string $domain The name of the site
- * @return [type]         [description]
+ * @param  string $domain The name of the site.
  */
 function mark_site_as_checked_in( $domain ) {
 	db()->update(
@@ -709,7 +761,6 @@ function purge_sites() {
 	// with sites creation given that ServerPilot runs tasks in series.
 	$sites = array_slice( $sites, 0, $max_sites );
 	$system_users = provisioner()->sysuser_list();
-	$site_users = wp_list_pluck( $sites, 'username' );
 	$purge = array();
 
 	foreach ( $system_users as $user ) {
@@ -770,16 +821,16 @@ function purge_sites() {
  *
  * @param string $user     System user for ssh.
  * @param string $password System password for ssh.
- * @param string $cmd      The command to run on the shell
+ * @param string $cmd      The command to run on the shell.
  * @return string          The command output
  */
 function run_command_on_behalf( $user, $password, $cmd ) {
 	$domain = settings( 'domain' );
-	// Redirect all errors to stdout so exec shows them in the $output parameters
+	// Redirect all errors to stdout so exec shows them in the $output parameters.
 	$run = "SSHPASS=$password sshpass -e ssh -oStrictHostKeyChecking=no $user@$domain '$cmd' 2>&1";
 	$output = null;
 	$return_value = null;
-	// Use exec instead of shell_exect so we can know if the commands failed or not
+	// Use exec instead of shell_exect so we can know if the commands failed or not.
 	// phpcs:disable WordPress.PHP.DiscouragedPHPFunctions.system_calls_exec
 	exec( $run, $output, $return_value );
 	// phpcs:enable
@@ -801,10 +852,11 @@ function run_command_on_behalf( $user, $password, $cmd ) {
  * Runs a set of commands via ssh.
  * The command string is a result of applying filter `jurassic_ninja_feature_command`
  *
- * @param  string $user     [description]
- * @param  string $password [description]
- * @param  string $domain   [description]
- * @return [type]           [description]
+ * @param  string $user     [description].
+ * @param  string $password [description].
+ * @param  string $domain   [description].
+ *
+ * @throws \Exception If a WP_Error is returned.
  */
 function run_commands_for_features( $user, $password, $domain ) {
 	$wp_home = "~/apps/$user/public";
@@ -855,7 +907,8 @@ function sites_to_be_purged() {
 /**
  * Checks if a subdomain is already user by a running site.
  *
- * @param $subdomain    The subdomain to check for collision with an already launched site.
+ * @param string $subdomain  The subdomain to check for collision with an already launched site.
+ *
  * @return bool         Return true if the domain is used by a running site.
  */
 function subdomain_is_used( $subdomain ) {

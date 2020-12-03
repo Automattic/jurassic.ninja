@@ -1,4 +1,9 @@
 <?php
+/**
+ * Debug helper!
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 

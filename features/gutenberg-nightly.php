@@ -1,4 +1,9 @@
 <?php
+/**
+ * G Nightly.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 

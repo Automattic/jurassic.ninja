@@ -1,4 +1,9 @@
 <?php
+/**
+ * CRM for everyone.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -16,7 +21,7 @@ add_action(
 			function ( &$app, $features, $domain ) use ( $defaults ) {
 				$features = array_merge( $defaults, $features );
 				if ( $features['jetpack-crm-master'] ) {
-					// Abort the installation from master if the public plugin is selected
+					// Abort the installation from master if the public plugin is selected.
 					if ( $features['zero-bs-crm'] ) {
 						return;
 					}

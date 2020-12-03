@@ -1,4 +1,9 @@
 <?php
+/**
+ * WC Beta Tester.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -41,7 +46,7 @@ add_action(
 			function ( $features, $json_params ) {
 				if ( isset( $json_params['woocommerce-beta-tester'] ) ) {
 					$features['woocommerce-beta-tester'] = $json_params['woocommerce-beta-tester'];
-					// The WooCommerce Beta Tester Plugin works only when woocommerce is installed and active too
+					// The WooCommerce Beta Tester Plugin works only when woocommerce is installed and active too.
 					if ( $features['woocommerce-beta-tester'] ) {
 						$features['woocommerce'] = true;
 					}

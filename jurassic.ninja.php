@@ -1,10 +1,11 @@
 <?php
-
-/*
+/**
  * Plugin Name: Jurassic Ninja
  * Description: Launch ephemeral instances of WordPress + Jetpack using ServerPilot and an Ubuntu Box.
  * Version: 5.7
  * Author: Automattic
+ *
+ * @package jurassic-ninja
  **/
 
 namespace jn;
@@ -23,8 +24,6 @@ init_or_fail_if_no_dependencies_installed();
  * Creates settings page, REST API extensions, cron jobs, and administrative tables.
  * It also adds nonce and javascript to the /create page.
  * Will not load any feature if the settings are not well configured.
- *
- * @return [type] [description]
  */
 function init() {
 	require_once __DIR__ . '/lib/cron-stuff.php';
@@ -33,7 +32,7 @@ function init() {
 	require_once __DIR__ . '/lib/stuff.php';
 
 	if ( is_cli_running() ) {
-		require_once __DIR__ . '/lib/cli-stuff.php';
+		require_once __DIR__ . '/lib/class-jn-cli-command.php';
 	}
 
 	/**
@@ -44,18 +43,18 @@ function init() {
 	 * @since 3.0
 	 */
 	do_action( 'jurassic_ninja_admin_init' );
-	// Create settings page
+	// Create settings page.
 	add_settings_page();
-	// Settings problems include credentials and IDs not configured
+	// Settings problems include credentials and IDs not configured.
 	if ( ! settings_problems() ) {
 		// Include the JS only under the page which has the /create slug.
 		add_scripts();
-		// Serve the API root and nonce only under the page which has the /create slug
+		// Serve the API root and nonce only under the page which has the /create slug.
 		add_rest_nonce();
-		// Add wp-json /create /checkin and /extend endpoints
+		// Add wp-json /create /checkin and /extend endpoints.
 		add_rest_api_endpoints();
 		// Disable temporarily. Run via crontab and Jurassic Ninja's CLI
-		// add_cron_job( __FILE__ );
+		// add_cron_job( __FILE__ );.
 		add_admin_bar_node();
 	}
 	/**
@@ -70,6 +69,11 @@ function init() {
 	create_tables( __FILE__ );
 }
 
+/**
+ * Is WP CLI running?
+ *
+ * @return bool
+ */
 function is_cli_running() {
 	return defined( 'WP_CLI' ) && WP_CLI;
 }
@@ -119,7 +123,7 @@ function add_rest_nonce() {
 		'wp_enqueue_scripts',
 		function () {
 			// Add the nonce under the /create path and
-			// if the user can manage options, add it also on /specialops
+			// if the user can manage options, add it also on /specialops.
 			if ( page_is_launching_page() ) {
 				wp_localize_script(
 					'jurassicninja.js',

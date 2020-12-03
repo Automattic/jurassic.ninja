@@ -4,6 +4,8 @@
  * The thing is that ServerPilot PHP just throws if there's an error
  * so the wrappers defined here try/catch every call and return WP_Errors if The
  * library throws an exception
+ *
+ * @package jurassic-ninja
  */
 
 namespace jn;
@@ -12,13 +14,24 @@ if ( ! defined( '\\ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Class ServerPilotProvisioner
+ *
+ * @package jn
+ */
 class ServerPilotProvisioner {
+
+	/**
+	 * Serverpilot instance.
+	 *
+	 * @var \ServerPilot|null
+	 */
 	private $serverpilot_instance = null;
 
 	/**
 	 * Returns a ServerPilot instance
 	 *
-	 * @return [type] [description]
+	 * @throws \Exception Throws if new ServerPilot fails.
 	 */
 	public function __construct() {
 		if ( ! $this->serverpilot_instance ) {
@@ -30,13 +43,23 @@ class ServerPilotProvisioner {
 		}
 	}
 
+	/**
+	 * Creates an app.
+	 *
+	 * @param Object $user User object (WP user?).
+	 * @param string $php_version PHP Version.
+	 * @param string $domain Domain.
+	 * @param array  $features Array of features.
+	 *
+	 * @return \WP_Error
+	 */
 	public function create_app( $user, $php_version, $domain, $features ) {
 		// If creating a subdomain based multisite, we need to tell ServerPilot that the app as a wildcard subdomain.
 		// Doing this for all sites doesn't hurt.
 		$domain_arg = array( $domain, '*.' . $domain );
 		// Mitigate ungraceful PHP-FPM restart for shortlived sites by randomizing PHP version
 		// PHP does not support graceful "restart" so every php-pool gets closed
-		// each time ServerPilot needs to SIGUSR1 php for reloading configuration
+		// each time ServerPilot needs to SIGUSR1 php for reloading configuration.
 		$shortlife_php_versions_alternatives = array_keys( available_php_versions() );
 		if ( $features['shortlife'] && 'default' === $php_version ) {
 			$php_version = sprintf( 'php%s', $shortlife_php_versions_alternatives[ array_rand( $shortlife_php_versions_alternatives ) ] );
@@ -55,6 +78,12 @@ class ServerPilotProvisioner {
 		}
 	}
 
+	/**
+	 * Create system user
+	 *
+	 * @param string $username Username.
+	 * @param string $password Password.
+	 */
 	public function create_sysuser( $username, $password ) {
 		try {
 			$response = $this->serverpilot_instance->sysuser_create( settings( 'serverpilot_server_id' ), $username, $password );
@@ -68,10 +97,11 @@ class ServerPilotProvisioner {
 	/**
 	 * Creates a mysql database using ServerPilot's API
 	 *
-	 * @param  String $apid      The id of the app to attach this database.
+	 * @param  String $appid     The id of the app to attach this database.
 	 * @param  String $name      The name of the Database.
-	 * @param  String $username  The username that will be allowed to connect to this database
+	 * @param  String $username  The username that will be allowed to connect to this database.
 	 * @param  String $password  The password for $username.
+	 *
 	 * @return Object            An object with the new app data.
 	 */
 	public function create_database( $appid, $name, $username, $password ) {
@@ -97,6 +127,9 @@ class ServerPilotProvisioner {
 		}
 	}
 
+	/**
+	 * Returns systems user list.
+	 */
 	public function sysuser_list() {
 		$system_users = array();
 		try {
@@ -121,10 +154,15 @@ class ServerPilotProvisioner {
 		return $system_users;
 	}
 
+	/**
+	 * Delete site
+	 *
+	 * @param string $userid User ID.
+	 */
 	public function delete_site( $userid ) {
 		try {
 			// For ServerPilot we can just delete the sysuser and it will clean
-			// also its databases and sites
+			// also its databases and sites.
 			return $this->serverpilot_instance->sysuser_delete( $userid );
 		} catch ( \ServerPilotException $e ) {
 			return new \WP_Error( $e->getCode(), $e->getMessage() );
@@ -137,8 +175,7 @@ class ServerPilotProvisioner {
 	 * of instances created by ServerPilot and the throttling mechanism
 	 * enforced by Let's Encrypt.
 	 *
-	 * @param  string $appid The ServerPilot id for the app
-	 * @return [type]         [description]
+	 * @param  string $appid The ServerPilot id for the app.
 	 */
 	public function enable_auto_ssl( $appid ) {
 		try {
@@ -151,11 +188,10 @@ class ServerPilotProvisioner {
 	}
 
 	/**
-	 * Enable  SSL on a ServerPilot app according to the configured certificate
+	 * Enable SSL on a ServerPilot app according to the configured certificate
 	 * in Jurassic Ninja settings.
 	 *
-	 * @param  string $app_id The ServerPilot id for the app
-	 * @return [type]         [description]
+	 * @param  string $appid The ServerPilot id for the app.
 	 */
 	public function enable_ssl( $appid ) {
 		$response = $this->add_ssl_certificate( $appid );
@@ -166,6 +202,11 @@ class ServerPilotProvisioner {
 		return $response;
 	}
 
+	/**
+	 * Add SSL certs.
+	 *
+	 * @param string $appid The ServerPilot id for the app.
+	 */
 	public function add_ssl_certificate( $appid ) {
 		$private_key = settings( 'ssl_private_key' );
 		$certificate = settings( 'ssl_certificate' );
@@ -178,7 +219,7 @@ class ServerPilotProvisioner {
 			if ( ! $ca_certificates ) {
 				debug( 'No CA certificates configured in settings. This may take a little bit longer to launch' );
 			}
-			// Add certificate
+			// Add certificate.
 			debug( 'Adding SSL certificate for app %s', $appid );
 			$response = $this->serverpilot_instance->ssl_add( $appid, $private_key, $certificate, $ca_certificates );
 			/**
@@ -187,14 +228,20 @@ class ServerPilotProvisioner {
 			 * without the wait, the SSL provisioning still works fine.
 			 * Tested a few sites and nothing broke.
 			 * Leaving it commented in case something breaks eventually.
+			 *
+			 * $this->wait_for_serverpilot_action( $data->actionid );
 			 */
-			// $this->wait_for_serverpilot_action( $data->actionid );
 			return $response;
 		} catch ( \ServerPilotException $e ) {
 			return new \WP_Error( $e->getCode(), $e->getMessage() );
 		}
 	}
 
+	/**
+	 * Force SSL redirection.
+	 *
+	 * @param string $appid The ServerPilot id for the app.
+	 */
 	public function force_ssl_redirection( $appid ) {
 		try {
 			debug( 'Enabling forced SSL redirection for app %s', $appid );
@@ -203,9 +250,13 @@ class ServerPilotProvisioner {
 		} catch ( \ServerPilotException $e ) {
 			return new \WP_Error( $e->getCode(), $e->getMessage() );
 		}
-		// $this->wait_for_serverpilot_action( $response->actionid );
 	}
 
+	/**
+	 * Get App info.
+	 *
+	 * @param string $appid The ServerPilot id for the app.
+	 */
 	public function get_app( $appid ) {
 		try {
 				return $this->serverpilot_instance->app_info( $appid )->data;
@@ -227,6 +278,13 @@ class ServerPilotProvisioner {
 		}
 	}
 
+	/**
+	 * Update app
+	 *
+	 * @param string|int  $appid App ID.
+	 * @param string|null $php_version PHP ver.
+	 * @param null        $domains Domains.
+	 */
 	public function update_app( $appid, $php_version = null, $domains = null ) {
 		try {
 			$php_version = 'default' === $php_version ? 'php' . array_keys( available_php_versions() )[0] : $php_version;
@@ -238,6 +296,14 @@ class ServerPilotProvisioner {
 		}
 	}
 
+	/**
+	 * Update the system user.
+	 *
+	 * @param string|int $sysuserid System user ID.
+	 * @param string     $password Password.
+	 *
+	 * @return mixed|\WP_Error
+	 */
 	public function update_sysuser( $sysuserid, $password ) {
 		try {
 			return $this->serverpilot_instance->sysuser_update( $sysuserid, $password );
@@ -249,7 +315,7 @@ class ServerPilotProvisioner {
 	/**
 	 * Locks the process by looping until ServerPilots says the action is completed
 	 *
-	 * @param  string $action_id The ServerPilot Id for an action
+	 * @param  string $action_id The ServerPilot Id for an action.
 	 * @return string            The status of the action
 	 */
 	public function wait_for_serverpilot_action( $action_id ) {

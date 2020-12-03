@@ -1,4 +1,9 @@
 <?php
+/**
+ * Tests a blocked XMLRPC.php file.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -36,11 +41,14 @@ add_action(
 	}
 );
 
+/**
+ * Blocks XMLRPC via either 403 or 404 methods.
+ */
 function block_xmlrpc() {
 	$techniques = array(
-		// Force a 403
+		// Force a 403.
 		'echo -e "\n\n#Block XML-RPC\n<Files xmlrpc.php>\norder deny,allow\ndeny from all\n</Files>" >> .htaccess',
-		// Force a 404
+		// Force a 404.
 		'rm xmlrpc.php',
 	);
 	$cmd = $techniques[ array_rand( $techniques ) ];

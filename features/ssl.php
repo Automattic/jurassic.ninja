@@ -1,4 +1,9 @@
 <?php
+/**
+ * Let's SSL it!
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -12,13 +17,13 @@ add_action(
 
 		add_action(
 			'jurassic_ninja_add_features_after_create_app',
-			function ( &$app, $features, $domain ) use ( $defaults ) {
+			function ( &$app, $features ) use ( $defaults ) {
 				$features = array_merge( $defaults, $features );
 				if ( $features['auto_ssl'] ) {
 					// Currently not a feature of Jurassic Ninja but the code works.
 					provisioner()->enable_auto_ssl( $app->id );
 				} else {
-					$response = provisioner()->add_ssl_certificate( $app->id );
+					provisioner()->add_ssl_certificate( $app->id );
 				}
 			},
 			10,
@@ -31,7 +36,7 @@ add_action(
 				// We can't easily enable SSL for subodmains because
 				// wildcard certificates don't support multiple levels of subdomains
 				// and this can result in awful experience.
-				// Need to explore a little bit better
+				// Need to explore a little bit better.
 
 				if ( $features['ssl'] && ! ( isset( $features['subdomain_multisite'] ) && $features['subdomain_multisite'] ) ) {
 					$features = array_merge( $defaults, $features );
@@ -138,6 +143,11 @@ add_action(
 	}
 );
 
+/**
+ * WP CLI commands to set URLs.
+ *
+ * @param string $domain Site domain.
+ */
 function set_home_and_site_url( $domain ) {
 	$cmd = "wp option set siteurl https://$domain"
 		. " && wp option set home https://$domain";

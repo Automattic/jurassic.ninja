@@ -1,4 +1,9 @@
 <?php
+/**
+ * WC Smooth.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 

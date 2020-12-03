@@ -1,4 +1,9 @@
 <?php
+/**
+ * Error stuff.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 

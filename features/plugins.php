@@ -1,4 +1,9 @@
 <?php
+/**
+ * Plugin installer.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -32,7 +37,7 @@ add_action(
 		// Set all defaults to false.
 		// Will probably add a filter here.
 		$defaults = array_map(
-			function ( $slug ) {
+			function () {
 				return false;
 			},
 			$whitelist
@@ -43,7 +48,7 @@ add_action(
 			function ( &$app = null, $features, $domain ) use ( $defaults, $whitelist ) {
 				$features = array_merge( $defaults, $features );
 				foreach ( $whitelist as $slug => $name ) {
-					// Hack for Crowdsignal cause it's still referred to as polldaddy on the org repo
+					// Hack for Crowdsignal cause it's still referred to as polldaddy on the org repo.
 					if ( 'crowdsignal' === $slug ) {
 						if ( isset( $features['crowdsignal'] ) && $features['crowdsignal'] ) {
 							debug( '%s: Adding %s', $domain, $name );
@@ -158,6 +163,8 @@ add_action(
 
 /**
  * Installs and activates a given plugin from the Plugin Directory.
+ *
+ * @param string $plugin_slug Plugin's slug.
  */
 function add_directory_plugin( $plugin_slug ) {
 	$cmd = "wp plugin install $plugin_slug --activate";

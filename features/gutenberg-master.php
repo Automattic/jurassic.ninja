@@ -1,4 +1,9 @@
 <?php
+/**
+ * We're going straight to the dev-iest of devs for G.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 

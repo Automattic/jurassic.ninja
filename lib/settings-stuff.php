@@ -1,4 +1,9 @@
 <?php
+/**
+ * Settings stuff.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -8,6 +13,11 @@ if ( ! defined( '\\ABSPATH' ) ) {
 
 define( 'SETTINGS_KEY', 'jurassic-ninja-settings' );
 
+/**
+ * Returns an array of PHP versions available.
+ *
+ * @return array
+ */
 function available_php_versions() {
 	return array(
 		'7.4' => __( '7.4', 'jurassic-ninja' ),
@@ -21,14 +31,14 @@ function available_php_versions() {
 /**
  * Access a plugin option
  *
- * @param  String $key The particular option we want to access
- * @param  Mixed  $default As with get_option you can specify a defaul value to return if the option is not set
+ * @param  String $key The particular option we want to access.
+ * @param  Mixed  $default As with get_option you can specify a default value to return if the option is not set.
  * @return String      The option value. All of the are just strings.
  */
 function settings( $key = null, $default = null ) {
 	$options = get_option( SETTINGS_KEY );
 
-	// Create the array needed by ServerPilot() here so I don't have to copy/paste this around
+	// Create the array needed by ServerPilot() here so I don't have to copy/paste this around.
 	if ( 'serverpilot' === $key ) {
 		return array(
 			'id' => $options['serverpilot_client_id'],
@@ -71,6 +81,7 @@ function settings_problems() {
 		$unconfigured[] = __( 'Main Admin Email Address', 'jurassic-ninja' );
 	};
 
+	// phpcs:disable
 	// Comment this out until I find a better way to do this without querying
 	// ServerPilot's API on each page load :troll:
 	// $serverpilot_settings_set = settings( 'serverpilot_client_key' ) && settings( 'serverpilot_client_id' )
@@ -82,6 +93,7 @@ function settings_problems() {
 	// $unconfigured[] = __( 'valid ServerPilot Id, Key and Server Id for a paid plan', 'jurassic-ninja' );
 	// }
 	// }
+	// phpcs:enable
 
 	return $unconfigured;
 }
