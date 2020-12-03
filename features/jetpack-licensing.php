@@ -45,11 +45,11 @@ function fetch_product_families() {
 	if ( 200 !== $status ) {
 		return new WP_Error(
 			'get_products_request_failed',
-			// Translators: %s = error message returned by an API
+			// Translators: %s = error message returned by an API.
 			sprintf( __( 'Get products request failed with: %s', 'jurassic-ninja' ), $body ),
-			[
+			array(
 				'status' => $status,
-			]
+			)
 		);
 	}
 
@@ -347,10 +347,12 @@ add_action(
 /**
  * Register a shortcode which renders Jetpack Licensing controls suitable for SpecialOps usage.
  */
-add_shortcode( 'jn_jetpack_products_list', function () {
-	$families = get_product_families();
-	ob_start();
-	?>
+add_shortcode(
+	'jn_jetpack_products_list',
+	function () {
+		$families = get_product_families();
+		ob_start();
+		?>
 	<style>
 		.jn-jetpack-products-list {
 			margin: 0 0 32px 32px;
