@@ -76,6 +76,9 @@ Recommended `/specialops` page content:
 <li>
 <div class="checkbox"><label><input type="checkbox" data-feature="jetpack-debug-helper">&nbsp;Include Jetpack Debug Helper</label></div>
 </li>
+<li>
+<div class="checkbox"><label><input type="checkbox" data-feature="client-example">&nbsp;Include Client Example</label></div>
+</li>
 </ul>
 <!-- /wp:html --></div>
 <!-- /wp:column -->
