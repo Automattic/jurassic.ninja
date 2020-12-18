@@ -31,7 +31,16 @@ add_action( 'jurassic_ninja_init', function () {
  */
 function add_client_example_master_plugin() {
 	$client_example_plugin_master_url = CLIENT_EXAMPLE_PLUGIN_MASTER_URL;
-	$cmd                              = "wp plugin install $client_example_plugin_master_url --activate";
+
+	/**
+	 * We install the plugin but don't activate until dependencies are there or it will fail
+	 */
+	$cmd = "wp plugin install $client_example_plugin_master_url"
+		. ' && pushd . && cd wp-content/plugins/client-example'
+		. ' && composer install --no-dev'
+		. ' && wp plugin activate client-example'
+		. ' && popd';
+
 	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
 		return "$s && $cmd";
 	} );
