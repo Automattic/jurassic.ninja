@@ -13,7 +13,7 @@ add_action( 'jurassic_ninja_init', function () {
 		$features = array_merge( $defaults, $features );
 		if ( $features['jetpack-debug-helper'] ) {
 			debug( '%s: Adding Jetpack Debug Helper Plugin (master branch)', $domain );
-			add_client_example_master_plugin();
+			add_jetpack_debug_helper_master_plugin();
 		}
 	}, 10, 3 );
 
