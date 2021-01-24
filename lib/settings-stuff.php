@@ -1,4 +1,9 @@
 <?php
+/**
+ * Settings stuff.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -9,20 +14,36 @@ if ( ! defined( '\\ABSPATH' ) ) {
 define( 'SETTINGS_KEY', 'jurassic-ninja-settings' );
 
 /**
+ * Returns an array of PHP versions available.
+ *
+ * @return array
+ */
+function available_php_versions() {
+	return array(
+		'7.4' => __( '7.4', 'jurassic-ninja' ),
+		'7.3' => __( '7.3', 'jurassic-ninja' ),
+		'7.2' => __( '7.2', 'jurassic-ninja' ),
+		'7.0' => __( '7.0', 'jurassic-ninja' ),
+		'5.6' => __( '5.6', 'jurassic-ninja' ),
+	);
+}
+
+/**
  * Access a plugin option
- * @param  String $key The particular option we want to access
- * @param  Mixed  $default As with get_option you can specify a defaul value to return if the option is not set
+ *
+ * @param  String $key The particular option we want to access.
+ * @param  Mixed  $default As with get_option you can specify a default value to return if the option is not set.
  * @return String      The option value. All of the are just strings.
  */
 function settings( $key = null, $default = null ) {
 	$options = get_option( SETTINGS_KEY );
 
-	// Create the array needed by ServerPilot() here so I don't have to copy/paste this around
+	// Create the array needed by ServerPilot() here so I don't have to copy/paste this around.
 	if ( 'serverpilot' === $key ) {
-		return [
+		return array(
 			'id' => $options['serverpilot_client_id'],
 			'key' => $options['serverpilot_client_key'],
-		];
+		);
 	}
 
 	if ( ! isset( $options[ $key ] ) ) {
@@ -39,7 +60,7 @@ function settings( $key = null, $default = null ) {
  * @return Array problems found when checking settings.
  */
 function settings_problems() {
-	$unconfigured = [];
+	$unconfigured = array();
 
 	if ( ! settings( 'serverpilot_client_key' ) ) {
 		$unconfigured[] = __( 'ServerPilot Client Key', 'jurassic-ninja' );
@@ -60,17 +81,19 @@ function settings_problems() {
 		$unconfigured[] = __( 'Main Admin Email Address', 'jurassic-ninja' );
 	};
 
+	// phpcs:disable
 	// Comment this out until I find a better way to do this without querying
 	// ServerPilot's API on each page load :troll:
 	// $serverpilot_settings_set = settings( 'serverpilot_client_key' ) && settings( 'serverpilot_client_id' )
-	// 	&& settings( 'serverpilot_server_id' );
+	// && settings( 'serverpilot_server_id' );
 	// if ( $serverpilot_settings_set ) {
-	// 	try {
-	// 		sp()->server_info( settings( 'serverpilot_server_id' ) );
-	// 	} catch ( \ServerPilotException $e ) {
-	// 		$unconfigured[] = __( 'valid ServerPilot Id, Key and Server Id for a paid plan', 'jurassic-ninja' );
-	// 	}
+	// try {
+	// $provisioner->serverpilot_instance->server_info( settings( 'serverpilot_server_id' ) );
+	// } catch ( \ServerPilotException $e ) {
+	// $unconfigured[] = __( 'valid ServerPilot Id, Key and Server Id for a paid plan', 'jurassic-ninja' );
 	// }
+	// }
+	// phpcs:enable
 
 	return $unconfigured;
 }
@@ -81,7 +104,7 @@ function settings_problems() {
  *     - The Site Admin page
  */
 function add_settings_page() {
-	$options_page = [
+	$options_page = array(
 		'jurassic-ninja' => array(
 			'page_title' => __( 'Jurassic Ninja Sites Admin', 'jurassic-ninja' ),
 			'menu_title' => __( 'Jurassic Ninja', 'jurassic-ninja' ),
@@ -139,6 +162,35 @@ function add_settings_page() {
 							'placeholder' => 'INTERVAL 2 HOUR',
 							'value' => 'INTERVAL 2 HOUR',
 						),
+						'default_php_version' => array(
+							'id' => 'default_php_version',
+							'title' => 'Default PHP version for launched sites',
+							'type' => 'select',
+							'value' => '7.4',
+							'choices' => available_php_versions(),
+							'text' => 'Sites will be launched with this PHP version by default',
+						),
+						'use_spare_sites' => array(
+							'id' => 'use_spare_sites',
+							'type' => 'checkbox',
+							'title' => 'Use a pool of spare sites to speed up launching',
+							'checked' => false,
+							'text' => 'Some sites will be pre-launched and only set up when a site is requested',
+						),
+						'launch_site_if_no_spare_available' => array(
+							'type' => 'checkbox',
+							'id' => 'launch_site_if_no_spare_available',
+							'title' => 'Launch sites if no spare available',
+							'checked' => true,
+							'text' => 'If unchecked it will fail if there are no spare sites available',
+						),
+						'min_spare_sites' => array(
+							'id' => 'min_spare_sites',
+							'title' => 'Minimum number of spare sites',
+							'value' => '10',
+							'placeholder' => '10',
+							'text' => 'This number of PHP environments will be launched beforehand to speed up site launching',
+						),
 						'use_subdomain_based_wordpress_title' => array(
 							'id' => 'use_subdomain_based_wordpress_title',
 							'title' => __( 'Base the site titles on their subdomain', 'jurassic-ninja' ),
@@ -192,7 +244,7 @@ function add_settings_page() {
 				),
 			),
 		),
-	];
+	);
 	/**
 	 * Filters the argument passed to the RationalOptionPages constructor
 	 *

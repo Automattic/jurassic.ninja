@@ -3,10 +3,7 @@
 		<config name="minimum_supported_wp_version" value="4.7" />
 		<config name="testVersion" value="7.2-"/>
 
-		<rule ref="PHPCompatibility" />
-		<rule ref="WordPress-Core" />
-		<rule ref="WordPress-Extra" />
-		<rule ref="VariableAnalysis" />
+		<rule ref="Jetpack" />
 
 		<rule ref="WordPress.WP.I18n">
 			<properties>

@@ -1,41 +1,65 @@
 <?php
+/**
+ * WC Smooth.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
 define( 'WC_SMOOTH_GENERATOR_PLUGIN_URL', 'https://github.com/woocommerce/wc-smooth-generator/archive/master.zip' );
 
-add_action( 'jurassic_ninja_init', function() {
-	$defaults = [
-		'wc-smooth-generator' => false,
-	];
-
-	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
-		$features = array_merge( $defaults, $features );
-		if ( $features['wc-smooth-generator'] ) {
-			debug( '%s: Adding WooCommerce Smooth Generator Plugin', $domain );
-			add_wc_smooth_generator_plugin();
-		}
-	}, 10, 3 );
-
-	add_filter( 'jurassic_ninja_rest_feature_defaults', function( $defaults ) {
-		return array_merge( $defaults, [
+add_action(
+	'jurassic_ninja_init',
+	function () {
+		$defaults = array(
 			'wc-smooth-generator' => false,
-		] );
-	} );
+		);
 
-	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) {
-		if ( isset( $json_params['wc-smooth-generator'] ) ) {
-			$features['wc-smooth-generator'] = $json_params['wc-smooth-generator'];
-			// The WooCommerce Smooth Generator Plugin is meant to work alongside
-			// WooCommerce and active.
-			if ( $features['wc-smooth-generator'] ) {
-				$features['woocommerce'] = true;
+		add_action(
+			'jurassic_ninja_add_features_before_auto_login',
+			function ( &$app = null, $features, $domain ) use ( $defaults ) {
+				$features = array_merge( $defaults, $features );
+				if ( $features['wc-smooth-generator'] ) {
+					debug( '%s: Adding WooCommerce Smooth Generator Plugin', $domain );
+					add_wc_smooth_generator_plugin();
+				}
+			},
+			10,
+			3
+		);
+
+		add_filter(
+			'jurassic_ninja_rest_feature_defaults',
+			function ( $defaults ) {
+				return array_merge(
+					$defaults,
+					array(
+						'wc-smooth-generator' => false,
+					)
+				);
 			}
-		}
-		return $features;
-	}, 10, 2 );
+		);
 
-} );
+		add_filter(
+			'jurassic_ninja_rest_create_request_features',
+			function ( $features, $json_params ) {
+				if ( isset( $json_params['wc-smooth-generator'] ) ) {
+					$features['wc-smooth-generator'] = $json_params['wc-smooth-generator'];
+					// The WooCommerce Smooth Generator Plugin is meant to work alongside
+					// WooCommerce and active.
+					if ( $features['wc-smooth-generator'] ) {
+						$features['woocommerce'] = true;
+					}
+				}
+				return $features;
+			},
+			10,
+			2
+		);
+
+	}
+);
 
 /**
  * Installs and activates WooCommerce Smooth Generator plugin on the site.
@@ -51,7 +75,10 @@ function add_wc_smooth_generator_plugin() {
 		. ' && wp plugin activate wc-smooth-generator'
 		. ' && popd';
 
-	add_filter( 'jurassic_ninja_feature_command', function ( $s ) use ( $cmd ) {
-		return "$s && $cmd";
-	} );
+	add_filter(
+		'jurassic_ninja_feature_command',
+		function ( $s ) use ( $cmd ) {
+			return "$s && $cmd";
+		}
+	);
 }

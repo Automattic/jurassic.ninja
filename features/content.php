@@ -1,11 +1,18 @@
 <?php
+/**
+ * Add default content.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
-add_action( 'jurassic_ninja_init', function() {
-	$defaults = [
-		'content' => false,
-	];
+add_action(
+	'jurassic_ninja_init',
+	function () {
+		$defaults = array(
+			'content' => false,
+		);
 
 	add_action( 'jurassic_ninja_add_features_before_auto_login', function( &$app = null, $features, $domain ) use ( $defaults ) {
 		$features = array_merge( $defaults, $features );
@@ -15,13 +22,19 @@ add_action( 'jurassic_ninja_init', function() {
 		}
 	}, 1, 3 );
 
-	add_filter( 'jurassic_ninja_rest_create_request_features', function( $features, $json_params ) {
-		if ( isset( $json_params['content'] ) ) {
-			$features['content'] = $json_params['content'];
-		}
-		return $features;
-	}, 10, 2 );
-} );
+		add_filter(
+			'jurassic_ninja_rest_create_request_features',
+			function ( $features, $json_params ) {
+				if ( isset( $json_params['content'] ) ) {
+					$features['content'] = $json_params['content'];
+				}
+				return $features;
+			},
+			10,
+			2
+		);
+	}
+);
 
 function add_content( $domain, $features ) {
 	$schema = ( isset( $features['ssl'] ) && $features['ssl'] ) ? 'https://' : 'http://';

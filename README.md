@@ -7,7 +7,7 @@ A frontend to launching ephemeral WordPress instances that auto-destroy after so
 ### Requirements
 
 * An [ubuntu box managed by ServerPilot](https://serverpilot.io/community/articles/connect-a-digitalocean-server.html).
-* A [ServerPilot plan](https://serverpilot.io/community/articles/how-to-upgrade-your-account.html). One of the paid plans. Coach plan is OK. This is to take advantage of multiple sysusers management.
+* A [ServerPilot plan](https://serverpilot.io/community/articles/how-to-upgrade-your-account.html). One of the paid plans. Economy plan is OK. This is to take advantage of multiple sysusers management.
 * [sshpass](https://linux.die.net/man/1/sshpass) installed on the box. (Just `apt-get install sshpass` after you have the Ubuntu box set up).
 * **Have a domain name you fully control**.
     * Add a wildcard A record for every subdomain under that domain, pointing to the box's IP addresss.
@@ -35,7 +35,7 @@ On plugin activation, this plugin will create two tables on the same database yo
 
     ```sh
     cd wp-content/plugins/jurassic.ninja
-    composer install
+    composer install --no-dev
     ```
 
 * **Activate the plugin**
@@ -46,13 +46,21 @@ On plugin activation, this plugin will create two tables on the same database yo
 
 #### 2. Create pages for launching the sites.
 
-All of the frontend site launching is done by a little piece of Javascript that detects if current page is on the `/create` path and if it's the case it just launches a request in the background to this plugin's REST API in order to launch a new site.
+Your WordPress site will need a total of three pages in order for Jurassic Ninja to work with all its features:
 
-**Create a page with the slug `create`**
+##### Home
 
-Create a page titled **Create**. Make sure its slug is `/create`.
+Create a new page and call it "Home". For the page's content the minimum needed is that it contains a link to the `/create` page. You can use the contents of [home.md](/docs/home.md) as a starting point.
 
-And add this content using the Text version of the editor:
+In wp-admin go to `Settings > Reading` and configure the homepage as a static page and choose the page you just created called "Home".
+
+##### Create
+
+All the frontend site launching is done by a little piece of Javascript that detects if the current page is on the `/create` path. If this is the case, it launches a request in the background to this plugin's REST API in order to launch a new site.
+
+Create a new page and call it "Create". Use `create` as the slug.
+
+Add this content to it using the Text version of the editor:
 
 ```html
 <img id="img1" class="aligncenter" style="display: none;" data-failure-img-src="https://i.imgur.com/vdyaxmx.gif" src="https://media.giphy.com/media/uIRyMKFfmoHyo/giphy.gif" />
@@ -60,14 +68,19 @@ And add this content using the Text version of the editor:
 <p id="progress" class="lead" style="text-align: center;" data-success-message="The new WP is ready to go, visit it!" data-error-message="Oh No! There was a problem launching the new WP.">Launching a fresh WP with a Jetpack ...</p>
 ```
 
-**Create a home page with a link to `/create`**
+##### Specialops
 
-1. Create a new page and configure it a static front page with a link to `/create`.
+Create a new page and call it "Specialops". You can use the contents of [specialops.md](/docs/specialops.md) as a starting point.
+
 
 #### 3. Configure Jurassic Ninja Settings page in wp-admin
 
 1. Visit the Jurassic Ninja Settings page in wp-admin.
-2. Configure your Server pilot client id, client key and server id.
+2. Configure your Server pilot credentials:
+    - client id: You can get this from the Account Settings > API.
+    - client key: Same as API Key. This is in the same page as the client id.
+    - server id: When you click on a server, the last bit of the URL will be the sever id.
+
 3. Configure the top-domain on which this is going to create sites.
 
 ### Using a docker container for testing
@@ -92,3 +105,6 @@ docker-compose up
 
 1. Setup Jurassic Ninja plugin as menitioned above
 
+### Gotchas
+
+Because of the way ServerPilot handles PHP-FPM restarts, the PHP version you use for the Jurassic Ninja app cannot be used for any of the sites you plan to launch.
