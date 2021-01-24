@@ -35,7 +35,7 @@ On plugin activation, this plugin will create two tables on the same database yo
 
     ```sh
     cd wp-content/plugins/jurassic.ninja
-    composer install
+    composer install --no-dev
     ```
 
 * **Activate the plugin**
