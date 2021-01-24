@@ -25,7 +25,7 @@ add_action(
 			'crowdsignal'           => 'Crowdsignal',
 			'gutenberg'             => 'Gutenberg',
 			'jetpack'               => 'Jetpack',
-      'mailpoet'              => 'Mailpoet',
+			'mailpoet'              => 'Mailpoet',
 			'vaultpress'            => 'VaultPress',
 			'woocommerce'           => 'WooCommerce',
 			'wordpress-beta-tester' => 'WordPress Beta Tester Plugin',
