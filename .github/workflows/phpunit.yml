@@ -39,7 +39,7 @@ jobs:
           php --version
           composer --version
       - name: Setup environment
-        run: composer install --prefer-dist --no-suggest --no-progress --no-ansi --no-interaction
+        run: composer install --prefer-dist --no-progress --no-ansi --no-interaction
 
       - name: Run linting
         run: composer lint
