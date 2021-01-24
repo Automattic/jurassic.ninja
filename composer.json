@@ -4,10 +4,8 @@
 		"nubs/random-name-generator": "1.*"
 	},
 	"require-dev": {
-	       "dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
-	       "wp-coding-standards/wpcs": "^0.14.0",
-	        "sirbrillig/phpcs-variable-analysis": "^2.0",
-	        "wimg/php-compatibility": "^8.1",
+		"automattic/jetpack-codesniffer": "^2.0",
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
 		"phpunit/phpunit": "^6.4",
 		"squizlabs/php_codesniffer": "*"
 	},
@@ -15,5 +13,8 @@
 		"changelog": "git changelog  changelog.md",
 		"lint": "vendor/bin/phpcs",
 		"test": "vendor/bin/phpunit"
+	},
+	"config": {
+		"sort-packages": true
 	}
 }

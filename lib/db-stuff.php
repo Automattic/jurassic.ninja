@@ -1,4 +1,9 @@
 <?php
+/**
+ * DB stuff.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -6,6 +11,11 @@ if ( ! defined( '\\ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Returns the $wpdb global.
+ *
+ * @return wpdb WP DB object.
+ */
 function db() {
 	global $wpdb;
 	return $wpdb;
@@ -16,14 +26,15 @@ function db() {
  * for the activation process.
  * It will create a few tables needed for janitorial matters
  *
- * @param  string $plugin_file Nothing super useful. the plugin path
- * @return [type]              [description]
+ * @param  string $plugin_file Nothing super useful. the plugin path.
  */
 function create_tables( $plugin_file ) {
 	register_activation_hook( $plugin_file, 'jn\jurassic_ninja_create_table' );
 }
 
-
+/**
+ * Creates tables.
+ */
 function jurassic_ninja_create_table() {
 	global $wpdb;
 
@@ -70,7 +81,7 @@ function jurassic_ninja_create_table() {
 	}
 
 	try {
-		// phpcs:disable Generic.PHP.NoSilencedErrors.Discouraged
+		// phpcs:disable WordPress.PHP.NoSilencedErrors.Discouraged
 		@dbDelta( $sites_sql );
 		@dbDelta( $purged_sites_sql );
 		@dbDelta( $spare_sites_sql );

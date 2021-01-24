@@ -1,4 +1,9 @@
 <?php
+/**
+ * Sites view.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -54,29 +59,29 @@ $serverpilot_apps = apply_filters( 'jurassic_ninja_serverpilot_apps_list', provi
 	</thead>
 	<tbody>
 <?php
-$unmanaged = [];
+$unmanaged = array();
 foreach ( $serverpilot_apps as $site ) {
-	$domain = figure_out_main_domain( $site->domains );
-	$in_logs = array_key_exists( $domain, $db_sites_indexed );
-	if ( array_key_exists( $domain, $db_spare_sites_indexed ) ) {
+	$main_domain = figure_out_main_domain( $site->domains );
+	$in_logs     = array_key_exists( $main_domain, $db_sites_indexed );
+	if ( array_key_exists( $main_domain, $db_spare_sites_indexed ) ) {
 		continue;
 	}
 	if ( ! $in_logs ) {
 		$unmanaged[] = $site;
 		continue;
 	}
-	$db_id = $db_sites_indexed[ $domain ]['id'];
-	$created = $db_sites_indexed[ $domain ]['created'];
-	$sysusername = $db_sites_indexed[ $domain ]['username'];
-	$last_logged_in = $db_sites_indexed[ $domain ]['last_logged_in'];
-	$checked_in = $db_sites_indexed[ $domain ]['checked_in'];
-	$launched_by = $db_sites_indexed[ $domain ]['launched_by'];
-	$is_shortlived_site = $db_sites_indexed[ $domain ]['shortlived'];
+	$db_id = $db_sites_indexed[ $main_domain ]['id'];
+	$created = $db_sites_indexed[ $main_domain ]['created'];
+	$sysusername = $db_sites_indexed[ $main_domain ]['username'];
+	$last_logged_in = $db_sites_indexed[ $main_domain ]['last_logged_in'];
+	$checked_in = $db_sites_indexed[ $main_domain ]['checked_in'];
+	$launched_by = $db_sites_indexed[ $main_domain ]['launched_by'];
+	$is_shortlived_site = $db_sites_indexed[ $main_domain ]['shortlived'];
 	?>
 	<tr class="active">
 		<td class="column-columnname"><?php echo esc_html( $db_id ); ?></td>
 		<td class="column-columnname">
-			<a target="_blank" href="<?php echo 'http://' . esc_attr( $domain ); ?>" rel="noopener nofollow"<strong><?php echo esc_html( $domain ); ?></strong></a>
+			<a target="_blank" href="<?php echo 'http://' . esc_attr( $main_domain ); ?>" rel="noopener nofollow"<strong><?php echo esc_html( $main_domain ); ?></strong></a>
 		</td>
 		<td class="column-columnname"><a rel="noreferrer noopener" target="_blank" href="<?php echo esc_attr( "https://manage.serverpilot.io/servers/$serverpilot_server_id/users/$site->sysuserid" ); ?>"><?php echo esc_html( $sysusername ); ?></a></td>
 		<td class="column-columnname"><?php echo $is_shortlived_site ? esc_html__( 'Yes', 'jurassic-ninja' ) : esc_html__( 'No', 'jurassic-ninja' ); ?></td>

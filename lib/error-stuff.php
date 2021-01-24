@@ -1,4 +1,9 @@
 <?php
+/**
+ * Error stuff.
+ *
+ * @package jurassic-ninja
+ */
 
 namespace jn;
 
@@ -6,7 +11,7 @@ if ( ! defined( '\\ABSPATH' ) ) {
 	exit;
 }
 
-$jurassic_ninja_errors = [];
+$jurassic_ninja_errors = array();
 
 /**
  * Registers a hook to admin_notices
@@ -17,6 +22,7 @@ function add_error_notices() {
 
 /**
  * Will show a persistent admin notice for errors and messages in wp-admin
+ *
  * @return [type] [description]
  */
 function admin_noticies() {
@@ -57,10 +63,11 @@ function admin_noticies() {
 
 /**
  * Given an array of strings, returns and enumeration in text, comma separated.
- * @param  array  $list The strings to join.
+ *
+ * @param  array $list The strings to join.
  * @return string       The sentence
  */
-function list_in_words( $list = [] ) {
+function list_in_words( $list = array() ) {
 	$last = array_pop( $list );
 	$s = join( ', ', $list );
 	$s .= count( $list ) ? __( ' and ', 'jurassic-ninja' ) . $last : $last;
@@ -69,6 +76,7 @@ function list_in_words( $list = [] ) {
 
 /**
  * Returns an array of WP_Errors pushed to this plugin's own stack of errors
+ *
  * @return [Array] array of WP_Error
  */
 function errors() {
@@ -78,7 +86,8 @@ function errors() {
 
 /**
  * Push an error to the stack of errors that will be shown on the admin notices
- * @param  WP_Error  $err An error to be shown in the admin notice.
+ *
+ * @param  WP_Error $err An error to be shown in the admin notice.
  */
 function push_error( $err ) {
 	global $jurassic_ninja_errors;
