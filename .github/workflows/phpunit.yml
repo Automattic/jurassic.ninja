@@ -1,4 +1,4 @@
-name: PHPUnit tests
+name: Required PHP Checks
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ env:
 
 jobs:
   phpunit:
-    name: "PHPUnit tests"
+    name: "PHPCS & PHPUnit"
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
