@@ -11,6 +11,7 @@ if ( ! defined( '\\ABSPATH' ) ) {
 	exit;
 }
 
+global $jurassic_ninja_errors;
 $jurassic_ninja_errors = array();
 
 /**
