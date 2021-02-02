@@ -1,7 +1,7 @@
 {
 	"require": {
 		"daverogers/serverpilot-php": "1.*",
-		"nubs/random-name-generator": "1.*"
+		"nubs/random-name-generator": "^2.2"
 	},
 	"require-dev": {
 		"automattic/jetpack-codesniffer": "^2.0",
