@@ -1,12 +1,14 @@
 {
 	"require": {
 		"daverogers/serverpilot-php": "1.*",
-		"nubs/random-name-generator": "^2.2"
+		"nubs/random-name-generator": "^2.2",
+		"php": "~7.1 || 8.*"
 	},
 	"require-dev": {
 		"automattic/jetpack-codesniffer": "^2.0",
+		"brain/monkey": "^2.6",
 		"dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
-		"phpunit/phpunit": "^6.4",
+		"phpunit/phpunit": "7.* || 8.*",
 		"squizlabs/php_codesniffer": "*"
 	},
 	"scripts": {

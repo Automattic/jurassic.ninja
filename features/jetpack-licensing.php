@@ -347,7 +347,7 @@ add_action(
 /**
  * Register a shortcode which renders Jetpack Licensing controls suitable for SpecialOps usage.
  */
-add_shortcode(
+\add_shortcode(
 	'jn_jetpack_products_list',
 	function () {
 		$families = get_product_families();
