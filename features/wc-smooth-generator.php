@@ -7,7 +7,7 @@
 
 namespace jn;
 
-define( 'WC_SMOOTH_GENERATOR_PLUGIN_URL', 'https://github.com/woocommerce/wc-smooth-generator/archive/master.zip' );
+define( 'WC_SMOOTH_GENERATOR_PLUGIN_URL', 'https://github.com/woocommerce/wc-smooth-generator/archive/trunk.zip' );
 
 add_action(
 	'jurassic_ninja_init',
