@@ -1,8 +1,33 @@
-5.5 / 2021-04-20
+5.10 / 2021-04-20
 ==================
 
   * Add the TT1-Blocks FSE theme.
   * Adds infrastructure to install themes.
+
+5.9 / 2020-12-18
+==================
+
+* Add the client-example plugin.
+
+5.8 / 2020-12-18
+==================
+
+* Add support for MailPoet install.
+
+5.7 / 2020-09-16
+==================
+
+* Add support for automatic plan provisioning.
+
+5.6 / 2020-11-17
+==================
+
+* Add support for the Jetpack Debug Helper.
+
+5.5 / 2020-11-11
+==================
+
+* Add support for licenses.
 
 5.4 / 2020-09-16
 ==================
