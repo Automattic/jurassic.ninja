@@ -1,3 +1,9 @@
+5.5 / 2021-04-20
+==================
+
+  * Add the TT1-Blocks FSE theme.
+  * Adds infrastructure to install themes.
+
 5.4 / 2020-09-16
 ==================
 
