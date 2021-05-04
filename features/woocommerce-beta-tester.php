@@ -7,7 +7,7 @@
 
 namespace jn;
 
-define( 'WOOCOMMERCE_BETA_TESTER_PLUGIN_URL', 'https://github.com/woocommerce/woocommerce-beta-tester/archive/master.zip' );
+define( 'WOOCOMMERCE_BETA_TESTER_PLUGIN_URL', 'https://github.com/woocommerce/woocommerce-beta-tester/archive/refs/heads/trunk.zip' );
 
 add_action(
 	'jurassic_ninja_init',
