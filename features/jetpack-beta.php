@@ -37,7 +37,7 @@ add_action(
 				if ( $features['jetpack-beta'] ) {
 					debug( '%s: Adding Jetpack Beta Tester Plugin', $domain );
 					add_jetpack_beta_plugin( false );
-				} else if ( $features['jetpack-beta-dev'] ) {
+				} elseif ( $features['jetpack-beta-dev'] ) {
 					debug( '%s: Adding Jetpack Beta Tester Plugin (Bleeding Edge)', $domain );
 					add_jetpack_beta_plugin( true );
 				}
