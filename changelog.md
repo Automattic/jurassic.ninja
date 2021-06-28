@@ -2,6 +2,7 @@
 ==================
 
   * Disconnect Jetpack upon site purge.
+  * Add support for installing Jetpack Beta's bleeding edge.
 
 5.10.1 / 2021-05-05
 ==================
