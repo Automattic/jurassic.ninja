@@ -29,6 +29,7 @@ function init() {
 	require_once __DIR__ . '/lib/cron-stuff.php';
 	require_once __DIR__ . '/lib/db-stuff.php';
 	require_once __DIR__ . '/lib/settings-stuff.php';
+	require_once __DIR__ . '/lib/jetpack-stuff.php';
 	require_once __DIR__ . '/lib/stuff.php';
 
 	if ( is_cli_running() ) {
