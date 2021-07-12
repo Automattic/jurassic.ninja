@@ -113,7 +113,6 @@ add_action(
 						$json_params['branches'] = array( 'jetpack' => 'master' );
 					}
 
-
 					$error = null;
 					foreach ( $json_params['branches'] as $plugin_name => $branch_name ) {
 						if ( ! $branch_name ) {
