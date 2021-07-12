@@ -47,7 +47,7 @@ function init() {
 	// Create settings page.
 	add_settings_page();
 	// Settings problems include credentials and IDs not configured.
-	if ( true || ! settings_problems() ) {
+	if ( ! settings_problems() ) {
 		// Include the JS only under the page which has the /create slug.
 		add_scripts();
 		// Serve the API root and nonce only under the page which has the /create slug.
