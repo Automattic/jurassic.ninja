@@ -105,18 +105,31 @@ function collectFeaturesFromQueryString() {
 		return {};
 	}
 
-	let params = location.search.split( '?' )[1].split( '&' );
+	let params = location.search.substr( 1 ).replace( /\+/g, '%20' ).split( '&' );
 	let features = {};
+	const assign = ( key, v ) => {
+		let n = features;
+		const keys = key.split( '.' );
+		while ( keys.length > 1 ) {
+			const k = keys.shift();
+			if ( typeof( n[k] ) !== 'object' ) {
+				n[k] = {};
+			}
+			n = n[k];
+		}
+		n[keys.shift()] = v;
+	};
 
 	for ( var p of params ) {
 		if ( p.includes( '=' ) ) {
-			const splitParam = p.split( '=' )
-			features[ splitParam[0] ] = splitParam[1]
+			const splitParam = p.split( '=', 2 ).map( c => decodeURIComponent( c ) );
+			assign( splitParam[0], splitParam[1] );
 		} else {
+			p = decodeURIComponent( p );
 			if ( p.startsWith( 'no' ) ) {
-				features[ p.slice( 2 ) ] = false
+				assign( p.slice( 2 ), false );
 			} else {
-				features[ p ] = true
+				assign( p, true );
 			}
 		}
 	}
