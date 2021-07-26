@@ -24,5 +24,7 @@ add_action(
 				$return->get_error_message()
 			);
 		}
-	}
+	},
+	10,
+	2
 );
