@@ -11,7 +11,7 @@ namespace jn;
 add_action(
 	'jurassic_ninja_purge_site',
 	function ( $site, $user ) {
-		$command = "cd ~/apps/{$user->name}/public && wp jetpack disconnect";
+		$command = "cd ~/apps/{$user->name}/public && wp jetpack disconnect blog";
 		debug( '%s: Running commands %s', $user->id, $command );
 
 		$return = run_command_on_behalf( $site['username'], $site['password'], $command );
