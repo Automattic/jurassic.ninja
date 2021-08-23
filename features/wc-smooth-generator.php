@@ -7,7 +7,7 @@
 
 namespace jn;
 
-define( 'WC_SMOOTH_GENERATOR_PLUGIN_URL', 'https://github.com/woocommerce/wc-smooth-generator/archive/trunk.zip' );
+define( 'WC_SMOOTH_GENERATOR_PLUGIN_URL', 'https://github.com/woocommerce/wc-smooth-generator/releases/download/1.0.3/wc-smooth-generator.zip' );
 
 add_action(
 	'jurassic_ninja_init',
@@ -67,13 +67,9 @@ add_action(
 function add_wc_smooth_generator_plugin() {
 	$wc_smooth_generator_plugin_url = WC_SMOOTH_GENERATOR_PLUGIN_URL;
 	/**
-	 * We install the plugin but don't activate until dependencies are there or it will fail
+	 * We install the latest released version of the plugin
 	 */
-	$cmd = "wp plugin install $wc_smooth_generator_plugin_url"
-		. ' && pushd . && cd wp-content/plugins/wc-smooth-generator'
-		. ' && composer install --no-dev'
-		. ' && wp plugin activate wc-smooth-generator'
-		. ' && popd';
+	$cmd = "wp plugin install $wc_smooth_generator_plugin_url --activate";
 
 	add_filter(
 		'jurassic_ninja_feature_command',
