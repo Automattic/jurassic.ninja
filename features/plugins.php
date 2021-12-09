@@ -27,6 +27,7 @@ add_action(
 			'jetpack'               => 'Jetpack',
 			'mailpoet'              => 'Mailpoet',
 			'vaultpress'            => 'VaultPress',
+			'woocommerce-payments'  => 'WooCommerce Payments',
 			'woocommerce'           => 'WooCommerce',
 			'wordpress-beta-tester' => 'WordPress Beta Tester Plugin',
 			'wp-downgrade'          => 'WP Downgrade',

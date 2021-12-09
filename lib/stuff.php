@@ -126,6 +126,7 @@ function require_feature_files() {
 		'/features/gutenberg-nightly.php',
 		'/features/wordpress-4.php',
 		'/features/themes.php',
+		'/features/woocommerce-payments.php',
 	);
 
 	$available_features = apply_filters( 'jurassic_ninja_available_features', $available_features );
