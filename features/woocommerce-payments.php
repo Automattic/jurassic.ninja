@@ -8,7 +8,6 @@
 namespace jn;
 
 const WCPAY_DEFAULTS = array(
-	'woocommerce-payments-branch' => false,
 	'woocommerce-payments-dev-tools' => false,
 	'woocommerce-payments-jn-options' => false,
 	'woocommerce-payments-release' => false,
@@ -21,14 +20,9 @@ add_action(
 			'jurassic_ninja_add_features_before_auto_login',
 			function ( &$app = null, $features, $domain ) {
 				$features = array_merge( WCPAY_DEFAULTS, $features );
-				if ( ! isset( $features['woocommerce-payments'] ) ) {
-					if ( $features['woocommerce-payments-branch'] ) {
-						debug( '%s: Adding WooCommerce Payments (on the %s branch)', $domain, $features['woocommerce-payments-branch'] );
-						add_woocommerce_payments_branch_plugin( $features['woocommerce-payments-branch'] );
-					} elseif ( $features['woocommerce-payments-release'] ) {
-						debug( '%s: Adding WooCommerce Payments (version %s)', $domain, $features['woocommerce-payments-release'] );
-						add_woocommerce_payments_release_plugin( $features['woocommerce-payments-release'] );
-					}
+				if ( ! isset( $features['woocommerce-payments'] ) && $features['woocommerce-payments-release'] ) {
+					debug( '%s: Adding WooCommerce Payments (version %s)', $domain, $features['woocommerce-payments-release'] );
+					add_woocommerce_payments_release_plugin( $features['woocommerce-payments-release'] );
 				}
 
 				if ( $features['woocommerce-payments-dev-tools'] ) {
@@ -55,10 +49,6 @@ add_action(
 		add_filter(
 			'jurassic_ninja_rest_create_request_features',
 			function ( $features, $json_params ) {
-				if ( isset( $json_params['woocommerce-payments-branch'] ) ) {
-					$features['woocommerce-payments-branch'] = $json_params['woocommerce-payments-branch'];
-				}
-
 				if ( isset( $json_params['woocommerce-payments-dev-tools'] ) ) {
 					$features['woocommerce-payments-dev-tools'] = true;
 				}
@@ -78,25 +68,6 @@ add_action(
 		);
 	}
 );
-
-/**
- * Builds, installs and activates the WooCommerce Payments plugin on the site
- * for a given branch.
- *
- * @param string $branch The WooCommerce Payments branch to install.
- */
-function add_woocommerce_payments_branch_plugin( $branch ) {
-	$cmd = 'curl https://gist.githubusercontent.com/aprea/45a7f3b3583ff65a658d303c2e5a6207/raw --output build-woocommerce-payments.sh'
-		. " && source build-woocommerce-payments.sh $branch"
-		. ' && wp plugin activate woocommerce-payments';
-
-	add_filter(
-		'jurassic_ninja_feature_command',
-		function ( $s ) use ( $cmd ) {
-			return "$s && $cmd";
-		}
-	);
-}
 
 /**
  * Installs and activates the WooCommerce Payments plugin on the site
