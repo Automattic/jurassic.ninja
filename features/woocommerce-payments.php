@@ -59,6 +59,7 @@ add_action(
 
 				if ( isset( $json_params['woocommerce-payments-release'] ) ) {
 					$features['woocommerce-payments-release'] = $json_params['woocommerce-payments-release'];
+					$features['woocommerce'] = true;
 				}
 
 				return $features;
