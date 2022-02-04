@@ -119,6 +119,7 @@ function require_feature_files() {
 		'/features/jetpack-crm-master.php',
 		'/features/jetpack-debug-helper.php',
 		'/features/client-example.php',
+		'/features/my-jetpack.php',
 		'/features/wp-debug-log.php',
 		'/features/block-xmlrpc.php',
 		'/features/language.php',
