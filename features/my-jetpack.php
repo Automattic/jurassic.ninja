@@ -1,6 +1,6 @@
 <?php
 /**
- * WP Debug Log.
+ * My Jetpack.
  *
  * @package jurassic-ninja
  */
@@ -54,11 +54,10 @@ add_action(
 );
 
 /**
- * Sets the WP_DEBUG constants.
+ * Sets the JETPACK_ENABLE_MY_JETPACK constant.
  */
 function set_my_jetpack() {
-	$cmd = 'wp config --type=constant set JETPACK_ENABLE_MY_JETPACK true'
-		. ' && wp config --type=constant set JETPACK_ENABLE_MY_JETPACK true';
+	$cmd = 'wp config --type=constant set JETPACK_ENABLE_MY_JETPACK true';
 	add_filter(
 		'jurassic_ninja_feature_command',
 		function ( $s ) use ( $cmd ) {
