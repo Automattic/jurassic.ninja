@@ -8,8 +8,6 @@ services:
       MYSQL_DATABASE: wordpress
     volumes:
     - ./jndb:/var/lib/mysql
-    ports:
-      - "${PORT_MYSQL:-3306}:3306"
     env_file:
       - ../jetpack/tools/docker/default.env
       - ../jetpack/tools/docker/.env
@@ -30,7 +28,7 @@ services:
       - WORDPRESS_DB_PASSWORD=wordpress
       - XDEBUG_CONFIG=_host=10.0.1.19
     volumes:
-      - ../jetpack:/var/www/html/wp-content/plugins/jetpack
+      - ../jetpack/projects/plugins/jetpack:/var/www/html/wp-content/plugins/jetpack
       - ../jetpack/tools/docker/wordpress:/var/www/html
       - ../jetpack/tools/docker/logs/apache2:/var/log/apache2
       - ../jetpack/tools/docker/logs/php:/var/log/php
@@ -39,4 +37,4 @@ services:
       - ../errors:/var/www/html/wp-content/plugins/errors
       - ./:/var/www/html/wp-content/plugins/jurassic.ninja
       - ../jurassic.ninja-ext:/var/www/html/wp-content/plugins/jurassic.ninja-ext
-  
+
