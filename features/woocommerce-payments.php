@@ -50,16 +50,18 @@ add_action(
 			'jurassic_ninja_rest_create_request_features',
 			function ( $features, $json_params ) {
 				if ( isset( $json_params['woocommerce-payments-dev-tools'] ) ) {
-					$features['woocommerce-payments-dev-tools'] = true;
+					$features['woocommerce-payments-dev-tools'] = $json_params['woocommerce-payments-dev-tools'];
 				}
 
 				if ( isset( $json_params['woocommerce-payments-jn-options'] ) ) {
-					$features['woocommerce-payments-jn-options'] = true;
+					$features['woocommerce-payments-jn-options'] = $json_params['woocommerce-payments-jn-options'];
 				}
 
 				if ( isset( $json_params['woocommerce-payments-release'] ) ) {
 					$features['woocommerce-payments-release'] = $json_params['woocommerce-payments-release'];
-					$features['woocommerce'] = true;
+					if ( $features['woocommerce-payments-release'] ) {
+						$features['woocommerce'] = true;
+					}
 				}
 
 				return $features;
