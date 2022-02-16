@@ -75,6 +75,9 @@ add_action(
 
 				if ( $features['branches'] ) {
 					foreach ( $features['branches'] as $plugin_name => $branch_name ) {
+						if ( $plugin_name === 'jetpack' && isset( $features['jetpack'] ) && $features['jetpack'] === false  ) {
+							continue;
+						}
 						if ( $branch_name ) {
 							debug( '%s: Activating %s plugin %s branch in Beta plugin', $domain, $plugin_name, $branch_name );
 							activate_jetpack_branch( $plugin_name, $branch_name );
