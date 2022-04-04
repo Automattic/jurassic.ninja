@@ -7,27 +7,41 @@
 
 namespace jn;
 
-define( 'JETPACK_CRM_PLUGIN_MASTER_URL', 'https://github.com/automattic/zero-bs-crm/archive/master.zip' );
-
 add_action(
 	'jurassic_ninja_init',
 	function () {
+
 		$defaults = array(
-			'jetpack-crm-master' => false,
+			'jpcrm-build' => false,
+			'zero-bs-crm' => false,
+			'jpcrm-version' => false,
 		);
 
 		add_action(
 			'jurassic_ninja_add_features_before_auto_login',
 			function ( &$app, $features, $domain ) use ( $defaults ) {
+
 				$features = array_merge( $defaults, $features );
-				if ( $features['jetpack-crm-master'] ) {
-					// Abort the installation from master if the public plugin is selected.
-					if ( $features['zero-bs-crm'] ) {
-						return;
-					}
-					debug( '%s: Adding Jetpack CRM Plugin (master branch)', $domain );
-					add_jetpack_crm_master_plugin();
+
+				// Don't install if Jetpack CRM isn't specified.
+				if ( ! $features['zero-bs-crm'] ) {
+					return;
 				}
+
+				if ( $features['jpcrm-version'] ) {
+
+				// Install specified version of Jetpack CRM.
+					debug( '%s: Installing Jetpack CRM version %s from WP.org repo', $domain, $features['jpcrm-version'] );
+					add_jpcrm_from_wporg( $features['jpcrm-version'] );
+
+				} elseif ( $features['jpcrm-build'] ) {
+
+					// Install custom build of Jetpack CRM.
+					debug( '%s: Installing Jetpack CRM from %s', $domain, $features['jpcrm-build'] );
+					add_jpcrm_from_custom_build( $features['jpcrm-build'] );
+
+				}
+
 			},
 			10,
 			3
@@ -36,8 +50,13 @@ add_action(
 		add_filter(
 			'jurassic_ninja_rest_create_request_features',
 			function ( $features, $json_params ) {
-				if ( isset( $json_params['jetpack-crm-master'] ) ) {
-					$features['jetpack-crm-master'] = $json_params['jetpack-crm-master'];
+
+				if ( isset( $json_params['jpcrm-version'] ) ) {
+					$features['jpcrm-version'] = $json_params['jpcrm-version'];
+				}
+
+				if ( isset( $json_params['jpcrm-build'] ) ) {
+					$features['jpcrm-build'] = $json_params['jpcrm-build'];
 				}
 
 				return $features;
@@ -49,11 +68,38 @@ add_action(
 );
 
 /**
- * Installs and activates Jetpack CRM plugin (master branch) on the site.
+ * Installs and activates a specified version of Jetpack CRM from the WP.org plugin repo.
  */
-function add_jetpack_crm_master_plugin() {
-	$jetpack_crm_plugin_master_url = JETPACK_CRM_PLUGIN_MASTER_URL;
-	$cmd                           = "wp plugin install $jetpack_crm_plugin_master_url --activate";
+function add_jpcrm_from_wporg( $version ) {
+
+	// Verify we have a valid version number.
+	if ( ! version_compare( $version, '1.0.0', '>=' ) ) {
+		return new \WP_Error( 'bad_version_number', 'Bad version number.', array( 'status' => 404 ) );
+	}
+
+	$cmd = "wp plugin install zero-bs-crm --version=$version --activate";
+	add_filter(
+		'jurassic_ninja_feature_command',
+		function ( $s ) use ( $cmd ) {
+			return "$s && $cmd";
+		}
+	);
+
+}
+
+/**
+ * Installs and activates a specified build of Jetpack CRM from our custom build URL.
+ */
+function add_jpcrm_from_custom_build( $build ) {
+
+	// For now, require commit SHA-1 hash (40 char long hex).
+	if ( ! preg_match( '/^[A-Fa-f0-9]{40}$/', $build ) ) {
+		return new \WP_Error( 'bad_commit_hash', 'Invalid commit hash.', array( 'status' => 404 ) );
+	}
+
+	$jpcrm_build_base_url = 'https://TBD/builds/';
+	$jpcrm_build_url = $jpcrm_build_base_url . 'zero-bs-crm-' . $build . '.zip';
+	$cmd = "wp plugin install $jpcrm_build_url --activate";
 	add_filter(
 		'jurassic_ninja_feature_command',
 		function ( $s ) use ( $cmd ) {
