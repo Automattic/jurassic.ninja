@@ -143,8 +143,8 @@ function add_jpcrm_from_custom_build( $build ) {
 			<div class="jn-jpcrm-options" style="display:none;">
 				<ul>
 					<li><label><input type="radio" name="jpcrm-options" checked /> WP.org</label></li>
-					<li><label><input type="radio" name="jpcrm-options" data-feature="jpcrm-version" /> Version: <input type="text" id="jpcrm-version"></label></li>
-					<li><label><input type="radio" name="jpcrm-options" data-feature="jpcrm-build" /> Build: <input type="text" id="jpcrm-build"></label></li>
+					<li><label><input type="radio" name="jpcrm-options" data-feature="jpcrm-version" /> Version: <input type="text" id="jpcrm-version" placeholder="4.10.1"></label></li>
+					<li><label><input type="radio" name="jpcrm-options" data-feature="jpcrm-build" /> Build: <input type="text" id="jpcrm-build" placeholder="fix/314/rationalise_pi"></label></li>
 				</ul>
 			</div>
 		<?php
