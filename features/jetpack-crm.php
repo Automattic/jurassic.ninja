@@ -30,7 +30,7 @@ add_action(
 
 				if ( $features['jpcrm-version'] ) {
 
-				// Install specified version of Jetpack CRM from WP.org repo.
+					// Install specified version of Jetpack CRM from WP.org repo.
 					debug( '%s: Installing Jetpack CRM version %s from WP.org repo', $domain, $features['jpcrm-version'] );
 					add_jpcrm_from_wporg( $features['jpcrm-version'] );
 
