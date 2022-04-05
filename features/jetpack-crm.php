@@ -103,13 +103,17 @@ function add_jpcrm_from_wporg( $version ) {
  */
 function add_jpcrm_from_custom_build( $build ) {
 
-	// For now, require commit SHA-1 hash (40 char long hex).
-	if ( ! preg_match( '/^[A-Fa-f0-9]{40}$/', $build ) ) {
-		return new \WP_Error( 'bad_commit_hash', 'Invalid commit hash.', array( 'status' => 404 ) );
-	}
+	// Require commit SHA-1 hash (40 char long hex).
+	// if ( ! preg_match( '/^[A-Fa-f0-9]{40}$/', $build ) ) {
+	// 	return new \WP_Error( 'bad_commit_hash', 'Invalid commit hash.', array( 'status' => 404 ) );
+	// }
 
-	$jpcrm_build_base_url = 'https://TBD/builds/';
-	$jpcrm_build_url = $jpcrm_build_base_url . 'zero-bs-crm-' . $build . '.zip';
+	$clean_build = str_replace('/', '_', $build);
+
+	// note that this public link is in a public repo
+	$jpcrm_build_base_url = 'https://jetpackcrm-builds.s3.amazonaws.com/builds/';
+	$jpcrm_build_url = $jpcrm_build_base_url . 'zero-bs-crm-' . $clean_build . '.zip';
+
 	$cmd = "wp plugin install $jpcrm_build_url --activate";
 
 	add_filter(
