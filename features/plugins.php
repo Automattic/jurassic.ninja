@@ -18,7 +18,6 @@ add_action(
 	function () {
 		$whitelist = array(
 			'amp'                   => 'AMP',
-			'zero-bs-crm'           => 'Jetpack CRM',
 			'classic-editor'        => 'Classic Editor',
 			'code-snippets'         => 'Code Snippets',
 			'config-constants'      => 'Config Constants',
