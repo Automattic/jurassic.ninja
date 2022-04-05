@@ -113,3 +113,31 @@ function add_jpcrm_from_custom_build( $build ) {
 		}
 	);
 }
+
+/**
+ * Register a shortcode which renders Jetpack Licensing controls suitable for SpecialOps usage.
+ */
+\add_shortcode(
+	'jn_jpcrm_options',
+	function () {
+		ob_start();
+		?>
+			<style>
+			.jn-jpcrm-options ul {
+				list-style-type: none;
+			}
+			.jn-jpcrm-options input[type="text"] {
+				margin-left: 25px;
+			}
+			</style>
+			<div class="jn-jpcrm-options" style="display:none;">
+				<ul>
+					<li><label><input type="radio" name="jpcrm-options" checked /> WP.org</label></li>
+					<li><label><input type="radio" name="jpcrm-options" data-feature="jpcrm-version" /> Version: <input type="text" id="jpcrm-version"></label></li>
+					<li><label><input type="radio" name="jpcrm-options" data-feature="jpcrm-build" /> Build: <input type="text" id="jpcrm-build"></label></li>
+				</ul>
+			</div>
+		<?php
+		return ob_get_clean();
+	}
+);
