@@ -57,6 +57,10 @@ add_action(
 			'jurassic_ninja_rest_create_request_features',
 			function ( $features, $json_params ) {
 
+				if ( isset( $json_params['jpcrm'] ) ) {
+					$features['jpcrm'] = $json_params['jpcrm'];
+				}
+
 				if ( isset( $json_params['jpcrm-version'] ) ) {
 					$features['jpcrm-version'] = $json_params['jpcrm-version'];
 				}
