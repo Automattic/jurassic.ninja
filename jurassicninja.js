@@ -97,6 +97,13 @@ function collectFeaturesFromFormInputs() {
 		},
 		[]
 	);
+
+	// get selected JPCRM option and value
+	selected_jpcrm_option = document.querySelector( "input[type='radio'][name='jpcrm-options']:checked" );
+	if ( selected_jpcrm_option.dataset.feature ) {
+		features[selected_jpcrm_option.dataset.feature] = selected_jpcrm_option.nextElementSibling.value;
+	}
+
 	return features;
 }
 
@@ -353,15 +360,24 @@ function toggleJetpackProducts() {
 	$jetpack_products.toggle( $jetpack_toggle.is( ':checked' ) );
 }
 
+function toggleJPCRMProducts() {
+	const $jpcrm_toggle = jQuery( '[data-feature=jpcrm]' );
+	const $jpcrm_options = jQuery( '.jn-jpcrm-options' );
+	$jpcrm_options.toggle( $jpcrm_toggle.is( ':checked' ) );
+}
+
 function hookJetpackBranches() {
 	const $jetpack_toggle = jQuery( '[data-feature=jetpack]' );
 	const $jetpack_beta_toggle = jQuery( '[data-feature=jetpack-beta]' );
+	const $jpcrm_toggle = jQuery( '[data-feature=jpcrm]' );
 	const $branches_list = jQuery('#jetpack_beta_branches_group');
 	const $search_input = jQuery('#jetpack_branch');
 	const search_results = document.getElementById('jetpack_branches');
 
 	$jetpack_toggle.change( toggleJetpackProducts );
 	toggleJetpackProducts();
+
+	$jpcrm_toggle.change( toggleJPCRMProducts );
 
 	let onchange;
 	if ( $branches_list.length ) {
