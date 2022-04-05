@@ -23,7 +23,7 @@ add_action(
 
 				$features = array_merge( $defaults, $features );
 
-				// Don't install if Jetpack CRM isn't specified.
+				// Don't install if Jetpack CRM isn't selected.
 				if ( ! $features['jpcrm'] ) {
 					return;
 				}
@@ -43,7 +43,7 @@ add_action(
 				} else {
 
 					// Install current version of Jetpack CRM from WP.org repo.
-					debug( '%s: Installing Jetpack CRM from %s', $domain, $features['jpcrm-build'] );
+					debug( '%s: Installing Jetpack CRM from WP.org', $domain );
 					add_directory_plugin( 'zero-bs-crm' );
 
 				}
@@ -84,6 +84,7 @@ function add_jpcrm_from_wporg( $version ) {
 	}
 
 	$cmd = "wp plugin install zero-bs-crm --version=$version --activate";
+
 	add_filter(
 		'jurassic_ninja_feature_command',
 		function ( $s ) use ( $cmd ) {
@@ -106,6 +107,7 @@ function add_jpcrm_from_custom_build( $build ) {
 	$jpcrm_build_base_url = 'https://TBD/builds/';
 	$jpcrm_build_url = $jpcrm_build_base_url . 'zero-bs-crm-' . $build . '.zip';
 	$cmd = "wp plugin install $jpcrm_build_url --activate";
+
 	add_filter(
 		'jurassic_ninja_feature_command',
 		function ( $s ) use ( $cmd ) {
