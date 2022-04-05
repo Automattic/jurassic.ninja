@@ -360,7 +360,7 @@ function toggleJetpackProducts() {
 	$jetpack_products.toggle( $jetpack_toggle.is( ':checked' ) );
 }
 
-function toggleJPCRMProducts() {
+function toggleJPCRMOptions() {
 	const $jpcrm_toggle = jQuery( '[data-feature=jpcrm]' );
 	const $jpcrm_options = jQuery( '.jn-jpcrm-options' );
 	$jpcrm_options.toggle( $jpcrm_toggle.is( ':checked' ) );
@@ -377,7 +377,7 @@ function hookJetpackBranches() {
 	$jetpack_toggle.change( toggleJetpackProducts );
 	toggleJetpackProducts();
 
-	$jpcrm_toggle.change( toggleJPCRMProducts );
+	$jpcrm_toggle.change( toggleJPCRMOptions );
 
 	let onchange;
 	if ( $branches_list.length ) {
