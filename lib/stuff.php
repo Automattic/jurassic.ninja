@@ -116,7 +116,7 @@ function require_feature_files() {
 		'/features/jetpack-beta.php',
 		'/features/wc-smooth-generator.php',
 		'/features/woocommerce-beta-tester.php',
-		'/features/jetpack-crm-master.php',
+		'/features/jetpack-crm.php',
 		'/features/jetpack-debug-helper.php',
 		'/features/client-example.php',
 		'/features/my-jetpack.php',

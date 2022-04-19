@@ -69,7 +69,9 @@ Recommended `/specialops` page content:
 <div class="checkbox"><label><input type="checkbox" data-feature="vaultpress">&nbsp;Include VaultPress</label></div>
 </li>
 <li>
-<div class="checkbox"><label><input type="checkbox" data-feature="zero-bs-crm">&nbsp;Include Jetpack CRM</label></div>
+<div class="checkbox"><label><input type="checkbox" data-feature="jpcrm">&nbsp;Include Jetpack CRM</label>
+[jn_jpcrm_options]
+</div>
 </li>
 <li>
 <div class="checkbox"><label><input type="checkbox" data-feature="jetpack-debug-helper">&nbsp;Include Jetpack Debug Helper</label></div>
