@@ -75,7 +75,7 @@ add_action(
 
 				if ( $features['branches'] ) {
 					foreach ( $features['branches'] as $plugin_name => $branch_name ) {
-						if ( $plugin_name === 'jetpack' && isset( $features['jetpack'] ) && $features['jetpack'] === false  ) {
+						if ( $plugin_name === 'jetpack' && isset( $features['jetpack'] ) && $features['jetpack'] === false ) {
 							continue;
 						}
 						if ( $branch_name ) {
