@@ -79,6 +79,8 @@ add_action(
 
 /**
  * Installs and activates a specified version of Jetpack CRM from the WP.org plugin repo.
+ *
+ * @param string $version Version of Jetpack CRM.
  */
 function add_jpcrm_from_wporg( $version ) {
 
@@ -100,15 +102,22 @@ function add_jpcrm_from_wporg( $version ) {
 
 /**
  * Installs and activates a specified build of Jetpack CRM from our custom build URL.
+ *
+ * @param string $build Hash of build to use.
  */
 function add_jpcrm_from_custom_build( $build ) {
 
-	// Require commit SHA-1 hash (40 char long hex).
-	// if ( ! preg_match( '/^[A-Fa-f0-9]{40}$/', $build ) ) {
-	// 	return new \WP_Error( 'bad_commit_hash', 'Invalid commit hash.', array( 'status' => 404 ) );
-	// }
+	// phpcs:disable Squiz.PHP.CommentedOutCode.Found
 
-	$clean_build = str_replace('/', '_', $build);
+	/*
+	 * Require commit SHA-1 hash (40 char long hex).
+	 * if ( ! preg_match( '/^[A-Fa-f0-9]{40}$/', $build ) ) {
+	 * return new \WP_Error( 'bad_commit_hash', 'Invalid commit hash.', array( 'status' => 404 ) );
+	 * }
+	 */
+	// phpcs:enable
+
+	$clean_build = str_replace( '/', '_', $build );
 
 	// note that this public link is in a public repo
 	$jpcrm_build_base_url = 'https://jetpackcrm-builds.s3.amazonaws.com/builds/';
