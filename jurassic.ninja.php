@@ -176,5 +176,5 @@ function page_is_launching_page() {
  * @return boolean [description]
  */
 function page_is_specialops() {
-	return current_user_can( 'manage_options' ) && 'specialops' === get_page_uri();
+	return is_user_logged_in() && 'specialops' === get_page_uri();
 }
