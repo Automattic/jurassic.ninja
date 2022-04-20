@@ -17,7 +17,7 @@ if ( ! defined( '\\ABSPATH' ) ) {
 function add_rest_api_endpoints() {
 	$permission_callback = array(
 		'permission_callback' => function () {
-			return settings( 'lock_launching', false ) ? current_user_can( 'read' ) : true;
+			return settings( 'lock_launching', false ) ? is_user_logged_in() : true;
 		},
 	);
 
