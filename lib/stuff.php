@@ -120,6 +120,7 @@ function require_feature_files() {
 		'/features/jetpack-debug-helper.php',
 		'/features/client-example.php',
 		'/features/my-jetpack.php',
+		'/features/jetpack-beta-blocks.php',
 		'/features/wp-debug-log.php',
 		'/features/block-xmlrpc.php',
 		'/features/language.php',
