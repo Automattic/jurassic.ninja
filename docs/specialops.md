@@ -3,6 +3,7 @@
 Similarly to the `/create` page, a `/specialops` page can be created which gives control over site configuration.
 
 Recommended `/specialops` page content:
+
 ```
 <!-- wp:paragraph {"className":"has-border","textColor":"primary","fontSize":"small"} -->
 <p class="has-border has-primary-color has-text-color has-small-font-size">IMPORTANT: Jurassic Ninja is meant to be used as an internal tool only. It’s not branded (there’s neither an intention to) and is not set up to scale to mass public use. For more questions ask in #jurassic-ninja Slack.</p>
@@ -135,9 +136,6 @@ Recommended `/specialops` page content:
 </li>
 <li style="min-width: 30%;">
 <div class="checkbox"><label><input type="checkbox" data-feature="config-constants">&nbsp;Include Config Constants plugin</label></div>
-</li>
-<li style="min-width: 30%;">
-<div class="checkbox"><label><input type="checkbox" data-feature="wp-log-viewer">&nbsp;Include WP Log Viewer plugin</label></div>
 </li>
 </ul>
 <!-- /wp:html --></div></div>
