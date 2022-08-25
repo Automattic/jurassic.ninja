@@ -154,7 +154,6 @@ function require_feature_files() {
  *        boolean woocommerce           Should we add WooCommerce plugin to the site?
  *        boolean wordpress-beta-tester Should we add Jetpack Beta Tester plugin to the site?
  *        boolean wp-debug-log          Should we set WP_DEBUG and WP_DEBUG log to true ?
- *        boolean wp-log-viewer         Should we add WP Log Viewer plugin to the site.
  * @param bool   $spare Spare site.
  *
  * @throws \Exception Throws on any error launching WP.

@@ -37,7 +37,6 @@ add_action(
 			'wordpress-beta-tester' => 'WordPress Beta Tester Plugin',
 			'wp-downgrade'          => 'WP Downgrade',
 			'wp-job-manager'        => 'WP Job Manager',
-			'wp-log-viewer'         => 'WP Log Viewer',
 			'wp-rollback'           => 'WP Rollback',
 			'wp-super-cache'        => 'WP Super Cache',
 		);
