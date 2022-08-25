@@ -142,18 +142,21 @@ function require_feature_files() {
  * Launches a new WordPress instance on the managed server
  *
  * @param  string $php_version          The PHP version to run the app on.
- * @param  array  $requested_features   Array of features to enable.
- *        boolean config-constants      Should we add the Config Constants plugin to the site?
- *        boolean auto_ssl              Should we add Let's Encrypt-based SSL for the site?
- *        boolean ssl                   Should we add the configured SSL certificate for the site?
- *        boolean gutenberg             Should we add Gutenberg to the site?
- *        boolean jetpack               Should we add Jetpack to the site?
- *        boolean jetpack-beta          Should we add Jetpack Beta Tester plugin to the site?
- *        boolean subdir_multisite      Should we enable subdir-based multisite on the site?
- *        boolean subdir_multisite      Should we enable subdomain-based multisite on the site?
- *        boolean woocommerce           Should we add WooCommerce plugin to the site?
- *        boolean wordpress-beta-tester Should we add Jetpack Beta Tester plugin to the site?
- *        boolean wp-debug-log          Should we set WP_DEBUG and WP_DEBUG log to true ?
+ * @param  array  $requested_features {
+ *    Array of features to enable.
+ * 
+ *        @type boolean $config-constants      Should we add the Config Constants plugin to the site?
+ *        @type boolean $auto_ssl              Should we add Let's Encrypt-based SSL for the site?
+ *        @type boolean $ssl                   Should we add the configured SSL certificate for the site?
+ *        @type boolean $gutenberg             Should we add Gutenberg to the site?
+ *        @type boolean $jetpack               Should we add Jetpack to the site?
+ *        @type boolean $jetpack-beta          Should we add Jetpack Beta Tester plugin to the site?
+ *        @type boolean $subdir_multisite      Should we enable subdir-based multisite on the site?
+ *        @type boolean $subdir_multisite      Should we enable subdomain-based multisite on the site?
+ *        @type boolean $woocommerce           Should we add WooCommerce plugin to the site?
+ *        @type boolean $wordpress-beta-tester Should we add Jetpack Beta Tester plugin to the site?
+ *        @type boolean $wp-debug-log          Should we set WP_DEBUG and WP_DEBUG log to true?
+ * }
  * @param bool   $spare Spare site.
  *
  * @throws \Exception Throws on any error launching WP.
