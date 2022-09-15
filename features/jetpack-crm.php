@@ -223,6 +223,18 @@ function populate_woo_data() {
 					<li><label style="display:none"><input type="checkbox" name="jpcrm-options" data-feature="jpcrm-populate-woo-data" /> Populate Woo data</label></li>
 				</ul>
 			</div>
+			<script>
+				function jpcrm_toggle_woo_populate_button(e) {
+					if (e.target.dataset['feature'] && e.target.dataset['feature'] === 'woocommerce') {
+						if (!e.target.checked) {
+							document.querySelector('[data-feature="jpcrm-populate-woo-data"]').checked = false;
+						}
+						document.querySelector('[data-feature="jpcrm-populate-woo-data"]').parentElement.style.display = e.target.checked ? '' : 'none';
+					}
+				}
+				document.querySelector('.entry-content').addEventListener( 'click', jpcrm_toggle_woo_populate_button );
+
+			</script>
 		<?php
 		return ob_get_clean();
 	}
