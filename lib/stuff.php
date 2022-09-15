@@ -144,7 +144,7 @@ function require_feature_files() {
  * @param  string $php_version          The PHP version to run the app on.
  * @param  array  $requested_features {
  *    Array of features to enable.
- * 
+ *
  *        @type boolean $config-constants      Should we add the Config Constants plugin to the site?
  *        @type boolean $auto_ssl              Should we add Let's Encrypt-based SSL for the site?
  *        @type boolean $ssl                   Should we add the configured SSL certificate for the site?

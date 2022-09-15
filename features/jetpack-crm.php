@@ -15,6 +15,8 @@ add_action(
 			'jpcrm' => false,
 			'jpcrm-build' => false,
 			'jpcrm-version' => false,
+			'jpcrm-populate-crm-data' => false,
+			'jpcrm-populate-woo-data' => false,
 		);
 
 		add_action(
@@ -48,6 +50,16 @@ add_action(
 
 				}
 
+				if ( $features['jpcrm-populate-crm-data'] || $features['jpcrm-populate-woo-data'] ) {
+					add_jpcrm_sdg();
+					if ( $features['jpcrm-populate-crm-data'] ) {
+						populate_crm_data();
+					}
+					if ( $features['jpcrm-populate-woo-data'] ) {
+						populate_woo_data();
+					}
+				}
+
 			},
 			10,
 			3
@@ -67,6 +79,14 @@ add_action(
 
 				if ( isset( $json_params['jpcrm-build'] ) ) {
 					$features['jpcrm-build'] = $json_params['jpcrm-build'];
+				}
+
+				if ( isset( $json_params['jpcrm-populate-crm-data'] ) ) {
+					$features['jpcrm-populate-crm-data'] = $json_params['jpcrm-populate-crm-data'];
+				}
+
+				if ( isset( $json_params['jpcrm-populate-woo-data'] ) ) {
+					$features['jpcrm-populate-woo-data'] = $json_params['jpcrm-populate-woo-data'];
 				}
 
 				return $features;
@@ -101,11 +121,11 @@ function add_jpcrm_from_wporg( $version ) {
 }
 
 /**
- * Installs and activates a specified build of Jetpack CRM from our custom build URL.
+ * Installs and activates a specified branch of Jetpack CRM from our custom build URL.
  *
- * @param string $build Hash of build to use.
+ * @param string $branch name of branch to use.
  */
-function add_jpcrm_from_custom_build( $build ) {
+function add_jpcrm_from_custom_build( $branch ) {
 
 	// phpcs:disable Squiz.PHP.CommentedOutCode.Found
 
@@ -117,13 +137,57 @@ function add_jpcrm_from_custom_build( $build ) {
 	 */
 	// phpcs:enable
 
-	$clean_build = str_replace( '/', '_', $build );
+	$clean_branch = str_replace( '/', '_', $branch );
 
 	// note that this public link is in a public repo
 	$jpcrm_build_base_url = 'https://jetpackcrm-builds.s3.amazonaws.com/builds/';
-	$jpcrm_build_url = $jpcrm_build_base_url . 'zero-bs-crm-' . $clean_build . '.zip';
+	$jpcrm_build_url = $jpcrm_build_base_url . 'zero-bs-crm-' . $clean_branch . '.zip';
 
 	$cmd = "wp plugin install $jpcrm_build_url --activate";
+
+	add_filter(
+		'jurassic_ninja_feature_command',
+		function ( $s ) use ( $cmd ) {
+			return "$s && $cmd";
+		}
+	);
+}
+
+/**
+ * Installs and activates Jetpack CRM Sample Data Generator.
+ */
+function add_jpcrm_sdg() {
+	$jpcrm_sdg_url = 'https://jetpackcrm-builds.s3.amazonaws.com/jpcrm-sdg/jpcrm-sdg.zip';
+
+	$cmd = "wp plugin install $jpcrm_sdg_url --activate";
+
+	add_filter(
+		'jurassic_ninja_feature_command',
+		function ( $s ) use ( $cmd ) {
+			return "$s && $cmd";
+		}
+	);
+}
+
+/**
+ * Populates Jetpack CRM with data from JPCRM SDG.
+ */
+function populate_crm_data() {
+	$cmd = 'wp jpcrmsdg --objtype=all';
+
+	add_filter(
+		'jurassic_ninja_feature_command',
+		function ( $s ) use ( $cmd ) {
+			return "$s && $cmd";
+		}
+	);
+}
+
+/**
+ * Populates Woo with data from JPCRM SDG.
+ */
+function populate_woo_data() {
+	$cmd = 'wp jpcrmsdg --objtype=woo';
 
 	add_filter(
 		'jurassic_ninja_feature_command',
@@ -154,8 +218,30 @@ function add_jpcrm_from_custom_build( $build ) {
 					<li><label><input type="radio" name="jpcrm-options" checked /> WP.org</label></li>
 					<li><label><input type="radio" name="jpcrm-options" data-feature="jpcrm-version" /> Version: <input type="text" id="jpcrm-version" placeholder="4.10.1"></label></li>
 					<li><label><input type="radio" name="jpcrm-options" data-feature="jpcrm-build" /> Build: <input type="text" id="jpcrm-build" placeholder="fix/314/rationalise_pi"></label></li>
+					<li><label><input type="checkbox" name="jpcrm-options" data-feature="jpcrm-populate-crm-data" /> Populate CRM data</label></li>
+					<li style="display:none"><label><input type="checkbox" name="jpcrm-options" data-feature="jpcrm-populate-woo-data" /> Populate Woo data</label></li>
 				</ul>
 			</div>
+			<script>
+				// hide/show "populate Woo data" option depending on Woo plugin selection
+				function jpcrm_toggle_woo_populate_button(e) {
+					if (e.target.dataset['feature'] && e.target.dataset['feature'] === 'woocommerce') {
+						if (!e.target.checked) {
+							document.querySelector('[data-feature="jpcrm-populate-woo-data"]').checked = false;
+						}
+						document.querySelector('[data-feature="jpcrm-populate-woo-data"]').parentElement.parentElement.style.display = e.target.checked ? '' : 'none';
+					}
+				}
+
+				// select radio button associated with input
+				function jpcrm_select_associated_radio_button(e) {
+					e.target.parentElement.children[0].checked = true;
+				}
+
+				document.querySelector('.entry-content').addEventListener('click', jpcrm_toggle_woo_populate_button);
+				document.querySelectorAll('#jpcrm-version, #jpcrm-build').forEach(i => i.addEventListener('click', jpcrm_select_associated_radio_button));
+
+			</script>
 		<?php
 		return ob_get_clean();
 	}
