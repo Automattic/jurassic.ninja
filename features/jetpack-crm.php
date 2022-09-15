@@ -58,7 +58,6 @@ add_action(
 					if ( $features['jpcrm-populate-woo-data'] ) {
 						populate_woo_data();
 					}
-
 				}
 
 			},
@@ -174,7 +173,7 @@ function add_jpcrm_sdg() {
  * Populates Jetpack CRM with data from JPCRM SDG.
  */
 function populate_crm_data() {
-	$cmd = "wp jpcrmsdg --objtype=all";
+	$cmd = 'wp jpcrmsdg --objtype=all';
 
 	add_filter(
 		'jurassic_ninja_feature_command',
@@ -188,7 +187,7 @@ function populate_crm_data() {
  * Populates Woo with data from JPCRM SDG.
  */
 function populate_woo_data() {
-	$cmd = "wp jpcrmsdg --objtype=woo";
+	$cmd = 'wp jpcrmsdg --objtype=woo';
 
 	add_filter(
 		'jurassic_ninja_feature_command',
