@@ -224,6 +224,7 @@ function populate_woo_data() {
 				</ul>
 			</div>
 			<script>
+				// hide/show "populate Woo data" option depending on Woo plugin selection
 				function jpcrm_toggle_woo_populate_button(e) {
 					if (e.target.dataset['feature'] && e.target.dataset['feature'] === 'woocommerce') {
 						if (!e.target.checked) {
@@ -232,7 +233,14 @@ function populate_woo_data() {
 						document.querySelector('[data-feature="jpcrm-populate-woo-data"]').parentElement.style.display = e.target.checked ? '' : 'none';
 					}
 				}
-				document.querySelector('.entry-content').addEventListener( 'click', jpcrm_toggle_woo_populate_button );
+
+				// select radio button associated with input
+				function jpcrm_select_associated_radio_button(e) {
+					e.target.parentElement.children[0].checked = true;
+				}
+
+				document.querySelector('.entry-content').addEventListener('click', jpcrm_toggle_woo_populate_button);
+				document.querySelectorAll('#jpcrm-version, #jpcrm-build').forEach(i => i.addEventListener('click', jpcrm_select_associated_radio_button));
 
 			</script>
 		<?php
