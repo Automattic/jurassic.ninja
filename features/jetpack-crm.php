@@ -122,11 +122,11 @@ function add_jpcrm_from_wporg( $version ) {
 }
 
 /**
- * Installs and activates a specified build of Jetpack CRM from our custom build URL.
+ * Installs and activates a specified branch of Jetpack CRM from our custom build URL.
  *
- * @param string $build Hash of build to use.
+ * @param string $branch name of branch to use.
  */
-function add_jpcrm_from_custom_build( $build ) {
+function add_jpcrm_from_custom_build( $branch ) {
 
 	// phpcs:disable Squiz.PHP.CommentedOutCode.Found
 
@@ -138,11 +138,11 @@ function add_jpcrm_from_custom_build( $build ) {
 	 */
 	// phpcs:enable
 
-	$clean_build = str_replace( '/', '_', $build );
+	$clean_branch = str_replace( '/', '_', $branch );
 
 	// note that this public link is in a public repo
 	$jpcrm_build_base_url = 'https://jetpackcrm-builds.s3.amazonaws.com/builds/';
-	$jpcrm_build_url = $jpcrm_build_base_url . 'zero-bs-crm-' . $clean_build . '.zip';
+	$jpcrm_build_url = $jpcrm_build_base_url . 'zero-bs-crm-' . $clean_branch . '.zip';
 
 	$cmd = "wp plugin install $jpcrm_build_url --activate";
 
