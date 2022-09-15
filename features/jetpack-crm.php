@@ -220,7 +220,7 @@ function populate_woo_data() {
 					<li><label><input type="radio" name="jpcrm-options" data-feature="jpcrm-version" /> Version: <input type="text" id="jpcrm-version" placeholder="4.10.1"></label></li>
 					<li><label><input type="radio" name="jpcrm-options" data-feature="jpcrm-build" /> Build: <input type="text" id="jpcrm-build" placeholder="fix/314/rationalise_pi"></label></li>
 					<li><label><input type="checkbox" name="jpcrm-options" data-feature="jpcrm-populate-crm-data" /> Populate CRM data</label></li>
-					<li><label style="display:none"><input type="checkbox" name="jpcrm-options" data-feature="jpcrm-populate-woo-data" /> Populate Woo data</label></li>
+					<li style="display:none"><label><input type="checkbox" name="jpcrm-options" data-feature="jpcrm-populate-woo-data" /> Populate Woo data</label></li>
 				</ul>
 			</div>
 			<script>
@@ -230,7 +230,7 @@ function populate_woo_data() {
 						if (!e.target.checked) {
 							document.querySelector('[data-feature="jpcrm-populate-woo-data"]').checked = false;
 						}
-						document.querySelector('[data-feature="jpcrm-populate-woo-data"]').parentElement.style.display = e.target.checked ? '' : 'none';
+						document.querySelector('[data-feature="jpcrm-populate-woo-data"]').parentElement.parentElement.style.display = e.target.checked ? '' : 'none';
 					}
 				}
 
