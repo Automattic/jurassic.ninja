@@ -29,6 +29,7 @@ add_action(
 			'jetpack-social'        => 'Jetpack Social',
 			'jetpack-protect'       => 'Jetpack Protect',
 			'jetpack-search'        => 'Jetpack Search',
+			'jetpack-videopress'    => 'Jetpack VideoPress',
 			'zero-bs-crm'           => 'Jetpack CRM',
 			'mailpoet'              => 'Mailpoet',
 			'vaultpress'            => 'VaultPress',
