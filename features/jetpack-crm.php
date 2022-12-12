@@ -14,6 +14,7 @@ add_action(
 		$defaults = array(
 			'jpcrm' => false,
 			'jpcrm-build' => false,
+            'jpcrm-trunk' => false,
 			'jpcrm-version' => false,
 			'jpcrm-populate-crm-data' => false,
 			'jpcrm-populate-woo-data' => false,
@@ -42,7 +43,13 @@ add_action(
 					debug( '%s: Installing Jetpack CRM from %s', $domain, $features['jpcrm-build'] );
 					add_jpcrm_from_custom_build( $features['jpcrm-build'] );
 
-				} else {
+				} elseif ( $features['jpcrm-trunk'] ) {
+
+                    // Install trunk build of Jetpack CRM.
+                    debug( '%s: Installing Jetpack CRM from %s', $domain, 'trunk' );
+                    add_jpcrm_from_custom_build( 'trunk' );
+
+                }else {
 
 					// Install current version of Jetpack CRM from WP.org repo.
 					debug( '%s: Installing Jetpack CRM from WP.org', $domain );
@@ -80,6 +87,10 @@ add_action(
 				if ( isset( $json_params['jpcrm-build'] ) ) {
 					$features['jpcrm-build'] = $json_params['jpcrm-build'];
 				}
+
+                if ( isset( $json_params['jpcrm-trunk'] ) ) {
+                    $features['jpcrm-trunk'] = $json_params['jpcrm-trunk'];
+                }
 
 				if ( isset( $json_params['jpcrm-populate-crm-data'] ) ) {
 					$features['jpcrm-populate-crm-data'] = $json_params['jpcrm-populate-crm-data'];
@@ -217,6 +228,7 @@ function populate_woo_data() {
 				<ul>
 					<li><label><input type="radio" name="jpcrm-options" checked /> WP.org</label></li>
 					<li><label><input type="radio" name="jpcrm-options" data-feature="jpcrm-version" /> Version: <input type="text" id="jpcrm-version" placeholder="4.10.1"></label></li>
+                    <li><label><input type="radio" name="jpcrm-options" data-feature="jpcrm-trunk" /> GH trunk</label></li>
 					<li><label><input type="radio" name="jpcrm-options" data-feature="jpcrm-build" /> Build: <input type="text" id="jpcrm-build" placeholder="fix/314/rationalise_pi"></label></li>
 					<li><label><input type="checkbox" name="jpcrm-options" data-feature="jpcrm-populate-crm-data" /> Populate CRM data</label></li>
 					<li style="display:none"><label><input type="checkbox" name="jpcrm-options" data-feature="jpcrm-populate-woo-data" /> Populate Woo data</label></li>
