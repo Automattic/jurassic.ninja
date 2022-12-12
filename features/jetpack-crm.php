@@ -88,9 +88,9 @@ add_action(
 					$features['jpcrm-build'] = $json_params['jpcrm-build'];
 				}
 
-                if ( isset( $json_params['jpcrm-trunk'] ) ) {
-                    $features['jpcrm-trunk'] = $json_params['jpcrm-trunk'];
-                }
+				if ( isset( $json_params['jpcrm-trunk'] ) ) {
+					$features['jpcrm-trunk'] = $json_params['jpcrm-trunk'];
+				}
 
 				if ( isset( $json_params['jpcrm-populate-crm-data'] ) ) {
 					$features['jpcrm-populate-crm-data'] = $json_params['jpcrm-populate-crm-data'];
