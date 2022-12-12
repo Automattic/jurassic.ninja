@@ -14,7 +14,7 @@ add_action(
 		$defaults = array(
 			'jpcrm' => false,
 			'jpcrm-build' => false,
-            'jpcrm-trunk' => false,
+			'jpcrm-trunk' => false,
 			'jpcrm-version' => false,
 			'jpcrm-populate-crm-data' => false,
 			'jpcrm-populate-woo-data' => false,
@@ -45,11 +45,11 @@ add_action(
 
 				} elseif ( $features['jpcrm-trunk'] ) {
 
-                    // Install trunk build of Jetpack CRM.
-                    debug( '%s: Installing Jetpack CRM from %s', $domain, 'trunk' );
-                    add_jpcrm_from_custom_build( 'trunk' );
+					// Install trunk build of Jetpack CRM.
+					debug( '%s: Installing Jetpack CRM from %s', $domain, 'trunk' );
+					add_jpcrm_from_custom_build( 'trunk' );
 
-                }else {
+				}else {
 
 					// Install current version of Jetpack CRM from WP.org repo.
 					debug( '%s: Installing Jetpack CRM from WP.org', $domain );
