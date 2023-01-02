@@ -47,7 +47,7 @@ function init() {
 	// Create settings page.
 	add_settings_page();
 	// Settings problems include credentials and IDs not configured.
-	if ( ! settings_problems() ) {
+	// if ( ! settings_problems() ) {
 		// Include the JS only under the page which has the /create slug.
 		add_scripts();
 		// Serve the API root and nonce only under the page which has the /create slug.
@@ -57,7 +57,7 @@ function init() {
 		// Disable temporarily. Run via crontab and Jurassic Ninja's CLI
 		// add_cron_job( __FILE__ );.
 		add_admin_bar_node();
-	}
+	// }
 	/**
 	 * Done after adding settings page and before anything else related to Jurassic Ninja specifics.
 	 *
@@ -146,7 +146,7 @@ function add_scripts() {
 	add_action(
 		'wp_enqueue_scripts',
 		function () {
-			if ( page_is_launching_page() ) {
+			if ( true ) {
 				wp_enqueue_script( 'jurassicninja.js', plugins_url( '', __FILE__ ) . '/jurassicninja.js', array( 'jquery' ), '1.1', true );
 				/**
 				 * Done after enqueueing the jurassic.ninja.js file

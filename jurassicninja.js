@@ -19,6 +19,7 @@ function init() {
 
 	if ( isSpecialOpsPage() ) {
 		hookJetpackBranches();
+		hookWooCommerceBetaBranches();
 		hookAvailableLanguages();
 		jQuery( '[data-is-create-button]' ).click( function () {
 			const $this = jQuery( this );
@@ -319,6 +320,18 @@ function favicon_update_colour( colour ) {
     }
 }
 
+function getAvailableWooCommerceBetaBranches() {
+	return fetch( '/wp-json/jurassic.ninja/woocommerce-beta-tester/branches' )
+		.then( response => response.json() )
+		.then( body => {
+			if (body.data && body.data.pr) {
+				return Object.values(body.data.pr).sort((a, b) => a.branch.localeCompare(b.branch));
+			}
+
+			return [];
+		} );
+}
+
 function getAvailableJetpackBetaPlugins() {
 	return fetch( '/wp-json/jurassic.ninja/jetpack-beta/plugins')
 		.then( response => response.json() )
@@ -330,6 +343,7 @@ function getAvailableJetpackBetaPlugins() {
 			return plugins;
 		} );
 }
+
 function getAvailableJetpackBetaBranches( plugin_slug ) {
 	return fetch( '/wp-json/jurassic.ninja/jetpack-beta/plugins/' + ( plugin_slug || 'jetpack' ) + '/branches' )
 		.then( response => response.json() )
@@ -463,3 +477,47 @@ function hookJetpackBranches() {
 			} );
 		} );
 }
+
+function hookWooCommerceBetaBranches() {
+	getAvailableWooCommerceBetaBranches().then( branches => {
+		const wooBetaCheckBox = document.querySelector('[data-feature=woocommerce-beta-tester]');
+		
+		if (branches.length && wooBetaCheckBox) {
+			const checkboxContainer = wooBetaCheckBox.closest('.checkbox');
+			const wooBetaSelect = document.createElement('input');
+			
+			wooBetaSelect.id = 'woocommerce_beta_branch';
+			wooBetaSelect.name = 'woocommerce_beta_branch';
+			wooBetaSelect.className = 'form-control';
+			wooBetaSelect.setAttribute('role' , 'search') ;
+			wooBetaSelect.setAttribute('list', 'woocommerce_branches');
+			wooBetaSelect.setAttribute('type', 'text');
+			wooBetaSelect.setAttribute('Placeholder', 'Select a branch to enable');
+			wooBetaSelect.style.display = "none";
+	
+			const datalist = document.createElement('datalist');
+			datalist.id = 'woocommerce_branches';
+			
+			branches.forEach( branch => {
+				const option = document.createElement('option');
+				option.innerHTML = branch.branch;
+				option.value = branch.branch;
+				datalist.appendChild(option);				
+			} );
+			
+			checkboxContainer.appendChild(wooBetaSelect);
+			checkboxContainer.appendChild(datalist);
+			
+			// Toggle display of the select list
+			wooBetaCheckBox.addEventListener('change', function() {
+				if (this.checked) {
+					wooBetaSelect.style.display = "block";
+				} else {
+					wooBetaSelect.style.display = "none";
+				}
+			});
+		}		
+	});
+}
+
+

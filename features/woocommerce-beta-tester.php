@@ -10,6 +10,21 @@ namespace jn;
 define( 'WOOCOMMERCE_BETA_TESTER_PLUGIN_URL', 'https://github.com/woocommerce/woocommerce-beta-tester/archive/refs/heads/trunk.zip' );
 
 add_action(
+	'jurassic_ninja_added_rest_api_endpoints',
+	function () {		
+		add_get_endpoint(
+			'woocommerce-beta-tester/branches',
+			function () {
+				$manifest_url = 'https://betadownload.jetpack.me/woocommerce-branches.json';
+				$manifest = json_decode( wp_remote_retrieve_body( wp_remote_get( $manifest_url ) ) );
+
+				return $manifest;
+			}
+		);
+	}
+);
+
+add_action(
 	'jurassic_ninja_init',
 	function () {
 		$defaults = array(
@@ -23,6 +38,7 @@ add_action(
 				if ( $features['woocommerce-beta-tester'] ) {
 					debug( '%s: Adding WooCommerce Beta Tester Plugin', $domain );
 					add_woocommerce_beta_tester_plugin();
+					// TODO - determine which branch to install
 				}
 			},
 			10,
@@ -46,7 +62,8 @@ add_action(
 			function ( $features, $json_params ) {
 				if ( isset( $json_params['woocommerce-beta-tester'] ) ) {
 					$features['woocommerce-beta-tester'] = $json_params['woocommerce-beta-tester'];
-					// The WooCommerce Beta Tester Plugin works only when woocommerce is installed and active too.
+					
+					// The WooCommerce Beta Tester Plugin works only when WooCommerce is installed and active too.
 					if ( $features['woocommerce-beta-tester'] ) {
 						$features['woocommerce'] = true;
 					}
@@ -88,6 +105,19 @@ add_action(
 function add_woocommerce_beta_tester_plugin() {
 	$woocommerce_beta_tester_plugin_url = WOOCOMMERCE_BETA_TESTER_PLUGIN_URL;
 	$cmd = "wp plugin install $woocommerce_beta_tester_plugin_url --activate";
+	add_filter(
+		'jurassic_ninja_feature_command',
+		function ( $s ) use ( $cmd ) {
+			return "$s && $cmd";
+		}
+	);
+}
+
+/**
+ * Installs and activates a live branch of WooCommerce on the site.
+ */
+function add_woocommerce_live_branch( $url ) {
+	$cmd = "wp plugin install $url --activate";
 	add_filter(
 		'jurassic_ninja_feature_command',
 		function ( $s ) use ( $cmd ) {
