@@ -64,8 +64,8 @@ add_action(
 		add_filter(
 			'jurassic_ninja_rest_create_request_features',
 			function ( $features, $json_params ) {
-				error_log("*** WOOCOMMERCE BETA TESTER ***");
-				error_log( print_r( $json_params, true ) );
+				// error_log("*** WOOCOMMERCE BETA TESTER ***");
+				// error_log( print_r( $json_params, true ) );
 				if ( isset( $json_params['woocommerce-beta-tester'] ) ) {
 					$features['woocommerce-beta-tester'] = $json_params['woocommerce-beta-tester'];					
 					

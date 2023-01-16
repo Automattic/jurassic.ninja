@@ -336,11 +336,11 @@ function getAvailableJetpackBetaPlugins() {
 	return fetch( '/wp-json/jurassic.ninja/jetpack-beta/plugins')
 		.then( response => response.json() )
 		.then( body => {
-			let plugins = Object.keys( body.data ).map( slug => {
-				return Object.assign( { slug: slug }, body.data[slug] );
-			} );
-			plugins.sort( ( a, b ) => a.name.localeCompare( b.name ) );
-			return plugins;
+			// let plugins = Object.keys( body.data ).map( slug => {
+			// 	return Object.assign( { slug: slug }, body.data[slug] );
+			// } );
+			// plugins.sort( ( a, b ) => a.name.localeCompare( b.name ) );
+			return [];
 		} );
 }
 
