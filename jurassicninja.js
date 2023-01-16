@@ -493,15 +493,18 @@ function hookWooCommerceBetaBranches() {
 			wooBetaSelect.setAttribute('list', 'woocommerce_branches');
 			wooBetaSelect.setAttribute('type', 'text');
 			wooBetaSelect.setAttribute('Placeholder', 'Select a branch to enable');
+			wooBetaSelect.setAttribute('data-feature', 'woocommerce-beta-tester-live-branch');
 			wooBetaSelect.style.display = "none";
 	
 			const datalist = document.createElement('datalist');
 			datalist.id = 'woocommerce_branches';
 			
+			console.log(branches);
+
 			branches.forEach( branch => {
 				const option = document.createElement('option');
 				option.innerHTML = branch.branch;
-				option.value = branch.branch;
+				option.value = branch.download_url;
 				datalist.appendChild(option);				
 			} );
 			
