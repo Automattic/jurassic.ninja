@@ -27,6 +27,7 @@ add_action(
 	function () {
 		$defaults = array(
 			'woocommerce-beta-tester' => false,
+			'woocommerce-beta-tester-live-branch' => false
 		);
 
 		add_action(
@@ -37,10 +38,10 @@ add_action(
 					debug( '%s: Adding WooCommerce Beta Tester Plugin', $domain );
 					add_woocommerce_beta_tester_plugin();
 				
-					if ($features['woocommerce-beta-tester-live-branch']) {
+					if ( $features['woocommerce-beta-tester-live-branch'] ) {
 						$branch = $features['woocommerce-beta-tester-live-branch'];
 
-						debug( '%s: Adding WooCommerce Beta Tester Live Branch: %s', $domain, $branch );
+						debug( '%s: Adding WooCommerce Live Branch: %s', $domain, $branch );
 						add_woocommerce_live_branch( $branch );
 					}
 				}
@@ -147,17 +148,17 @@ function get_woocommerce_beta_tester_zip_url() {
  * Retrieve and install the WooCommerce Beta Tester Plugin.
  */
 function add_woocommerce_beta_tester_plugin() {
-	$zipUrl = get_woocommerce_beta_tester_zip_url();
+	$zip_url = get_woocommerce_beta_tester_zip_url();
 	
-	if ( $zipUrl ) {
-		$cmd = "wp plugin install $zipUrl --activate";
+	if ( $zip_url ) {
+		$cmd = "wp plugin install $zip_url --activate";
 		add_filter(
 			'jurassic_ninja_feature_command',
 			function ( $s ) use ( $cmd ) {
 				return "$s && $cmd";
 			}
 		);
-	} else{
+	} else {
 		throw new Exception( 'Could not find WooCommerce Beta Tester plugin zip file.' );
 	}
 }
