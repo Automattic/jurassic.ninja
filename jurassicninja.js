@@ -336,11 +336,11 @@ function getAvailableJetpackBetaPlugins() {
 	return fetch( '/wp-json/jurassic.ninja/jetpack-beta/plugins')
 		.then( response => response.json() )
 		.then( body => {
-			// let plugins = Object.keys( body.data ).map( slug => {
-			// 	return Object.assign( { slug: slug }, body.data[slug] );
-			// } );
-			// plugins.sort( ( a, b ) => a.name.localeCompare( b.name ) );
-			return [];
+			let plugins = Object.keys( body.data ).map( slug => {
+				return Object.assign( { slug: slug }, body.data[slug] );
+			} );
+			plugins.sort( ( a, b ) => a.name.localeCompare( b.name ) );
+			return plugins;
 		} );
 }
 
@@ -498,13 +498,11 @@ function hookWooCommerceBetaBranches() {
 	
 			const datalist = document.createElement('datalist');
 			datalist.id = 'woocommerce_branches';
-			
-			console.log(branches);
 
 			branches.forEach( branch => {
 				const option = document.createElement('option');
 				option.innerHTML = branch.branch;
-				option.value = branch.download_url;
+				option.value = branch.branch;
 				datalist.appendChild(option);				
 			} );
 			

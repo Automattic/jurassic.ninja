@@ -63,9 +63,7 @@ add_action(
 
 		add_filter(
 			'jurassic_ninja_rest_create_request_features',
-			function ( $features, $json_params ) {
-				// error_log("*** WOOCOMMERCE BETA TESTER ***");
-				// error_log( print_r( $json_params, true ) );
+			function ( $features, $json_params ) {				
 				if ( isset( $json_params['woocommerce-beta-tester'] ) ) {
 					$features['woocommerce-beta-tester'] = $json_params['woocommerce-beta-tester'];					
 					
@@ -145,6 +143,9 @@ function get_woocommerce_beta_tester_zip_url() {
 	}
 }
 
+/**
+ * Retrieve and install the WooCommerce Beta Tester Plugin.
+ */
 function add_woocommerce_beta_tester_plugin() {
 	$zipUrl = get_woocommerce_beta_tester_zip_url();
 	
