@@ -66,12 +66,7 @@ add_action(
 			'jurassic_ninja_rest_create_request_features',
 			function ( $features, $json_params ) {				
 				if ( isset( $json_params['woocommerce-beta-tester'] ) ) {
-					$features['woocommerce-beta-tester'] = $json_params['woocommerce-beta-tester'];					
-					
-					// The WooCommerce Beta Tester Plugin works only when WooCommerce is installed and active too.
-					if ( $features['woocommerce-beta-tester'] ) {
-						$features['woocommerce'] = true;
-					}
+					$features['woocommerce-beta-tester'] = $json_params['woocommerce-beta-tester'];
 				}
 
 				if ( isset( $json_params['woocommerce-beta-tester-live-branch'] ) ) {
