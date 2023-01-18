@@ -74,7 +74,7 @@ add_action(
 					}
 				}
 
-				if (isset( $json_params['woocommerce-beta-tester-live-branch'] ) ) {
+				if ( isset( $json_params['woocommerce-beta-tester-live-branch'] ) ) {
 					$features['woocommerce-beta-tester-live-branch'] = $json_params['woocommerce-beta-tester-live-branch'];
 				}
 				
@@ -125,11 +125,11 @@ function get_woocommerce_beta_tester_zip_url() {
 				return strpos( $release['tag_name'], "wc-beta-tester" ) !== false;
 		});
 
-		usort( $releases, function ( $a, $b ) {
+		usort( $filteredReleases, function ( $a, $b ) {
 			return strtotime( $b['created_at'] ) - strtotime( $a['created_at'] );
 		});
 
-		$latestRelease = $releases[0];
+		$latestRelease = $filteredReleases[0];
 
 		$assets = $latestRelease['assets'];
 		$zip = array_filter($assets, function ($asset) {
@@ -167,7 +167,7 @@ function add_woocommerce_beta_tester_plugin() {
  * Installs and activates a live branch of WooCommerce on the site.
  */
 function add_woocommerce_live_branch( $branch_name ) {
-	$cmd = "wp wc-beta-tester install $branch_name && wp wc-beta-tester activate $branch_name";
+	$cmd = "wp wc-beta-tester deactivate_woocommerce && wp wc-beta-tester install $branch_name && wp wc-beta-tester activate $branch_name";
 	
 	add_filter(
 		'jurassic_ninja_feature_command',
