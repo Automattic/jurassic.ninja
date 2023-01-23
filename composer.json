@@ -5,7 +5,7 @@
 		"php": "~7.1 || 8.*"
 	},
 	"require-dev": {
-		"automattic/jetpack-codesniffer": "^2.0",
+		"automattic/jetpack-codesniffer": "2.6.0",
 		"brain/monkey": "^2.6",
 		"dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
 		"phpunit/phpunit": "7.* || 8.*",
