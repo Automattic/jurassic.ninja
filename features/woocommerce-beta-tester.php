@@ -9,7 +9,7 @@ namespace jn;
 
 add_action(
 	'jurassic_ninja_added_rest_api_endpoints',
-	function () {		
+	function () {
 		add_get_endpoint(
 			'woocommerce-beta-tester/branches',
 			function () {
@@ -27,7 +27,7 @@ add_action(
 	function () {
 		$defaults = array(
 			'woocommerce-beta-tester' => false,
-			'woocommerce-beta-tester-live-branch' => false
+			'woocommerce-beta-tester-live-branch' => false,
 		);
 
 		add_action(
@@ -37,7 +37,7 @@ add_action(
 				if ( $features['woocommerce-beta-tester'] ) {
 					debug( '%s: Adding WooCommerce Beta Tester Plugin', $domain );
 					add_woocommerce_beta_tester_plugin();
-				
+
 					if ( $features['woocommerce-beta-tester-live-branch'] ) {
 						$branch = $features['woocommerce-beta-tester-live-branch'];
 
@@ -64,7 +64,7 @@ add_action(
 
 		add_filter(
 			'jurassic_ninja_rest_create_request_features',
-			function ( $features, $json_params ) {				
+			function ( $features, $json_params ) {
 				if ( isset( $json_params['woocommerce-beta-tester'] ) ) {
 					$features['woocommerce-beta-tester'] = $json_params['woocommerce-beta-tester'];
 				}
@@ -72,7 +72,7 @@ add_action(
 				if ( isset( $json_params['woocommerce-beta-tester-live-branch'] ) ) {
 					$features['woocommerce-beta-tester-live-branch'] = $json_params['woocommerce-beta-tester-live-branch'];
 				}
-				
+
 				return $features;
 			},
 			10,
@@ -111,27 +111,36 @@ function get_woocommerce_beta_tester_zip_url() {
 	$url = 'https://api.github.com/repos/woocommerce/woocommerce/releases';
 	$response = wp_remote_get( $url );
 
-	if( is_wp_error( $response ) ) {
+	if ( is_wp_error( $response ) ) {
 			return false;
 	} else {
 		$releases = json_decode( wp_remote_retrieve_body( $response ), true );
 
-		$filteredReleases = array_filter($releases, function ($release) {
-				return strpos( $release['tag_name'], "wc-beta-tester" ) !== false;
-		});
+		$filtered_releases = array_filter(
+			$releases,
+			function ( $release ) {
+				return strpos( $release['tag_name'], 'wc-beta-tester' ) !== false;
+			}
+		);
 
-		usort( $filteredReleases, function ( $a, $b ) {
-			return strtotime( $b['created_at'] ) - strtotime( $a['created_at'] );
-		});
+		usort(
+			$filtered_releases,
+			function ( $a, $b ) {
+				return strtotime( $b['created_at'] ) - strtotime( $a['created_at'] );
+			}
+		);
 
-		$latestRelease = $filteredReleases[0];
+		$latest_release = $filtered_releases[0];
 
-		$assets = $latestRelease['assets'];
-		$zip = array_filter($assets, function ($asset) {
-			return strpos( $asset['name'], "zip" ) !== false;
-		});
+		$assets = $latest_release['assets'];
+		$zip = array_filter(
+			$assets,
+			function ( $asset ) {
+				return strpos( $asset['name'], 'zip' ) !== false;
+			}
+		);
 
-		if ( count($zip) > 0 ) {
+		if ( count( $zip ) > 0 ) {
 			return $zip[0]['browser_download_url'];
 		} else {
 			return false;
@@ -141,10 +150,12 @@ function get_woocommerce_beta_tester_zip_url() {
 
 /**
  * Retrieve and install the WooCommerce Beta Tester Plugin.
+ *
+ * @throws Exception If the plugin zip file cannot be found.
  */
 function add_woocommerce_beta_tester_plugin() {
 	$zip_url = get_woocommerce_beta_tester_zip_url();
-	
+
 	if ( $zip_url ) {
 		$cmd = "wp plugin install $zip_url --activate";
 		add_filter(
@@ -160,10 +171,12 @@ function add_woocommerce_beta_tester_plugin() {
 
 /**
  * Installs and activates a live branch of WooCommerce on the site.
+ *
+ * @param string $branch_name The name of the branch to install.
  */
 function add_woocommerce_live_branch( $branch_name ) {
 	$cmd = "wp wc-beta-tester deactivate_woocommerce && wp wc-beta-tester install $branch_name && wp wc-beta-tester activate $branch_name";
-	
+
 	add_filter(
 		'jurassic_ninja_feature_command',
 		function ( $s ) use ( $cmd ) {
