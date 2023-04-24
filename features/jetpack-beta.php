@@ -49,10 +49,10 @@ add_action(
 		);
 
 		add_get_endpoint(
-			'jetpack-beta/branches/(?P<repo>[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+)/(?P<branch>.+)'
+			'jetpack-beta/branches/(?P<repo>[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+)/(?P<branch>.+)',
 			function ( $data ) {
 				$url = 'https://betadownload.jetpack.me/query-branch.php?repo=' . rawurlencode( $data['repo'] ) . '&branch=' . rawurlencode( $data['branch'] );
-				$manifest = json_decode( wp_remote_retrieve_body( wp_remote_get( $manifest_url ) ) );
+				$manifest = json_decode( wp_remote_retrieve_body( wp_remote_get( $url ) ) );
 				$output = $manifest;
 				return $output;
 			}
