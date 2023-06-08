@@ -94,7 +94,7 @@ function add_woocommerce_payments_release_plugin( $release_tag ) {
  * Installs and activates the WooCommerce Payments Dev Tools plugin on the site.
  */
 function add_woocommerce_payments_dev_tools() {
-	$woocommerce_payments_dev_tools_plugin_url = 'https://github.com/Automattic/woocommerce-payments-dev-tools-ci/archive/trunk.zip';
+	$woocommerce_payments_dev_tools_plugin_url = 'https://github.com/Automattic/woocommerce-payments-dev-tools-ci/releases/latest/download/woocommerce-payments-dev-tools-trunk.zip';
 	// We install the trunk version of the plugin.
 	$cmd = "wp plugin install $woocommerce_payments_dev_tools_plugin_url --activate";
 
