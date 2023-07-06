@@ -324,11 +324,19 @@ function getAvailableWooCommerceBetaBranches() {
 	return fetch( '/wp-json/jurassic.ninja/woocommerce-beta-tester/branches' )
 		.then( response => response.json() )
 		.then( body => {
-			if (body.data && body.data.pr) {
-				return Object.values(body.data.pr).sort((a, b) => a.branch.localeCompare(b.branch));
+			if ( !body.data ) {
+				return [];
 			}
 
-			return [];
+			let branches = [];
+			if ( body.data.pr ) {
+				branches = Object.values(body.data.pr);
+			}
+			if ( body.data.master ) {
+				branches.push( body.data.master );
+			}
+			
+			return branches.sort((a, b) => a.branch.localeCompare(b.branch));
 		} );
 }
 
