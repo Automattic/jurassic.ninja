@@ -20,6 +20,7 @@ define( 'SETTINGS_KEY', 'jurassic-ninja-settings' );
  */
 function available_php_versions() {
 	return array(
+		'8.2' => __( '8.2', 'jurassic-ninja' ),
 		'8.1' => __( '8.1', 'jurassic-ninja' ),
 		'8.0' => __( '8.0', 'jurassic-ninja' ),
 		'7.4' => __( '7.4', 'jurassic-ninja' ),
