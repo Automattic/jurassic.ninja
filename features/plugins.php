@@ -32,6 +32,7 @@ add_action(
 			'jetpack-videopress'    => 'Jetpack VideoPress',
 			'zero-bs-crm'           => 'Jetpack CRM',
 			'mailpoet'              => 'Mailpoet',
+			'user-switching'        => 'User Switching',
 			'vaultpress'            => 'VaultPress',
 			'woocommerce-payments'  => 'WooCommerce Payments',
 			'woocommerce'           => 'WooCommerce',
@@ -82,6 +83,7 @@ add_action(
 						'gutenberg' => (bool) settings( 'add_gutenberg_by_default', false ),
 						'jetpack' => (bool) settings( 'add_jetpack_by_default', true ),
 						'woocommerce' => (bool) settings( 'add_woocommerce_by_default', false ),
+						'user-switching' => (bool) settings( 'add_userswitching_by_default', false ),
 					)
 				);
 			}
@@ -148,6 +150,13 @@ add_action(
 							'id' => 'add_woocommerce_by_default',
 							'title' => __( 'Add WooCommerce to every launched WordPress', 'jurassic-ninja' ),
 							'text' => __( 'Install and activate WooCommerce on launch', 'jurassic-ninja' ),
+							'type' => 'checkbox',
+							'checked' => false,
+						),
+						'add_userswitching_by_default' => array(
+							'id' => 'add_userswitching_by_default',
+							'title' => __( 'Add User Switching to every launched WordPress', 'jurassic-ninja' ),
+							'text' => __( 'Install and activate User Switching on launch', 'jurassic-ninja' ),
 							'type' => 'checkbox',
 							'checked' => false,
 						),

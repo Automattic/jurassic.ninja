@@ -103,6 +103,22 @@ function stop_pingomatic() {
 }
 
 /**
+ * Adds other users.
+ */
+function add_other_users() {
+	$cmd = 'wp user create editor editor@example.com --role=editor'
+			. ' && wp user create author author@example.com --role=author'
+			. ' && wp user create contributor contributor@example.com --role=contributor'
+			. ' %% wp user create subscriber subscriber@example.com --role=subscriber';
+	add_filter(
+		'jurassic_ninja_feature_command',
+		function ( $s ) use ( $cmd ) {
+			return "$s && $cmd";
+		}
+	);
+}
+
+/**
  * Just loops through a filtered array of files inside the features directory and requires them
  */
 function require_feature_files() {
@@ -246,6 +262,8 @@ function launch_wordpress( $php_version = 'default', $requested_features = array
 			// the person that launched it reaches the site, thus the site is locked for them.
 			debug( '%s: Stopping pings to Ping-O-Mattic', $app->domain );
 			stop_pingomatic();
+
+			add_other_users();
 
 			debug( '%s: Adding Companion Plugin for Auto Login', $app->domain );
 			add_auto_login( $app->password, $app->username );
