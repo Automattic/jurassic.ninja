@@ -263,6 +263,7 @@ function launch_wordpress( $php_version = 'default', $requested_features = array
 			debug( '%s: Stopping pings to Ping-O-Mattic', $app->domain );
 			stop_pingomatic();
 
+			debug( '%s: Adding additional users', $app->domain );
 			add_other_users();
 
 			debug( '%s: Adding Companion Plugin for Auto Login', $app->domain );
