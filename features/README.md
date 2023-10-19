@@ -12,7 +12,7 @@ Some features are:
 
 - Enabling of SSL. (`ssl.php`).
 - Addition of plugins. (`plugins.php`)
-- Addition of plugins from github. ('woocommerce-beta-tester.php')
+- Addition of plugins from github. (`woocommerce-beta-tester.php`)
 - Setting of wp-config constants like WP_DEBUG and WP_DEBUG_LOG. (`wp-debug-log.php`)
 - Launching multisite installations instead of single site(`multisite.php`)
 
