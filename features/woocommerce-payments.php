@@ -91,12 +91,45 @@ function add_woocommerce_payments_release_plugin( $release_tag ) {
 }
 
 /**
+ * Gets the zip link for the WooCommerce Payments Dev Tools plugin from the private GitHub repo.
+ *
+ * @return string|null The zip link. Null if it can not be retrieved.
+ */
+function get_private_wcpay_dev_tools_zipball_link(): ?string{
+	$response = wp_remote_head(
+		'https://api.github.com/repos/Automattic/woocommerce-payments-dev-tools-ci/zipball/trunk',
+		array(
+			'headers' => array(
+				'Authorization' => 'Bearer ' . settings( 'wcpay_dev_tools_github_token', '' ),
+			),
+		)
+	);
+
+	$status      = wp_remote_retrieve_response_code( $response );
+	$location    = wp_remote_retrieve_header( $response, 'location' );
+
+	if ( 302 === $status
+		&& is_string( $location ) &&
+		wp_http_validate_url ( $location )
+	) {
+		return $location;
+	}
+
+	push_error( new \WP_Error(
+		'wcpay_dev_tools_private_repo',
+		__('Can not retrieve the WooCommerce Payments Dev Tools private repo. The GitHub fined-grain token may be invalid.', 'jurassic-ninja' )
+	) );
+	return null;
+}
+/**
  * Installs and activates the WooCommerce Payments Dev Tools plugin on the site.
  */
 function add_woocommerce_payments_dev_tools() {
-	$woocommerce_payments_dev_tools_plugin_url = 'https://github.com/Automattic/woocommerce-payments-dev-tools-ci/releases/latest/download/woocommerce-payments-dev-tools-trunk.zip';
-	// We install the trunk version of the plugin.
-	$cmd = "wp plugin install $woocommerce_payments_dev_tools_plugin_url --activate";
+	$private_repo_url = get_private_wcpay_dev_tools_zipball_link();
+	$public_repo_url  = 'https://github.com/Automattic/woocommerce-payments-dev-tools-ci/releases/latest/download/woocommerce-payments-dev-tools-trunk.zip';
+
+	$install_url = $private_repo_url ?? $public_repo_url;
+	$cmd         = "wp plugin install $install_url --activate";
 
 	add_filter(
 		'jurassic_ninja_feature_command',

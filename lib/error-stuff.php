@@ -88,7 +88,7 @@ function errors() {
 /**
  * Push an error to the stack of errors that will be shown on the admin notices
  *
- * @param  WP_Error $err An error to be shown in the admin notice.
+ * @param \WP_Error $err An error to be shown in the admin notice.
  */
 function push_error( $err ) {
 	global $jurassic_ninja_errors;

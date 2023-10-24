@@ -139,6 +139,12 @@ add_action(
 							'text' => __( 'Licensing API OAuth2 token to provision Jetpack products with. Leave blank to disable.', 'jurassic-ninja' ),
 							'sanitize' => false,
 						),
+						'wcpay_dev_tools_github_token' => array(
+							'id' => 'wcpay_dev_tools_github_token',
+							'title' => __( 'GitHub Token for WooPayments Dev Tool Private Repo', 'jurassic-ninja' ),
+							'text' => __( 'Set a fined-grain GitHub token with read-only access to retrieve the latest commit from the repo directly.', 'jurassic-ninja' ),
+							'sanitize' => false,
+						),
 						'add_gutenberg_by_default' => array(
 							'id' => 'add_gutenberg_by_default',
 							'title' => __( 'Add Gutenberg to every launched WordPress', 'jurassic-ninja' ),
