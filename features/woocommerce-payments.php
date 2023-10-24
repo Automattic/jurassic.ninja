@@ -95,7 +95,7 @@ function add_woocommerce_payments_release_plugin( $release_tag ) {
  *
  * @return string|null The zip link. Null if it can not be retrieved.
  */
-function get_private_wcpay_dev_tools_zipball_link(): ?string{
+function get_private_wcpay_dev_tools_zipball_link(): ?string {
 	$response = wp_remote_head(
 		'https://api.github.com/repos/Automattic/woocommerce-payments-dev-tools-ci/zipball/trunk',
 		array(
@@ -110,15 +110,17 @@ function get_private_wcpay_dev_tools_zipball_link(): ?string{
 
 	if ( 302 === $status
 		&& is_string( $location ) &&
-		wp_http_validate_url ( $location )
+		wp_http_validate_url( $location )
 	) {
 		return $location;
 	}
 
-	push_error( new \WP_Error(
-		'wcpay_dev_tools_private_repo',
-		__('Can not retrieve the WooCommerce Payments Dev Tools private repo. The GitHub fined-grain token may be invalid.', 'jurassic-ninja' )
-	) );
+	push_error(
+		new \WP_Error(
+			'wcpay_dev_tools_private_repo',
+			__( 'Can not retrieve the WooCommerce Payments Dev Tools private repo. The GitHub fined-grain token may be invalid.', 'jurassic-ninja' )
+		)
+	);
 	return null;
 }
 /**
