@@ -615,7 +615,7 @@ function create_php_app( $php_version, $features, $spare = false ) {
 	$db = provisioner()->create_database( $app->id, $dbname, $dbusername, $dbpassword );
 
 	if ( is_wp_error( $db ) ) {
-		throw new \Exception( 'Error creating database for app: ' . $app->get_error_message() );
+		throw new \Exception( 'Error creating database for app: ' . $db->get_error_message() );
 	}
 	if ( $spare ) {
 		log_new_unused_site( $app, $password, $features['shortlife'], is_user_logged_in() ? wp_get_current_user() : '' );
