@@ -124,9 +124,9 @@ function add_other_users() {
 function require_feature_files() {
 	$available_features = array(
 		'/features/logged-in-user-email-address.php',
-		'/features/content.php',
 		'/features/multisite.php',
 		'/features/ssl.php',
+		'/features/content.php',
 		'/features/plugins.php',
 		'/features/jetpack-licensing.php',
 		'/features/jetpack-beta.php',
