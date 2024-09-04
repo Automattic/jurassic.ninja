@@ -109,7 +109,7 @@ function add_other_users() {
 	$cmd = 'wp user create editor editor@example.com --role=editor'
 			. ' && wp user create author author@example.com --role=author'
 			. ' && wp user create contributor contributor@example.com --role=contributor'
-			. ' %% wp user create subscriber subscriber@example.com --role=subscriber';
+			. ' && wp user create subscriber subscriber@example.com --role=subscriber';
 	add_filter(
 		'jurassic_ninja_feature_command',
 		function ( $s ) use ( $cmd ) {
