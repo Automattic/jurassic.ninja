@@ -22,6 +22,7 @@ add_action(
 			'code-snippets'         => 'Code Snippets',
 			'config-constants'      => 'Config Constants',
 			'crowdsignal'           => 'Crowdsignal',
+			'gravatar-enhanced'     => 'Gravatar Enhanced',
 			'gutenberg'             => 'Gutenberg',
 			'jetpack'               => 'Jetpack',
 			'jetpack-backup'        => 'Jetpack Backup',
@@ -40,7 +41,6 @@ add_action(
 			'wp-downgrade'          => 'WP Downgrade',
 			'wp-job-manager'        => 'WP Job Manager',
 			'wp-rollback'           => 'WP Rollback',
-			'wp-super-cache'        => 'WP Super Cache',
 		);
 		// Set all defaults to false.
 		// Will probably add a filter here.
